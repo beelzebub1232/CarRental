@@ -923,10 +923,16 @@ function initProgressiveEnhancement() {
         });
     }
     
-    // Service worker registration for offline support
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(console.error);
-    }
+    // Service worker registration removed as not needed
+    // if ('serviceWorker' in navigator) {
+    //   navigator.serviceWorker.register('/sw.js')
+    //     .then(function(registration) {
+    //       // Registration successful
+    //     })
+    //     .catch(function(error) {
+    //       // Registration failed
+    //     });
+    // }
 }
 
 function removeInitialLoadingStates() {

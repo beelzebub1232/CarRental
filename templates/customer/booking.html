@@ -164,7 +164,8 @@
                             </div>
                         </div>
                         
-                        <div id="map" class="booking-map"></div>
+                        <!-- Map container in the HTML -->
+                        <div id="map" class="booking-map" style="height: 300px; border-radius: 1rem; margin-bottom: 1.5rem;"></div>
                         
                         <!-- Selected Vehicle Preview -->
                         <div id="vehicle-preview" class="vehicle-preview hidden">
@@ -603,6 +604,46 @@
     </style>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var mapContainer = document.getElementById('map');
+    if (mapContainer && typeof L !== 'undefined' && !mapContainer._leaflet_id) {
+      var defaultLat = 10.0270;
+      var defaultLng = 76.3083;
+      var map = L.map('map', { attributionControl: false }).setView([defaultLat, defaultLng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '',
+      }).addTo(map);
+      var pickupMarker = null;
+      function setPickupMarker(lat, lng, popupText) {
+        if (pickupMarker) map.removeLayer(pickupMarker);
+        pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup(popupText || 'Pickup Location').openPopup();
+        let bookingForm = document.getElementById('booking-form');
+        let latInput = document.getElementById('pickup_lat');
+        let lngInput = document.getElementById('pickup_lng');
+        if (!latInput) {
+          latInput = document.createElement('input');
+          latInput.type = 'hidden';
+          latInput.id = 'pickup_lat';
+          latInput.name = 'pickup_lat';
+          bookingForm.appendChild(latInput);
+        }
+        if (!lngInput) {
+          lngInput = document.createElement('input');
+          lngInput.type = 'hidden';
+          lngInput.id = 'pickup_lng';
+          lngInput.name = 'pickup_lng';
+          bookingForm.appendChild(lngInput);
+        }
+        latInput.value = lat;
+        lngInput.value = lng;
+      }
+      map.on('click', function(e) {
+        setPickupMarker(e.latlng.lat, e.latlng.lng, 'Pickup Location');
+      });
+    }
+  });
+</script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
         // Initialize map
@@ -738,28 +779,6 @@
                 );
             }
         });
-
-        // Add feedback div above the booking form
-        const bookingForm = document.getElementById('booking-form');
-        let feedbackDiv = document.getElementById('booking-feedback');
-        if (!feedbackDiv) {
-            feedbackDiv = document.createElement('div');
-            feedbackDiv.id = 'booking-feedback';
-            feedbackDiv.style.marginBottom = '1rem';
-            bookingForm.parentNode.insertBefore(feedbackDiv, bookingForm);
-        }
-
-        // Helper to show feedback
-        function showBookingFeedback(message, type = 'info') {
-            feedbackDiv.textContent = message;
-            feedbackDiv.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
-            feedbackDiv.style.display = 'block';
-        }
-        function clearBookingFeedback() {
-            feedbackDiv.textContent = '';
-            feedbackDiv.className = '';
-            feedbackDiv.style.display = 'none';
-        }
 
         // Update price calculation function
         function calculatePrice() {

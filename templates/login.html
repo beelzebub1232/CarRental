@@ -345,7 +345,8 @@
                 <button class="auth-tab" data-tab="register" type="button">Register</button>
             </div>
             <div id="login-tab" class="auth-content active">
-                <form method="POST" action="{{ url_for('login') }}" class="auth-form" novalidate autocomplete="on">
+                <div id="login-message" tabindex="-1" style="outline: none; display: none;" aria-live="polite"></div>
+                <form id="login-form" method="POST" action="{{ url_for('login') }}" class="auth-form" novalidate autocomplete="on">
                     <div class="form-group">
                         <input type="email" id="login-email" name="email" class="form-input" placeholder=" " required autocomplete="email">
                         <label for="login-email" class="form-label">Email Address</label>
