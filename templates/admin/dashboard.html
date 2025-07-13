@@ -365,19 +365,9 @@
                 });
             })
             .catch(error => {
-                // Fallback: populate with example data
+                // Show error if vehicle list cannot be loaded
                 const select = document.getElementById('sim-vehicle');
-                const examples = [
-                    {id: 1, text: 'Toyota Camry (2023)'},
-                    {id: 2, text: 'Honda CR-V (2023)'},
-                    {id: 3, text: 'BMW X5 (2023)'}
-                ];
-                examples.forEach(ex => {
-                    const option = document.createElement('option');
-                    option.value = ex.id;
-                    option.textContent = ex.text;
-                    select.appendChild(option);
-                });
+                select.innerHTML = '<option value="">Unable to load vehicles</option>';
             });
 
         // Price simulator form handler

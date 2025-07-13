@@ -993,5 +993,16 @@ def export_vehicles():
     output = si.getvalue()
     return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=vehicles.csv"})
 
+@app.route('/api/vehicle_types', methods=['GET'])
+def api_vehicle_types():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT type FROM vehicles ORDER BY type")
+    types = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return jsonify({'types': types})
+
 if __name__ == '__main__':
     app.run(debug=DEBUG)
