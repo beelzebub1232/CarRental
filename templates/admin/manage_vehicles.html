@@ -3,65 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Vehicles - Premium Car Rentals</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Manage Vehicles - DriveEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">Premium Car Rentals Admin</div>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ url_for('admin_manage_vehicles') }}">Vehicles</a></li>
-                <li><a href="{{ url_for('admin_reports') }}">Reports</a></li>
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            </ul>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Admin Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
-
-    <main class="container" style="padding: 2rem 0;">
-        <div class="card mb-5">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1 class="card-title">Vehicle Management</h1>
-                    <p style="color: #6b7280;">Manage your fleet and pricing settings.</p>
-                </div>
+    <main class="main-content">
+        <div class="page-header" style="margin-bottom: 2rem;">
+            <div>
+                <h1 class="page-title">Vehicle Management</h1>
+                <p class="page-subtitle">Manage your fleet and pricing settings.</p>
+            </div>
+            <div>
                 <button class="btn btn-primary" onclick="showAddVehicleModal()">
-                    Add New Vehicle
+                    + Add New Vehicle
                 </button>
             </div>
         </div>
 
-        <!-- Vehicles Grid -->
-        <div class="grid grid-3">
+        {% if vehicles %}
+        <div class="vehicles-grid">
             {% for vehicle in vehicles %}
             <div class="vehicle-card">
-                <img src="{{ vehicle.image_url }}" alt="{{ vehicle.make }} {{ vehicle.model }}" class="vehicle-image">
+                <div class="vehicle-image-wrap">
+                    <img src="{{ vehicle.image_url }}" alt="{{ vehicle.make }} {{ vehicle.model }}" class="vehicle-image">
+                </div>
                 <div class="vehicle-info">
-                    <h3 class="vehicle-title">{{ vehicle.make }} {{ vehicle.model }}</h3>
-                    <p class="vehicle-type">{{ vehicle.year }} {{ vehicle.type }}</p>
-                    <div class="vehicle-price">${{ "%.2f"|format(vehicle.base_price) }}/hour</div>
-                    
-                    <div style="margin: 1rem 0;">
+                    <div class="vehicle-header">
+                        <h3 class="vehicle-title">{{ vehicle.make }} {{ vehicle.model }}</h3>
+                        <span class="vehicle-year">{{ vehicle.year }}</span>
+                    </div>
+                    <div class="vehicle-type">{{ vehicle.type }}</div>
+                    <div class="vehicle-price">₹{{ "%.2f"|format(vehicle.base_price) }}/hour</div>
+                    <div class="vehicle-status">
                         <span class="status-badge {{ 'status-approved' if vehicle.availability else 'status-rejected' }}">
                             {{ 'Available' if vehicle.availability else 'Unavailable' }}
                         </span>
                     </div>
-                    
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem;" 
-                                onclick="editVehicle({{ vehicle.id }})">
-                            Edit
-                        </button>
-                        <button class="btn btn-danger" style="flex: 1; padding: 0.5rem;" 
-                                onclick="deleteVehicle({{ vehicle.id }})">
-                            Delete
-                        </button>
-                    </div>
-                    
-                    <div style="margin-top: 0.5rem;">
-                        <button class="btn {{ 'btn-danger' if vehicle.availability else 'btn-primary' }}" 
-                                style="width: 100%; padding: 0.5rem; font-size: 0.875rem;"
+                    <div class="vehicle-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editVehicle({{ vehicle.id }})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteVehicle({{ vehicle.id }})">Delete</button>
+                        <button class="btn btn-sm {{ 'btn-danger' if vehicle.availability else 'btn-primary' }}" 
                                 onclick="toggleAvailability({{ vehicle.id }}, {{ vehicle.availability|lower }})">
                             {{ 'Mark Unavailable' if vehicle.availability else 'Mark Available' }}
                         </button>
@@ -70,8 +74,7 @@
             </div>
             {% endfor %}
         </div>
-
-        {% if not vehicles %}
+        {% else %}
         <div class="card text-center">
             <h2>No Vehicles Found</h2>
             <p style="color: #6b7280;">Start building your fleet by adding your first vehicle.</p>
@@ -81,6 +84,102 @@
         </div>
         {% endif %}
     </main>
+
+    <style>
+    .vehicles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: var(--space-8);
+        margin-bottom: var(--space-8);
+    }
+    .vehicle-card {
+        background: var(--primary-50);
+        border-radius: var(--radius-3xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--neutral-200);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: box-shadow 0.2s, transform 0.2s;
+        min-width: 0;
+    }
+    .vehicle-card:hover {
+        box-shadow: var(--shadow-2xl);
+        transform: translateY(-4px) scale(1.01);
+    }
+    .vehicle-image-wrap {
+        width: 100%;
+        height: 180px;
+        background: var(--neutral-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .vehicle-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .vehicle-info {
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    .vehicle-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-2);
+    }
+    .vehicle-title {
+        font-size: var(--text-xl);
+        font-weight: 800;
+        color: var(--neutral-900);
+        margin-bottom: 0;
+    }
+    .vehicle-year {
+        background: var(--neutral-100);
+        color: var(--neutral-600);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+    .vehicle-type {
+        color: var(--neutral-600);
+        font-size: var(--text-base);
+        font-weight: 500;
+    }
+    .vehicle-price {
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--accent-main);
+    }
+    .vehicle-status {
+        margin: var(--space-2) 0;
+    }
+    .vehicle-actions {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+    .vehicle-actions .btn {
+        flex: 1 1 40%;
+        min-width: 100px;
+        font-size: var(--text-sm);
+        padding: var(--space-2) var(--space-3);
+    }
+    @media (max-width: 768px) {
+        .vehicles-grid {
+            grid-template-columns: 1fr;
+        }
+        .vehicle-info {
+            padding: var(--space-4);
+        }
+    }
+    </style>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>

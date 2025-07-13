@@ -69,7 +69,7 @@
                                             data-lng="{{ vehicle.pickup_location_lng }}"
                                             data-image="{{ vehicle.image_url }}"
                                             data-type="{{ vehicle.type }}">
-                                        {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }}) - ${{ "%.2f"|format(vehicle.base_price) }}/hour
+                                        {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }}) - ₹{{ "%.2f"|format(vehicle.base_price) }}/hour
                                     </option>
                                     {% endfor %}
                                 </select>
@@ -223,7 +223,7 @@
                                 </div>
                             </div>
                             <div class="vehicle-price">
-                                <span class="price-amount">${{ "%.2f"|format(vehicle.base_price) }}</span>
+                                <span class="price-amount">₹{{ "%.2f"|format(vehicle.base_price) }}</span>
                                 <span class="price-unit">/hour</span>
                             </div>
                         </div>
@@ -599,7 +599,7 @@
                         <div style="text-align: center;">
                             <strong>${vehicle.make} ${vehicle.model}</strong><br>
                             ${vehicle.year} ${vehicle.type}<br>
-                            <strong>$${vehicle.base_price}/hour</strong>
+                            <strong>₹${vehicle.base_price}/hour</strong>
                         </div>
                     `)
                     .openPopup();
@@ -619,7 +619,7 @@
             img.alt = `${vehicle.make} ${vehicle.model}`;
             name.textContent = `${vehicle.make} ${vehicle.model}`;
             type.textContent = `${vehicle.year} ${vehicle.type}`;
-            price.textContent = `$${vehicle.base_price}/hour`;
+            price.textContent = `₹${vehicle.base_price}/hour`;
             
             preview.classList.remove('hidden');
         }
@@ -725,7 +725,7 @@
                     const hours = Math.ceil((end - start) / (1000 * 60 * 60));
                     
                     priceDisplay.innerHTML = `
-                        <div class="price-amount">$${data.price.toFixed(2)}</div>
+                        <div class="price-amount">₹${data.price.toFixed(2)}</div>
                         <div class="price-details">
                             Total for ${hours} hour${hours !== 1 ? 's' : ''}
                             <br>

@@ -82,15 +82,16 @@
                 <div class="metric-card">
                     <div class="metric-header">
                         <div class="metric-icon">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <line x1="12" y1="1" x2="12" y2="23"/>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            <svg class="icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" width="40" height="40">
+                                <g>
+                                    <text x="7" y="26" font-size="28" font-family="Arial Black, Arial, sans-serif" font-weight="bold" fill="currentColor" stroke="none">₹</text>
+                                </g>
                             </svg>
                         </div>
                     </div>
                     {% set completed_bookings = recent_bookings|selectattr('status', 'equalto', 'completed')|list %}
                     {% set total_spent = completed_bookings|sum(attribute='total_price') if completed_bookings else 0 %}
-                    <div class="metric-value">${{ "%.0f"|format(total_spent) }}</div>
+                    <div class="metric-value">₹{{ "%.0f"|format(total_spent) }}</div>
                     <div class="metric-label">Total Spent</div>
                 </div>
 
@@ -138,7 +139,7 @@
                                 <div class="booking-details">
                                     <div class="booking-vehicle">{{ booking.make }} {{ booking.model }}</div>
                                     <div class="booking-date">{{ booking.start_date.strftime('%b %d, %Y') }}</div>
-                                    <div class="booking-price">${{ "%.2f"|format(booking.total_price) }}</div>
+                                    <div class="booking-price">₹{{ "%.2f"|format(booking.total_price) }}</div>
                                 </div>
                                 <div class="booking-status">
                                     <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
@@ -172,7 +173,7 @@
                         <div class="tokens-grid">
                             {% for token in loyalty_tokens[:4] %}
                             <div class="token-card">
-                                <div class="token-value">${{ "%.2f"|format(token.token_value) }}</div>
+                                <div class="token-value">₹{{ "%.2f"|format(token.token_value) }}</div>
                                 <div class="token-expiry">
                                     {% if token.expiry_date %}
                                         Expires {{ token.expiry_date.strftime('%m/%d/%Y') }}

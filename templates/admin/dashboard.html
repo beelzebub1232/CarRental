@@ -92,7 +92,7 @@
                             </svg>
                         </div>
                     </div>
-                    <div class="stat-value">${{ "%.0f"|format(total_revenue) }}</div>
+                    <div class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</div>
                     <div class="stat-label">Total Revenue</div>
                 </div>
             </div>
@@ -200,7 +200,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="total-price">${{ "%.2f"|format(booking.total_price) }}</div>
+                                        <div class="total-price">₹{{ "%.2f"|format(booking.total_price) }}</div>
                                     </td>
                                     <td>
                                         <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
@@ -384,7 +384,7 @@
                     resultDiv.className = 'simulation-result show success';
                     resultDiv.innerHTML = `
                         <div style="font-size: var(--text-2xl); font-weight: 700; margin-bottom: var(--space-2);">
-                            $${result.simulated_price}
+                            ₹${result.simulated_price}
                         </div>
                         <div>Simulated price includes all dynamic pricing adjustments</div>
                     `;

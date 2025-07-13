@@ -125,7 +125,7 @@ function displayPrice(container, price, startDate, endDate) {
     
     container.innerHTML = `
         <div class="pricing-display" style="opacity: 0; transform: translateY(20px);">
-            <div class="price-amount">$${price.toFixed(2)}</div>
+            <div class="price-amount">₹${price.toFixed(2)}</div>
             <div class="price-details">
                 Total for ${hours} hour${hours !== 1 ? 's' : ''}
                 <br>
@@ -330,7 +330,7 @@ async function handlePriceSimulation(event) {
                     <div style="display: flex; align-items: center; gap: 1rem;">
                         <div style="font-size: 2rem;">💰</div>
                         <div>
-                            <strong>Simulated Price: $${result.simulated_price}</strong>
+                            <strong>Simulated Price: ₹${result.simulated_price}</strong>
                             <br>
                             <small>This includes all dynamic pricing adjustments</small>
                         </div>
@@ -808,9 +808,9 @@ function throttle(func, limit) {
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'INR'
     }).format(amount);
 }
 

@@ -84,7 +84,7 @@
                     {% if completed_bookings %}
                         {% set total_spent = completed_bookings|sum(attribute='total_price') %}
                         <div class="total-spent">
-                            <div class="spent-amount">${{ "%.2f"|format(total_spent) }}</div>
+                            <div class="spent-amount">₹{{ "%.2f"|format(total_spent) }}</div>
                             <div class="spent-label">Total Spent</div>
                         </div>
                     {% endif %}
@@ -101,7 +101,7 @@
                         {% for token in loyalty_tokens %}
                         <div class="loyalty-token-card {{ 'redeemed' if token.is_redeemed else 'available' }}">
                             <div class="token-header">
-                                <div class="token-value">${{ "%.2f"|format(token.token_value) }}</div>
+                                <div class="token-value">₹{{ "%.2f"|format(token.token_value) }}</div>
                                 <div class="token-status">
                                     {% if token.is_redeemed %}
                                         <span class="status-badge status-completed">Redeemed</span>
@@ -171,12 +171,12 @@
                                     </td>
                                     <td>
                                         <div class="pricing-info">
-                                            <div class="total-price">${{ "%.2f"|format(booking.total_price) }}</div>
+                                            <div class="total-price">₹{{ "%.2f"|format(booking.total_price) }}</div>
                                             {% if booking.discount_applied > 0 %}
-                                            <div class="discount-applied">-${{ "%.2f"|format(booking.discount_applied) }} discount</div>
+                                            <div class="discount-applied">-₹{{ "%.2f"|format(booking.discount_applied) }} discount</div>
                                             {% endif %}
                                             {% if booking.loyalty_token_used > 0 %}
-                                            <div class="loyalty-used">-${{ "%.2f"|format(booking.loyalty_token_used) }} loyalty</div>
+                                            <div class="loyalty-used">-₹{{ "%.2f"|format(booking.loyalty_token_used) }} loyalty</div>
                                             {% endif %}
                                         </div>
                                     </td>

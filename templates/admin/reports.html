@@ -3,23 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports - Premium Car Rentals</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Reports - DriveEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">Premium Car Rentals Admin</div>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ url_for('admin_manage_vehicles') }}">Vehicles</a></li>
-                <li><a href="{{ url_for('admin_reports') }}">Reports</a></li>
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            </ul>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Admin Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
-
-    <main class="container" style="padding: 2rem 0;">
+    <main class="main-content">
         <div class="card mb-5">
             <h1 class="card-title">Business Reports</h1>
             <p style="color: #6b7280;">Comprehensive analytics and insights for your car rental business.</p>
@@ -40,7 +51,7 @@
                 <div class="stat-label">Pending</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${{ "%.0f"|format(stats.total_revenue or 0) }}</div>
+                <div class="stat-value">₹{{ "%.0f"|format(stats.total_revenue or 0) }}</div>
                 <div class="stat-label">Total Revenue</div>
             </div>
         </div>
@@ -97,7 +108,7 @@
                     <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1)); 
                                 border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 1.5rem;">
                         <div style="font-size: 1.25rem; font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">
-                            ${{ "%.2f"|format(stats.total_revenue or 0) }}
+                            ₹{{ "%.2f"|format(stats.total_revenue or 0) }}
                         </div>
                         <div style="color: #6b7280; font-size: 0.875rem;">Total Revenue</div>
                     </div>
@@ -106,7 +117,7 @@
                     <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1)); 
                                 border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 1.5rem;">
                         <div style="font-size: 1.25rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">
-                            ${{ "%.2f"|format((stats.total_revenue or 0) / stats.completed_bookings) }}
+                            ₹{{ "%.2f"|format((stats.total_revenue or 0) / stats.completed_bookings) }}
                         </div>
                         <div style="color: #6b7280; font-size: 0.875rem;">Average per Booking</div>
                     </div>
