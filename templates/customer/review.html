@@ -16,7 +16,9 @@
             <div>Rating: {{ review.rating }} / 5</div>
             <div>Comment: {{ review.comment }}</div>
         {% else %}
-        <form method="POST">
+        <!-- Custom error/confirmation message area -->
+        <div id="review-message" tabindex="-1" style="outline: none;" aria-live="polite"></div>
+        <form method="POST" id="review-form" novalidate>
             <div class="form-group">
                 <label for="rating">Rating (1-5):</label>
                 <select name="rating" id="rating" class="form-select" required>

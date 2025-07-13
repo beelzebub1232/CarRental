@@ -425,6 +425,39 @@
             btn.querySelector('svg').innerHTML = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>';
         }
     }
+    // Custom form validation and focus management
+    const loginForm = document.getElementById('login-form');
+    const loginMessage = document.getElementById('login-message');
+    function showLoginMessage(message, type = 'info') {
+        loginMessage.textContent = message;
+        loginMessage.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
+        loginMessage.style.display = 'block';
+        loginMessage.focus();
+    }
+    function clearLoginMessage() {
+        loginMessage.textContent = '';
+        loginMessage.className = '';
+        loginMessage.style.display = 'none';
+    }
+    loginForm.addEventListener('submit', function(e) {
+        clearLoginMessage();
+        let hasError = false;
+        let firstErrorField = null;
+        // Validate required fields
+        ['email','password'].forEach(id => {
+            const field = document.getElementById(id);
+            if (!field.value) {
+                hasError = true;
+                if (!firstErrorField) firstErrorField = field;
+            }
+        });
+        if (hasError) {
+            e.preventDefault();
+            showLoginMessage('Please enter both email and password.', 'error');
+            if (firstErrorField) firstErrorField.focus();
+            return false;
+        }
+    });
     </script>
 </body>
 </html>

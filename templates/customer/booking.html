@@ -49,8 +49,9 @@
                             <h3 class="card-title">Booking Details</h3>
                             <div class="booking-step">Step 1 of 2</div>
                         </div>
-                        
-                        <form id="booking-form" class="booking-form" method="POST" action="{{ url_for('customer_payment') }}">
+                        <!-- Custom error/confirmation message area -->
+                        <div id="booking-message" tabindex="-1" style="outline: none;" aria-live="polite"></div>
+                        <form id="booking-form" class="booking-form" method="POST" action="{{ url_for('customer_payment') }}" novalidate>
                             <div class="form-group">
                                 <label for="vehicle_id" class="form-label">
                                     <svg class="icon icon-sm" viewBox="0 0 24 24">
@@ -249,6 +250,32 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: var(--space-6);
+            min-width: 0;
+        }
+
+        .form-row > .form-group {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-6);
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .form-input {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--neutral-200);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-base);
+            background: white;
+            transition: all var(--transition-fast);
+            word-break: break-word;
+            white-space: normal;
         }
 
         .form-label {
@@ -816,6 +843,42 @@
         // Mobile menu functionality
         document.addEventListener('DOMContentLoaded', () => {
             // Removed sidebar and sidebar overlay logic
+        });
+
+        // Custom form validation and focus management
+        const bookingForm = document.getElementById('booking-form');
+        const bookingMessage = document.getElementById('booking-message');
+        function showBookingMessage(message, type = 'info') {
+            bookingMessage.textContent = message;
+            bookingMessage.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
+            bookingMessage.style.display = 'block';
+            bookingMessage.focus();
+        }
+        function clearBookingMessage() {
+            bookingMessage.textContent = '';
+            bookingMessage.className = '';
+            bookingMessage.style.display = 'none';
+        }
+        bookingForm.addEventListener('submit', function(e) {
+            clearBookingMessage();
+            let hasError = false;
+            let firstErrorField = null;
+            // Validate required fields
+            ['vehicle_id','start_date','end_date'].forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value) {
+                    hasError = true;
+                    if (!firstErrorField) firstErrorField = field;
+                }
+            });
+            if (hasError) {
+                e.preventDefault();
+                showBookingMessage('Please fill in all required fields.', 'error');
+                if (firstErrorField) firstErrorField.focus();
+                return false;
+            }
+            // Optionally, show a confirmation message after successful submit (AJAX flow)
+            // showBookingMessage('Booking submitted successfully!', 'success');
         });
     </script>
 </body>

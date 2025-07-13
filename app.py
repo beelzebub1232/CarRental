@@ -788,12 +788,76 @@ def api_create_discount():
         cursor.close()
         conn.close()
 
-@app.route('/api/bookings/<int:booking_id>/status', methods=['POST'])
-def api_update_booking_status(booking_id):
+@app.route('/admin/bookings')
+def admin_bookings():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    status = request.args.get('status')
+    search = request.args.get('search')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = '''
+        SELECT b.*, u.full_name, u.email, v.make, v.model
+        FROM bookings b
+        JOIN users u ON b.user_id = u.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+    '''
+    filters = []
+    params = []
+    if status:
+        filters.append('b.status = %s')
+        params.append(status)
+    if search:
+        filters.append('(u.full_name LIKE %s OR v.make LIKE %s OR v.model LIKE %s OR b.id = %s)')
+        params.extend([f'%{search}%', f'%{search}%', f'%{search}%', search if search.isdigit() else -1])
+    if filters:
+        query += ' WHERE ' + ' AND '.join(filters)
+    query += ' ORDER BY b.booking_date DESC'
+    cursor.execute(query, tuple(params))
+    bookings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('admin/bookings.html', bookings=bookings)
+
+@app.route('/api/bookings/<int:booking_id>')
+def api_booking_details(booking_id):
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('''
+        SELECT b.*, u.full_name, u.email, v.make, v.model, v.year, v.type, v.image_url
+        FROM bookings b
+        JOIN users u ON b.user_id = u.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        WHERE b.id = %s
+    ''', (booking_id,))
+    booking = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not booking:
+        return '<div class="modal-content"><h3>Booking not found</h3><button class="btn btn-outline modal-close">Close</button></div>'
+    # Render details as HTML for modal
+    return f'''
+    <div class="modal-content">
+        <h3>Booking Details</h3>
+        <p><strong>ID:</strong> #{booking['id']}</p>
+        <p><strong>Customer:</strong> {booking['full_name']} ({booking['email']})</p>
+        <p><strong>Vehicle:</strong> {booking['make']} {booking['model']} ({booking['year']}, {booking['type']})</p>
+        <p><strong>Dates:</strong> {booking['start_date']} to {booking['end_date']}</p>
+        <p><strong>Total Price:</strong> ₹{booking['total_price']:.2f}</p>
+        <p><strong>Status:</strong> {booking['status'].title()}</p>
+        <p><strong>Discount Applied:</strong> ₹{booking['discount_applied']:.2f}</p>
+        <p><strong>Loyalty Token Used:</strong> ₹{booking['loyalty_token_used']:.2f}</p>
+        <button class="btn btn-outline modal-close">Close</button>
+    </div>
+    '''
+
+@app.route('/api/bookings/<int:booking_id>/status', methods=['PUT'])
+def api_update_booking_status_v2(booking_id):
     require_admin()
     data = request.get_json()
     status = data.get('status')
-    if status not in ['pending', 'approved', 'rejected', 'completed']:
+    if status not in ['pending', 'approved', 'rejected', 'completed', 'cancelled']:
         return jsonify({'success': False, 'error': 'Invalid status'}), 400
     conn = get_db_connection()
     cursor = conn.cursor()
