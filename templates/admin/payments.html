@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Admin Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link active">Payments</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Payments</h1>
+            <p class="page-subtitle">Monitor all payment transactions</p>
+        </div>
+        <div id="payment-feedback" style="margin-bottom: 1rem;"></div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">All Payments</h2>
+                <button class="btn btn-secondary" onclick="window.location='/api/export/payments'" style="float:right;">Export CSV</button>
+            </div>
+            <div class="card-body">
+                <table class="table" id="payments-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Booking ID</th>
+                            <th>User</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script>
+    // Feedback helpers
+    const paymentFeedback = document.getElementById('payment-feedback');
+    function showPaymentFeedback(msg, type='info') {
+        paymentFeedback.textContent = msg;
+        paymentFeedback.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
+        paymentFeedback.style.display = 'block';
+    }
+    function clearPaymentFeedback() {
+        paymentFeedback.textContent = '';
+        paymentFeedback.className = '';
+        paymentFeedback.style.display = 'none';
+    }
+    // Fetch and render payments
+    function loadPayments() {
+        fetch('/api/payments')
+            .then(r => r.json())
+            .then(data => {
+                const tbody = document.querySelector('#payments-table tbody');
+                tbody.innerHTML = '';
+                data.payments.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${p.id}</td>
+                        <td>${p.booking_id || ''}</td>
+                        <td>${p.full_name ? p.full_name + ' (' + p.email + ')' : p.user_id}</td>
+                        <td>₹${Number(p.amount).toFixed(2)}</td>
+                        <td>${p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}</td>
+                        <td>${p.status}</td>
+                        <td>${p.method}</td>
+                        <td>${p.reference || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+    loadPayments();
+    </script>
+    <style>
+    .feedback-success {
+        background: #e6ffed;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .feedback-error {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .feedback-info {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    </style>
+</body>
+</html> 

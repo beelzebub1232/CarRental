@@ -4,6 +4,9 @@ from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, SECRET_KEY, DEBUG
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import json
+import csv
+from io import StringIO
+from flask import Response
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -919,6 +922,76 @@ def api_delete_user(user_id):
     finally:
         cursor.close()
         conn.close()
+
+@app.route('/api/payments', methods=['GET'])
+def api_list_payments():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT p.id, p.booking_id, p.user_id, u.email, u.full_name, p.amount, p.payment_date, p.status, p.method, p.reference
+        FROM payments p
+        LEFT JOIN users u ON p.user_id = u.id
+        ORDER BY p.payment_date DESC
+    """)
+    payments = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify({'payments': payments})
+
+@app.route('/admin/payments')
+def admin_payments():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    return render_template('admin/payments.html')
+
+@app.route('/api/export/bookings')
+def export_bookings():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM bookings ORDER BY booking_date DESC")
+    bookings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    si = StringIO()
+    writer = csv.DictWriter(si, fieldnames=bookings[0].keys() if bookings else [])
+    writer.writeheader()
+    writer.writerows(bookings)
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=bookings.csv"})
+
+@app.route('/api/export/payments')
+def export_payments():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM payments ORDER BY payment_date DESC")
+    payments = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    si = StringIO()
+    writer = csv.DictWriter(si, fieldnames=payments[0].keys() if payments else [])
+    writer.writeheader()
+    writer.writerows(payments)
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=payments.csv"})
+
+@app.route('/api/export/vehicles')
+def export_vehicles():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM vehicles ORDER BY id")
+    vehicles = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    si = StringIO()
+    writer = csv.DictWriter(si, fieldnames=vehicles[0].keys() if vehicles else [])
+    writer.writeheader()
+    writer.writerows(vehicles)
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=vehicles.csv"})
 
 if __name__ == '__main__':
     app.run(debug=DEBUG)
