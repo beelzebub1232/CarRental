@@ -7,235 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-</head>
-<body>
-    <!-- Top Navigation Bar -->
-    <header class="top-nav">
-        <div class="brand-logo">
-            <div class="sidebar-logo">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
-                </svg>
-            </div>
-            <div>
-                <div class="sidebar-title">DriveEase</div>
-                <div class="sidebar-subtitle">Customer Portal</div>
-            </div>
-        </div>
-        <nav class="top-nav-links">
-            <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
-            <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
-            <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
-            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
-        </nav>
-    </header>
-    <main class="main-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Book Your Vehicle</h1>
-                    <p class="page-subtitle">Choose from our premium fleet and enjoy seamless booking experience</p>
-                </div>
-            </div>
-
-            <!-- Booking Form -->
-            <div class="booking-section">
-                <div class="grid grid-cols-2">
-                    <!-- Booking Form -->
-                    <div class="card animate-slide-in-left">
-                        <div class="card-header">
-                            <h3 class="card-title">Booking Details</h3>
-                            <div class="booking-step">Step 1 of 2</div>
-                        </div>
-                        <!-- Custom error/confirmation message area -->
-                        <div id="booking-message" tabindex="-1" style="outline: none;" aria-live="polite"></div>
-                        <form id="booking-form" class="booking-form" method="POST" action="{{ url_for('customer_payment') }}" novalidate>
-                            <div class="form-group">
-                                <label for="vehicle_id" class="form-label">
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                        <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-                                        <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
-                                    </svg>
-                                    Select Vehicle
-                                </label>
-                                <select id="vehicle_id" name="vehicle_id" class="form-select" required>
-                                    <option value="">Choose your vehicle...</option>
-                                    {% for vehicle in vehicles %}
-                                    <option value="{{ vehicle.id }}" 
-                                            data-price="{{ vehicle.base_price }}" 
-                                            data-lat="{{ vehicle.pickup_location_lat }}" 
-                                            data-lng="{{ vehicle.pickup_location_lng }}"
-                                            data-image="{{ vehicle.image_url }}"
-                                            data-type="{{ vehicle.type }}">
-                                        {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }}) - ₹{{ "%.2f"|format(vehicle.base_price) }}/hour
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="start_date" class="form-label">
-                                        <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                            <line x1="16" y1="2" x2="16" y2="6"/>
-                                            <line x1="8" y1="2" x2="8" y2="6"/>
-                                            <line x1="3" y1="10" x2="21" y2="10"/>
-                                        </svg>
-                                        Start Date & Time
-                                    </label>
-                                    <input type="datetime-local" id="start_date" name="start_date" class="form-input" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="end_date" class="form-label">
-                                        <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                            <line x1="16" y1="2" x2="16" y2="6"/>
-                                            <line x1="8" y1="2" x2="8" y2="6"/>
-                                            <line x1="3" y1="10" x2="21" y2="10"/>
-                                        </svg>
-                                        End Date & Time
-                                    </label>
-                                    <input type="datetime-local" id="end_date" name="end_date" class="form-input" required>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="discount_code" class="form-label">
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                        <path d="M21 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
-                                        <path d="M3 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
-                                        <path d="M12 21c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
-                                        <path d="M12 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
-                                    </svg>
-                                    Discount Code (Optional)
-                                </label>
-                                <input type="text" id="discount_code" name="discount_code" class="form-input" placeholder="Enter discount code">
-                                <div class="discount-hints">
-                                    <span class="discount-hint">WELCOME20</span>
-                                    <span class="discount-hint">LUXURY50</span>
-                                    <span class="discount-hint">ELECTRIC15</span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="loyalty_token_id" class="form-label">
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    Use Loyalty Token (Optional)
-                                </label>
-                                <select id="loyalty_token_id" name="loyalty_token_id" class="form-select">
-                                    <option value="">No loyalty token</option>
-                                    <!-- Loyalty tokens will be loaded here via JavaScript -->
-                                </select>
-                            </div>
-
-                            <!-- Price Display -->
-                            <div id="price-display" class="price-display hidden">
-                                <!-- Price will be displayed here -->
-                            </div>
-
-                            <button type="submit" class="btn btn-primary btn-full btn-lg">
-                                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M9 12l2 2 4-4"/>
-                                    <circle cx="12" cy="12" r="9"/>
-                                </svg>
-                                Book Now
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Map and Vehicle Preview -->
-                    <div class="card animate-slide-in-right">
-                        <div class="card-header">
-                            <h3 class="card-title">Pickup Locations</h3>
-                            <div class="map-controls">
-                                <button type="button" id="locate-btn" class="btn btn-outline btn-sm">
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                        <polygon points="3,11 22,2 13,21 11,13 3,11"/>
-                                    </svg>
-                                    Find Me
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Map container in the HTML -->
-                        <div id="map" class="booking-map" style="height: 300px; border-radius: 1rem; margin-bottom: 1.5rem;"></div>
-                        
-                        <!-- Selected Vehicle Preview -->
-                        <div id="vehicle-preview" class="vehicle-preview hidden">
-                            <div class="preview-header">
-                                <h4>Selected Vehicle</h4>
-                            </div>
-                            <div class="preview-content">
-                                <div class="preview-image">
-                                    <img id="preview-img" src="" alt="">
-                                </div>
-                                <div class="preview-details">
-                                    <div class="preview-name" id="preview-name"></div>
-                                    <div class="preview-type" id="preview-type"></div>
-                                    <div class="preview-price" id="preview-price"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Available Vehicles -->
-            <div class="vehicles-section">
-                <div class="section-header">
-                    <h2>Available Vehicles</h2>
-                    <p>Choose from our premium collection</p>
-                </div>
-                
-                <div class="vehicles-grid">
-                    {% for vehicle in vehicles %}
-                    <div class="vehicle-card animate-fade-in-up" style="animation-delay: {{ loop.index0 * 0.1 }}s;" onclick="selectVehicle({{ vehicle.id }})">
-                        <div class="vehicle-image">
-                            <img src="{{ vehicle.image_url }}" alt="{{ vehicle.make }} {{ vehicle.model }}">
-                            <div class="vehicle-overlay">
-                                <button class="btn btn-primary btn-sm">Select Vehicle</button>
-                            </div>
-                        </div>
-                        <div class="vehicle-info">
-                            <div class="vehicle-header">
-                                <h3 class="vehicle-name">{{ vehicle.make }} {{ vehicle.model }}</h3>
-                                <div class="vehicle-year">{{ vehicle.year }}</div>
-                            </div>
-                            <div class="vehicle-type">{{ vehicle.type }}</div>
-                            <div class="vehicle-features">
-                                <div class="feature">
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    Premium
-                                </div>
-                                <div class="feature">
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                        <path d="M9 12l2 2 4-4"/>
-                                        <circle cx="12" cy="12" r="9"/>
-                                    </svg>
-                                    Available
-                                </div>
-                            </div>
-                            <div class="vehicle-price">
-                                <span class="price-amount">₹{{ "%.2f"|format(vehicle.base_price) }}</span>
-                                <span class="price-unit">/hour</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </main>
-    </div>
-
     <style>
         /* Booking Page Specific Styles */
         .booking-step {
@@ -327,74 +98,6 @@
         .price-details {
             color: var(--success-600);
             font-weight: 600;
-        }
-
-        .booking-map {
-            height: 300px;
-            border-radius: var(--radius-2xl);
-            overflow: hidden;
-            margin-bottom: var(--space-6);
-        }
-
-        .map-controls {
-            display: flex;
-            gap: var(--space-2);
-        }
-
-        .vehicle-preview {
-            background: linear-gradient(135deg, var(--primary-50), var(--secondary-50));
-            border: 2px solid var(--primary-200);
-            border-radius: var(--radius-3xl);
-            padding: var(--space-6);
-        }
-
-        .preview-header h4 {
-            font-size: var(--text-lg);
-            font-weight: 700;
-            color: var(--primary-800);
-            margin-bottom: var(--space-4);
-        }
-
-        .preview-content {
-            display: flex;
-            gap: var(--space-4);
-            align-items: center;
-        }
-
-        .preview-image {
-            width: 80px;
-            height: 50px;
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .preview-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .preview-details {
-            flex: 1;
-        }
-
-        .preview-name {
-            font-weight: 700;
-            color: var(--primary-900);
-            margin-bottom: var(--space-1);
-        }
-
-        .preview-type {
-            font-size: var(--text-sm);
-            color: var(--primary-600);
-            margin-bottom: var(--space-1);
-        }
-
-        .preview-price {
-            font-weight: 700;
-            color: var(--secondary-600);
-            font-size: var(--text-lg);
         }
 
         /* Vehicles Section */
@@ -602,139 +305,229 @@
             }
         }
     </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Customer Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
+            <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Book Your Vehicle</h1>
+                    <p class="page-subtitle">Choose from our premium fleet and enjoy seamless booking experience</p>
+                </div>
+            </div>
 
+            <!-- Booking Form -->
+            <div class="booking-section">
+                <div class="grid grid-cols-2">
+                    <!-- Booking Form -->
+                    <div class="card animate-slide-in-left">
+                        <div class="card-header">
+                            <h3 class="card-title">Booking Details</h3>
+                            <div class="booking-step">Step 1 of 2</div>
+                        </div>
+                        <!-- Custom error/confirmation message area -->
+                        <div id="booking-message" tabindex="-1" style="outline: none;" aria-live="polite"></div>
+                        <form id="booking-form" class="booking-form" method="POST" action="{{ url_for('customer_payment') }}" novalidate>
+                            <div class="form-group">
+                                <label for="vehicle_id" class="form-label">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                        <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                        <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                                    </svg>
+                                    Select Vehicle
+                                </label>
+                                <select id="vehicle_id" name="vehicle_id" class="form-select" required>
+                                    <option value="">Choose your vehicle...</option>
+                                    {% for vehicle in vehicles %}
+                                    <option value="{{ vehicle.id }}" 
+                                            data-price="{{ vehicle.base_price }}" 
+                                            data-image="{{ vehicle.image_url }}"
+                                            data-type="{{ vehicle.type }}">
+                                        {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }}) - ₹{{ "%.2f"|format(vehicle.base_price) }}/hour
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="start_date" class="form-label">
+                                        <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                        Start Date & Time
+                                    </label>
+                                    <input type="datetime-local" id="start_date" name="start_date" class="form-input" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="end_date" class="form-label">
+                                        <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                        End Date & Time
+                                    </label>
+                                    <input type="datetime-local" id="end_date" name="end_date" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="discount_code" class="form-label">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                        <path d="M21 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                                        <path d="M3 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                                        <path d="M12 21c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                                        <path d="M12 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                                    </svg>
+                                    Discount Code (Optional)
+                                </label>
+                                <div style="display: flex; gap: var(--space-2);">
+                                    <input type="text" id="discount_code" name="discount_code" class="form-input" placeholder="Enter discount code" style="flex: 1;">
+                                    <button type="button" id="apply_discount_btn" class="btn btn-outline btn-sm" style="white-space: nowrap;">Apply</button>
+                                </div>
+                                <div class="discount-hints">
+                                    <span class="discount-hint">WELCOME20</span>
+                                    <span class="discount-hint">LUXURY50</span>
+                                    <span class="discount-hint">ELECTRIC15</span>
+                                </div>
+                                <div id="discount_status" style="margin-top: var(--space-2); display: none;"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="loyalty_token_id" class="form-label">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    Use Loyalty Token (Optional)
+                                </label>
+                                <select id="loyalty_token_id" name="loyalty_token_id" class="form-select">
+                                    <option value="">No loyalty token</option>
+                                    <!-- Loyalty tokens will be loaded here via JavaScript -->
+                                </select>
+                            </div>
+
+                            <!-- Price Display -->
+                            <div id="price-display" class="price-display hidden">
+                                <!-- Price will be displayed here -->
+                            </div>
+
+                            <input type="hidden" id="pickup_lat" name="pickup_lat">
+                            <input type="hidden" id="pickup_lng" name="pickup_lng">
+
+                            <button type="submit" class="btn btn-primary btn-full btn-lg">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4"/>
+                                    <circle cx="12" cy="12" r="9"/>
+                                </svg>
+                                Book Now
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Map Section -->
+                    <div class="card animate-slide-in-right" id="map-card" style="transition: max-height 0.4s cubic-bezier(.4,0,.2,1), box-shadow 0.3s; overflow: hidden;">
+                        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                            <h3 class="card-title">Pickup Location</h3>
+                            <button type="button" id="find-me-btn" class="btn btn-outline btn-sm">Find Me</button>
+                        </div>
+                        <div id="map" style="height: 300px; border-radius: 1rem; margin-bottom: 1.5rem;"></div>
+                        <div id="vehicle-preview" class="vehicle-preview" style="display: none; margin-top: 1rem; position: relative; width: 100%; height: 200px; border-radius: 1rem; overflow: hidden;">
+                            <img id="preview-img" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                <div id="preview-name" style="font-size: 1.5rem; font-weight: 700; color: white; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);"></div>
+                                <div style="font-size: 1rem; font-weight: 600; color: #4ade80; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); margin-top: 0.5rem;">SELECTED</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Vehicles -->
+            <div class="vehicles-section">
+                <div class="section-header">
+                    <h2>Available Vehicles</h2>
+                    <p>Choose from our premium collection</p>
+                </div>
+                
+                <div class="vehicles-grid">
+                    {% for vehicle in vehicles %}
+                    <div class="vehicle-card animate-fade-in-up" style="animation-delay: {{ loop.index0 * 0.1 }}s;" onclick="selectVehicle({{ vehicle.id }})">
+                        <div class="vehicle-image">
+                            <img src="{{ vehicle.image_url }}" alt="{{ vehicle.make }} {{ vehicle.model }}">
+                            <div class="vehicle-overlay">
+                                <button class="btn btn-primary btn-sm">Select Vehicle</button>
+                            </div>
+                        </div>
+                        <div class="vehicle-info">
+                            <div class="vehicle-header">
+                                <h3 class="vehicle-name">{{ vehicle.make }} {{ vehicle.model }}</h3>
+                                <div class="vehicle-year">{{ vehicle.year }}</div>
+                            </div>
+                            <div class="vehicle-type">{{ vehicle.type }}</div>
+                            <div class="vehicle-features">
+                                <div class="feature">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    Premium
+                                </div>
+                                <div class="feature">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                        <path d="M9 12l2 2 4-4"/>
+                                        <circle cx="12" cy="12" r="9"/>
+                                    </svg>
+                                    Available
+                                </div>
+                            </div>
+                            <div class="vehicle-price">
+                                <span class="price-amount">₹{{ "%.2f"|format(vehicle.base_price) }}</span>
+                                <span class="price-unit">/hour</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var mapContainer = document.getElementById('map');
-    if (mapContainer && typeof L !== 'undefined' && !mapContainer._leaflet_id) {
-      var defaultLat = 10.0270;
-      var defaultLng = 76.3083;
-      var map = L.map('map', { attributionControl: false }).setView([defaultLat, defaultLng], 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '',
-      }).addTo(map);
-      var pickupMarker = null;
-      function setPickupMarker(lat, lng, popupText) {
-        if (pickupMarker) map.removeLayer(pickupMarker);
-        pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup(popupText || 'Pickup Location').openPopup();
-        let bookingForm = document.getElementById('booking-form');
-        let latInput = document.getElementById('pickup_lat');
-        let lngInput = document.getElementById('pickup_lng');
-        if (!latInput) {
-          latInput = document.createElement('input');
-          latInput.type = 'hidden';
-          latInput.id = 'pickup_lat';
-          latInput.name = 'pickup_lat';
-          bookingForm.appendChild(latInput);
-        }
-        if (!lngInput) {
-          lngInput = document.createElement('input');
-          lngInput.type = 'hidden';
-          lngInput.id = 'pickup_lng';
-          lngInput.name = 'pickup_lng';
-          bookingForm.appendChild(lngInput);
-        }
-        latInput.value = lat;
-        lngInput.value = lng;
-      }
-      map.on('click', function(e) {
-        setPickupMarker(e.latlng.lat, e.latlng.lng, 'Pickup Location');
-      });
-    }
-  });
-</script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script>
-        // Initialize map
-        let map = L.map('map').setView([40.7128, -74.0060], 12);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        let currentMarker = null;
-        const vehicles = {{ vehicles|tojson }};
-
-        // Vehicle selection
-        function selectVehicle(vehicleId) {
-            const vehicleSelect = document.getElementById('vehicle_id');
-            vehicleSelect.value = vehicleId;
-            vehicleSelect.dispatchEvent(new Event('change'));
-            
-            // Scroll to form
-            document.querySelector('.booking-form').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-
-        // Update vehicle selection when dropdown changes
-        document.getElementById('vehicle_id').addEventListener('change', function() {
-            const vehicleId = parseInt(this.value);
-            const vehicle = vehicles.find(v => v.id === vehicleId);
-            
-            if (vehicle) {
-                updateMap(vehicle);
-                updateVehiclePreview(vehicle);
-                calculatePrice();
-            }
-        });
-
-        function updateMap(vehicle) {
-            if (vehicle.pickup_location_lat && vehicle.pickup_location_lng) {
-                if (currentMarker) {
-                    map.removeLayer(currentMarker);
-                }
-                
-                currentMarker = L.marker([vehicle.pickup_location_lat, vehicle.pickup_location_lng])
-                    .addTo(map)
-                    .bindPopup(`
-                        <div style="text-align: center;">
-                            <strong>${vehicle.make} ${vehicle.model}</strong><br>
-                            ${vehicle.year} ${vehicle.type}<br>
-                            <strong>₹${vehicle.base_price}/hour</strong>
-                        </div>
-                    `)
-                    .openPopup();
-                
-                map.setView([vehicle.pickup_location_lat, vehicle.pickup_location_lng], 14);
-            }
-        }
-
-        function updateVehiclePreview(vehicle) {
-            const preview = document.getElementById('vehicle-preview');
-            const img = document.getElementById('preview-img');
-            const name = document.getElementById('preview-name');
-            const type = document.getElementById('preview-type');
-            const price = document.getElementById('preview-price');
-            
-            img.src = vehicle.image_url;
-            img.alt = `${vehicle.make} ${vehicle.model}`;
-            name.textContent = `${vehicle.make} ${vehicle.model}`;
-            type.textContent = `${vehicle.year} ${vehicle.type}`;
-            price.textContent = `₹${vehicle.base_price}/hour`;
-            
-            preview.classList.remove('hidden');
-        }
-
         // Set minimum date to current time
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         const nowString = now.toISOString().slice(0, 16);
         document.getElementById('start_date').min = nowString;
-        document.getElementById('end_date').min = nowString;
-
-        // Validate end date is after start date
-        document.getElementById('start_date').addEventListener('change', function() {
-            document.getElementById('end_date').min = this.value;
-            if (document.getElementById('end_date').value && document.getElementById('end_date').value <= this.value) {
-                document.getElementById('end_date').value = '';
-            }
-            calculatePrice();
-        });
-
-        document.getElementById('end_date').addEventListener('change', calculatePrice);
 
         // Discount hint clicks
         document.querySelectorAll('.discount-hint').forEach(hint => {
@@ -743,108 +536,12 @@
             });
         });
 
-        // Locate button
-        document.getElementById('locate-btn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                this.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg> Locating...';
-                this.disabled = true;
-                
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        
-                        map.setView([lat, lng], 14);
-                        
-                        L.marker([lat, lng])
-                            .addTo(map)
-                            .bindPopup('Your location')
-                            .openPopup();
-                        
-                        this.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="3,11 22,2 13,21 11,13 3,11"/></svg> Located!';
-                        this.disabled = false;
-                        
-                        setTimeout(() => {
-                            this.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="3,11 22,2 13,21 11,13 3,11"/></svg> Find Me';
-                        }, 2000);
-                    },
-                    (error) => {
-                        this.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="3,11 22,2 13,21 11,13 3,11"/></svg> Error';
-                        this.disabled = false;
-                        
-                        setTimeout(() => {
-                            this.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="3,11 22,2 13,21 11,13 3,11"/></svg> Find Me';
-                        }, 2000);
-                    }
-                );
-            }
-        });
-
-        // Update price calculation function
-        function calculatePrice() {
-            const vehicleId = document.getElementById('vehicle_id').value;
-            const startDate = document.getElementById('start_date').value;
-            const endDate = document.getElementById('end_date').value;
-            const priceDisplay = document.getElementById('price-display');
-            clearBookingFeedback();
-            if (!vehicleId || !startDate || !endDate) {
-                priceDisplay.classList.add('hidden');
-                return;
-            }
-            priceDisplay.innerHTML = `
-                <div class="price-amount">Calculating...</div>
-                <div class="price-details">Please wait</div>
-            `;
-            priceDisplay.classList.remove('hidden');
-            fetch('/api/calculate_price', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vehicle_id: vehicleId,
-                    start_date: startDate,
-                    end_date: endDate
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.price) {
-                    const start = new Date(startDate);
-                    const end = new Date(endDate);
-                    const hours = Math.ceil((end - start) / (1000 * 60 * 60));
-                    priceDisplay.innerHTML = `
-                        <div class="price-amount">₹${data.price.toFixed(2)}</div>
-                        <div class="price-details">
-                            Total for ${hours} hour${hours !== 1 ? 's' : ''}
-                            <br>
-                            <small>Includes dynamic pricing adjustments</small>
-                        </div>
-                    `;
-                } else {
-                    priceDisplay.innerHTML = `
-                        <div class="price-amount">Error</div>
-                        <div class="price-details">${data.error || 'Unable to calculate price'}</div>
-                    `;
-                    showBookingFeedback(data.error || 'Unable to calculate price', 'error');
-                }
-            })
-            .catch(error => {
-                priceDisplay.innerHTML = `
-                    <div class="price-amount">Error</div>
-                    <div class="price-details">Please try again</div>
-                `;
-                showBookingFeedback('An error occurred while calculating price.', 'error');
-            });
-        }
-
         // Load loyalty tokens for the user and populate the dropdown
         function loadLoyaltyTokens() {
             fetch('/api/loyalty_tokens')
                 .then(response => response.json())
                 .then(data => {
                     const select = document.getElementById('loyalty_token_id');
-                    // Remove all except the first option
                     select.innerHTML = '<option value="">No loyalty token</option>';
                     if (data.tokens && data.tokens.length > 0) {
                         data.tokens.forEach(token => {
@@ -856,13 +553,130 @@
                     }
                 });
         }
-        // Call on page load
-        document.addEventListener('DOMContentLoaded', loadLoyaltyTokens);
 
-        // Mobile menu functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            // Removed sidebar and sidebar overlay logic
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Booking page DOM fully loaded, initializing map and preview...');
+            loadLoyaltyTokens();
+
+            // Map and vehicle preview logic
+            const vehicles = {{ vehicles|tojson }};
+            const map = L.map('map', { attributionControl: false }).setView([10.0270, 76.3083], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(map);
+            let markers = [];
+            let selectedMarker = null;
+            // Add markers for all vehicles
+            vehicles.forEach(vehicle => {
+                if (vehicle.pickup_location_lat && vehicle.pickup_location_lng) {
+                    const marker = L.marker([vehicle.pickup_location_lat, vehicle.pickup_location_lng]).addTo(map);
+                    marker.vehicleId = vehicle.id;
+                    marker.on('click', function() {
+                        selectVehicle(vehicle.id);
+                    });
+                    marker.bindPopup(`<strong>${vehicle.make} ${vehicle.model}</strong><br>${vehicle.year} ${vehicle.type}<br>₹${vehicle.base_price}/hour`);
+                    markers.push(marker);
+                }
+            });
+            // Highlight marker and center map when vehicle is selected
+            function highlightMarker(vehicleId) {
+                markers.forEach(marker => {
+                    if (marker.vehicleId === vehicleId) {
+                        marker.setIcon(L.icon({
+                            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                            shadowSize: [41, 41]
+                        }));
+                        marker.openPopup();
+                        map.setView(marker.getLatLng(), 15);
+                        selectedMarker = marker;
+                    } else {
+                        marker.setIcon(new L.Icon.Default());
+                        marker.closePopup();
+                    }
+                });
+            }
+            // When vehicle is selected in dropdown, update map and hidden fields
+            document.getElementById('vehicle_id').addEventListener('change', function() {
+                const vehicleId = parseInt(this.value);
+                const vehicle = vehicles.find(v => v.id === vehicleId);
+                if (vehicle && vehicle.pickup_location_lat && vehicle.pickup_location_lng) {
+                    highlightMarker(vehicleId);
+                    document.getElementById('pickup_lat').value = vehicle.pickup_location_lat;
+                    document.getElementById('pickup_lng').value = vehicle.pickup_location_lng;
+                }
+                if (vehicle) updateVehiclePreview(vehicle);
+                else updateVehiclePreview(null);
+                
+                // Trigger price calculation
+                console.log('Vehicle changed, triggering price calculation...');
+                if (window.CarRentalApp && window.CarRentalApp.calculatePrice) {
+                    console.log('Calling CarRentalApp.calculatePrice()');
+                    window.CarRentalApp.calculatePrice();
+                } else {
+                    console.log('CarRentalApp.calculatePrice not available');
+                }
+            });
+            // When marker is clicked, select vehicle in dropdown
+            window.selectVehicle = function(vehicleId) {
+                const vehicleSelect = document.getElementById('vehicle_id');
+                vehicleSelect.value = vehicleId;
+                vehicleSelect.dispatchEvent(new Event('change'));
+                document.querySelector('.booking-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            // Set initial marker highlight and preview if a vehicle is preselected
+            const initialVehicleId = parseInt(document.getElementById('vehicle_id').value);
+            if (initialVehicleId) {
+                highlightMarker(initialVehicleId);
+                const vehicle = vehicles.find(v => v.id === initialVehicleId);
+                if (vehicle) {
+                    document.getElementById('pickup_lat').value = vehicle.pickup_location_lat;
+                    document.getElementById('pickup_lng').value = vehicle.pickup_location_lng;
+                    updateVehiclePreview(vehicle);
+                }
+            }
+            // Find Me button
+            document.getElementById('find-me-btn').addEventListener('click', function() {
+                if (navigator.geolocation) {
+                    this.textContent = 'Locating...';
+                    this.disabled = true;
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            map.setView([lat, lng], 15);
+                            L.marker([lat, lng], { icon: new L.Icon.Default(), opacity: 0.7 }).addTo(map).bindPopup('Your Location').openPopup();
+                            this.textContent = 'Find Me';
+                            this.disabled = false;
+                        },
+                        (error) => {
+                            this.textContent = 'Find Me';
+                            this.disabled = false;
+                            alert('Unable to retrieve your location.');
+                        }
+                    );
+                }
+            });
+            // Vehicle preview logic
+            function updateVehiclePreview(vehicle) {
+                const preview = document.getElementById('vehicle-preview');
+                const mapCard = document.getElementById('map-card');
+                const img = document.getElementById('preview-img');
+                const name = document.getElementById('preview-name');
+                if (vehicle) {
+                    img.src = vehicle.image_url;
+                    img.alt = `${vehicle.make} ${vehicle.model}`;
+                    name.textContent = `${vehicle.make} ${vehicle.model}`;
+                    preview.style.display = 'block';
+                    mapCard.style.maxHeight = '1000px';
+                    mapCard.style.boxShadow = '0 4px 24px rgba(0,0,0,0.10)';
+                } else {
+                    preview.style.display = 'none';
+                    mapCard.style.maxHeight = '440px';
+                    mapCard.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)';
+                }
+            }
 
         // Custom form validation and focus management
         const bookingForm = document.getElementById('booking-form');
@@ -898,6 +712,43 @@
             }
             // Optionally, show a confirmation message after successful submit (AJAX flow)
             // showBookingMessage('Booking submitted successfully!', 'success');
+            });
+            // Hide preview if no vehicle is selected on initial load
+            const vehicleId = document.getElementById('vehicle_id').value;
+            if (!vehicleId) {
+                document.getElementById('vehicle-preview').style.display = 'none';
+                document.getElementById('map-card').style.maxHeight = '440px';
+            }
+            
+            // Add event listeners for date fields to trigger price calculation
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            
+            if (startDateInput) {
+                startDateInput.addEventListener('change', function() {
+                    if (window.CarRentalApp && window.CarRentalApp.calculatePrice) {
+                        window.CarRentalApp.calculatePrice();
+                    }
+                });
+            }
+            
+            if (endDateInput) {
+                endDateInput.addEventListener('change', function() {
+                    if (window.CarRentalApp && window.CarRentalApp.calculatePrice) {
+                        window.CarRentalApp.calculatePrice();
+                    }
+                });
+            }
+            
+            // Add event listener for Apply discount button
+            const applyDiscountBtn = document.getElementById('apply_discount_btn');
+            if (applyDiscountBtn) {
+                applyDiscountBtn.addEventListener('click', function() {
+                    if (window.CarRentalApp && window.CarRentalApp.validateDiscountCode) {
+                        window.CarRentalApp.validateDiscountCode();
+                    }
+                });
+            }
         });
     </script>
 </body>

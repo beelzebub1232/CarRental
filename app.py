@@ -24,48 +24,65 @@ def get_db_connection():
 
 def calculate_final_price(vehicle_id, start_datetime, end_datetime):
     """Calculate final price with dynamic pricing rules"""
+    import datetime
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
     try:
         # Get vehicle details
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT base_price, type FROM vehicles WHERE id = %s", (vehicle_id,))
         vehicle = cursor.fetchone()
+        cursor.close()
         if not vehicle:
             return None
-        
+
         base_price = float(vehicle['base_price'])
         vehicle_type = vehicle['type']
-        
+
         # Calculate duration in hours
         duration_hours = (end_datetime - start_datetime).total_seconds() / 3600
         calculated_price = base_price * duration_hours
-        
+
         # Apply time-based peak modifiers
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM pricing_rules WHERE rule_type = 'time_peak' AND is_active = TRUE")
         time_rules = cursor.fetchall()
-        
+        cursor.close()
+
         for rule in time_rules:
             peak_start = rule['peak_start_time']
             peak_end = rule['peak_end_time']
             booking_time = start_datetime.time()
-            
-            if peak_start <= booking_time <= peak_end:
-                calculated_price *= (1 + float(rule['modifier_percentage']) / 100)
-        
+
+            # Convert to time if needed
+            if isinstance(peak_start, datetime.timedelta):
+                peak_start = (datetime.datetime.min + peak_start).time()
+            if isinstance(peak_end, datetime.timedelta):
+                peak_end = (datetime.datetime.min + peak_end).time()
+
+            # Handle time comparison properly
+            if peak_start <= peak_end:
+                # Same day peak hours (e.g., 9:00 to 17:00)
+                if peak_start <= booking_time <= peak_end:
+                    calculated_price *= (1 + float(rule['modifier_percentage']) / 100)
+            else:
+                # Overnight peak hours (e.g., 22:00 to 06:00)
+                if booking_time >= peak_start or booking_time <= peak_end:
+                    calculated_price *= (1 + float(rule['modifier_percentage']) / 100)
+
         # Apply demand-based modifiers for car type
+        cursor = conn.cursor(dictionary=True)
         cursor.execute(
             "SELECT modifier_percentage FROM pricing_rules WHERE rule_type = 'demand_car_type' AND vehicle_type = %s AND is_active = TRUE",
             (vehicle_type,)
         )
         demand_rule = cursor.fetchone()
+        cursor.close()
         if demand_rule:
             calculated_price *= (1 + float(demand_rule['modifier_percentage']) / 100)
-        
+
         return round(calculated_price, 2)
-        
+
     finally:
-        cursor.close()
         conn.close()
 
 # Authentication routes
@@ -442,20 +459,49 @@ def admin_reports():
 # API routes
 @app.route('/api/calculate_price', methods=['POST'])
 def api_calculate_price():
-    data = request.get_json()
-    vehicle_id = data.get('vehicle_id')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    
     try:
-        start_datetime = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
-        end_datetime = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+        
+        vehicle_id = data.get('vehicle_id')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        
+        # Validate required fields
+        if not vehicle_id:
+            return jsonify({'error': 'vehicle_id is required'}), 400
+        if not start_date:
+            return jsonify({'error': 'start_date is required'}), 400
+        if not end_date:
+            return jsonify({'error': 'end_date is required'}), 400
+        
+        # Convert vehicle_id to int
+        try:
+            vehicle_id = int(vehicle_id)
+        except (ValueError, TypeError):
+            return jsonify({'error': 'vehicle_id must be a valid integer'}), 400
+        
+        # Parse dates
+        try:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
+        except ValueError as e:
+            return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
+        
+        # Validate that end_date is after start_date
+        if end_datetime <= start_datetime:
+            return jsonify({'error': 'End date must be after start date'}), 400
         
         price = calculate_final_price(vehicle_id, start_datetime, end_datetime)
         
+        if price is None:
+            return jsonify({'error': 'Vehicle not found or price calculation failed'}), 400
+        
         return jsonify({'price': price})
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        print(f"Error in calculate_price API: {str(e)}")
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 @app.route('/api/create_booking', methods=['POST'])
 def api_create_booking():
@@ -551,6 +597,59 @@ def api_create_booking():
     except Exception as e:
         conn.rollback()
         return jsonify({'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/validate_discount', methods=['POST'])
+def api_validate_discount():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    data = request.get_json()
+    discount_code = data.get('discount_code', '').strip()
+    vehicle_id = data.get('vehicle_id')
+    vehicle_type = data.get('vehicle_type')
+    
+    if not discount_code:
+        return jsonify({'error': 'Discount code is required'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Check if discount code exists and is valid
+        cursor.execute("""
+            SELECT * FROM discounts 
+            WHERE code = %s AND is_active = TRUE 
+            AND start_date <= CURDATE() AND end_date >= CURDATE()
+            AND (usage_limit = 0 OR times_used < usage_limit)
+        """, (discount_code,))
+        discount = cursor.fetchone()
+        
+        if not discount:
+            return jsonify({'error': 'Invalid or expired discount code'}), 400
+        
+        # Check if discount applies to this vehicle type
+        if discount['vehicle_type'] and vehicle_type:
+            if discount['vehicle_type'] not in vehicle_type:
+                return jsonify({'error': f'Discount code only applies to {discount["vehicle_type"]} vehicles'}), 400
+        
+        # Check if discount applies to specific vehicle
+        if discount['vehicle_id'] and vehicle_id:
+            if discount['vehicle_id'] != vehicle_id:
+                return jsonify({'error': 'Discount code does not apply to this vehicle'}), 400
+        
+        return jsonify({
+            'valid': True,
+            'discount_percentage': float(discount['discount_percentage']),
+            'description': discount.get('description', ''),
+            'code': discount['code']
+        })
+        
+    except Exception as e:
+        print(f"Error validating discount: {str(e)}")
+        return jsonify({'error': 'Error validating discount code'}), 500
     finally:
         cursor.close()
         conn.close()

@@ -151,12 +151,50 @@ def create_database():
         
         # Insert sample vehicles
         sample_vehicles = [
-            ('Toyota', 'Camry', 2023, 'Sedan', 45.00, True, 40.7128, -74.0060, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
-            ('Honda', 'CR-V', 2023, 'SUV', 65.00, True, 40.7589, -73.9851, 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg'),
-            ('BMW', 'X5', 2023, 'Luxury SUV', 120.00, True, 40.7505, -73.9934, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
-            ('Tesla', 'Model 3', 2023, 'Electric', 85.00, True, 40.7282, -74.0776, 'https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg'),
-            ('Ford', 'F-150', 2023, 'Truck', 75.00, True, 40.7411, -74.0018, 'https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg'),
-            ('Audi', 'A4', 2023, 'Luxury Sedan', 95.00, True, 40.7516, -73.9755, 'https://images.pexels.com/photos/1335077/pexels-photo-1335077.jpeg')
+            # Luxury Vehicles
+            ('Mercedes-Benz', 'S-Class', 2023, 'Luxury Sedan', 2500.00, True, 10.0234, 76.3112, 'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg'),
+            ('BMW', '7 Series', 2023, 'Luxury Sedan', 2200.00, True, 10.0187, 76.3056, 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg'),
+            ('Audi', 'A8', 2023, 'Luxury Sedan', 2300.00, True, 10.0298, 76.3145, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
+            ('Range Rover', 'Sport', 2023, 'Luxury SUV', 2800.00, True, 10.0156, 76.3089, 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg'),
+            ('Lexus', 'LX', 2023, 'Luxury SUV', 2600.00, True, 10.0321, 76.3167, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
+            
+            # Premium Vehicles
+            ('BMW', 'X5', 2023, 'Premium SUV', 1800.00, True, 10.0267, 76.3023, 'https://images.pexels.com/photos/1335077/pexels-photo-1335077.jpeg'),
+            ('Mercedes-Benz', 'GLC', 2023, 'Premium SUV', 1700.00, True, 10.0198, 76.3134, 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg'),
+            ('Audi', 'Q5', 2023, 'Premium SUV', 1600.00, True, 10.0345, 76.3078, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
+            ('Volvo', 'XC60', 2023, 'Premium SUV', 1500.00, True, 10.0212, 76.3198, 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg'),
+            ('Jaguar', 'F-Pace', 2023, 'Premium SUV', 1900.00, True, 10.0376, 76.3045, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
+            
+            # Electric Vehicles
+            ('Tesla', 'Model 3', 2023, 'Electric Sedan', 1200.00, True, 10.0145, 76.3212, 'https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg'),
+            ('Tesla', 'Model Y', 2023, 'Electric SUV', 1400.00, True, 10.0289, 76.3098, 'https://images.pexels.com/photos/1335077/pexels-photo-1335077.jpeg'),
+            ('MG', 'ZS EV', 2023, 'Electric SUV', 800.00, True, 10.0167, 76.3156, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
+            ('Tata', 'Nexon EV', 2023, 'Electric SUV', 600.00, True, 10.0356, 76.3123, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
+            
+            # Popular Sedans
+            ('Honda', 'City', 2023, 'Sedan', 500.00, True, 10.0223, 76.3187, 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg'),
+            ('Maruti', 'Ciaz', 2023, 'Sedan', 450.00, True, 10.0312, 76.3067, 'https://images.pexels.com/photos/1335077/pexels-photo-1335077.jpeg'),
+            ('Hyundai', 'Verna', 2023, 'Sedan', 480.00, True, 10.0178, 76.3245, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
+            ('Toyota', 'Camry', 2023, 'Sedan', 800.00, True, 10.0256, 76.3109, 'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg'),
+            ('Skoda', 'Rapid', 2023, 'Sedan', 550.00, True, 10.0389, 76.3176, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
+            
+            # SUVs
+            ('Mahindra', 'XUV700', 2023, 'SUV', 700.00, True, 10.0134, 76.3087, 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg'),
+            ('Tata', 'Harrier', 2023, 'SUV', 650.00, True, 10.0298, 76.3234, 'https://images.pexels.com/photos/1335077/pexels-photo-1335077.jpeg'),
+            ('MG', 'Hector', 2023, 'SUV', 750.00, True, 10.0201, 76.3165, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
+            ('Hyundai', 'Creta', 2023, 'SUV', 600.00, True, 10.0367, 76.3054, 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg'),
+            ('Kia', 'Seltos', 2023, 'SUV', 620.00, True, 10.0245, 76.3201, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
+            
+            # Hatchbacks
+            ('Maruti', 'Swift', 2023, 'Hatchback', 300.00, True, 10.0189, 76.3145, 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg'),
+            ('Hyundai', 'i20', 2023, 'Hatchback', 320.00, True, 10.0334, 76.3089, 'https://images.pexels.com/photos/1335077/pexels-photo-1335077.jpeg'),
+            ('Tata', 'Punch', 2023, 'Hatchback', 280.00, True, 10.0156, 76.3218, 'https://images.pexels.com/photos/1149831/pexels-photo-1149831.jpeg'),
+            ('Maruti', 'Baleno', 2023, 'Hatchback', 310.00, True, 10.0278, 76.3123, 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg'),
+            
+            # Commercial Vehicles
+            ('Mahindra', 'Bolero', 2023, 'Commercial', 400.00, True, 10.0301, 76.3198, 'https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg'),
+            ('Tata', 'Ace', 2023, 'Commercial', 350.00, True, 10.0167, 76.3076, 'https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg'),
+            ('Ashok Leyland', 'Dost', 2023, 'Commercial', 380.00, True, 10.0256, 76.3245, 'https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg')
         ]
         
         cursor.executemany("""

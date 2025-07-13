@@ -84,28 +84,42 @@ async function calculatePrice() {
     const endDate = document.getElementById('end_date')?.value;
     const priceDisplay = document.getElementById('price-display');
     
-    if (!vehicleId || !startDate || !endDate || !priceDisplay) return;
+    console.log('calculatePrice called with:', { vehicleId, startDate, endDate });
+    
+    if (!vehicleId || !startDate || !endDate || !priceDisplay) {
+        console.log('Missing required fields:', { vehicleId, startDate, endDate, priceDisplay: !!priceDisplay });
+        return;
+    }
     
     try {
         showLoadingState(priceDisplay);
+        
+        const requestData = {
+            vehicle_id: vehicleId,
+            start_date: startDate,
+            end_date: endDate
+        };
+        
+        console.log('Sending request to /api/calculate_price:', requestData);
         
         const response = await fetch('/api/calculate_price', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                vehicle_id: vehicleId,
-                start_date: startDate,
-                end_date: endDate
-            })
+            body: JSON.stringify(requestData)
         });
         
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Response error:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
         }
         
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.price) {
             displayPrice(priceDisplay, data.price, startDate, endDate);
@@ -123,16 +137,51 @@ function displayPrice(container, price, startDate, endDate) {
     const end = new Date(endDate);
     const hours = Math.ceil((end - start) / (1000 * 60 * 60));
     
-    container.innerHTML = `
+    let originalPrice = price;
+    let discountAmount = 0;
+    let finalPrice = price;
+    
+    // Apply discount if available
+    if (appliedDiscount) {
+        discountAmount = price * (appliedDiscount.percentage / 100);
+        finalPrice = price - discountAmount;
+    }
+    
+    let priceHtml = `
         <div class="pricing-display" style="opacity: 0; transform: translateY(20px);">
-            <div class="price-amount">₹${price.toFixed(2)}</div>
+            <div class="price-amount">₹${finalPrice.toFixed(2)}</div>
             <div class="price-details">
                 Total for ${hours} hour${hours !== 1 ? 's' : ''}
                 <br>
                 <small>Includes dynamic pricing adjustments</small>
+    `;
+    
+    if (appliedDiscount) {
+        priceHtml += `
+                <br>
+                <div style="margin-top: var(--space-2); padding: var(--space-2); background: var(--success-50); border-radius: var(--radius-md); border: 1px solid var(--success-200);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm);">
+                        <span>Original Price:</span>
+                        <span>₹${originalPrice.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm); color: var(--success-600); font-weight: 600;">
+                        <span>Discount (${appliedDiscount.percentage}%):</span>
+                        <span>-₹${discountAmount.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm); font-weight: 700; margin-top: var(--space-1);">
+                        <span>Final Price:</span>
+                        <span>₹${finalPrice.toFixed(2)}</span>
+                    </div>
+                </div>
+        `;
+    }
+    
+    priceHtml += `
             </div>
         </div>
     `;
+    
+    container.innerHTML = priceHtml;
     container.classList.remove('hidden');
     
     // Animate in
@@ -182,12 +231,15 @@ function initBookingSystem() {
         bookingForm.addEventListener('submit', handleBookingSubmission);
     }
     
-    // Enhanced discount code validation
+    // Enhanced discount code validation with apply button
     const discountInput = document.getElementById('discount_code');
+    const applyDiscountBtn = document.getElementById('apply_discount_btn');
+    
     if (discountInput) {
-        const debouncedValidation = debounce(validateDiscountCode, 800);
-        discountInput.addEventListener('input', debouncedValidation);
-        discountInput.addEventListener('blur', validateDiscountCode);
+        // Remove auto-validation on input/blur, only validate when Apply button is clicked
+        if (applyDiscountBtn) {
+            applyDiscountBtn.addEventListener('click', validateDiscountCode);
+        }
     }
 }
 
@@ -215,7 +267,7 @@ async function handleBookingSubmission(event) {
             vehicle_id: formData.get('vehicle_id'),
             start_date: formData.get('start_date'),
             end_date: formData.get('end_date'),
-            discount_code: formData.get('discount_code'),
+            discount_code: appliedDiscount ? appliedDiscount.code : formData.get('discount_code'),
             loyalty_token_id: formData.get('loyalty_token_id')
         };
         
@@ -255,35 +307,80 @@ async function handleBookingSubmission(event) {
     }
 }
 
+// Global variable to store applied discount
+let appliedDiscount = null;
+
 async function validateDiscountCode() {
     const discountInput = document.getElementById('discount_code');
+    const applyBtn = document.getElementById('apply_discount_btn');
+    const statusDiv = document.getElementById('discount_status');
     const code = discountInput.value.trim();
     
     if (!code) {
         clearFieldValidation(discountInput);
+        statusDiv.style.display = 'none';
+        appliedDiscount = null;
         return;
     }
     
     // Show loading state
     showFieldLoading(discountInput);
+    applyBtn.disabled = true;
+    applyBtn.textContent = 'Validating...';
     
     try {
-        // Simulate API call (replace with actual endpoint)
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Get current vehicle info
+        const vehicleId = document.getElementById('vehicle_id')?.value;
+        const vehicleSelect = document.getElementById('vehicle_id');
+        const selectedOption = vehicleSelect?.options[vehicleSelect.selectedIndex];
+        const vehicleType = selectedOption?.textContent.split('(')[1]?.split(')')[0] || '';
         
-        // Mock validation - replace with actual API call
-        const validCodes = ['WELCOME20', 'LUXURY50', 'ELECTRIC15'];
-        const isValid = validCodes.includes(code.toUpperCase());
+        const response = await fetch('/api/validate_discount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                discount_code: code,
+                vehicle_id: vehicleId,
+                vehicle_type: vehicleType
+            })
+        });
         
-        if (isValid) {
-            const percentage = code.includes('20') ? '20' : code.includes('50') ? '50' : '15';
-            showFieldSuccess(discountInput, `Valid! ${percentage}% discount applied`);
+        const data = await response.json();
+        
+        if (response.ok && data.valid) {
+            appliedDiscount = {
+                code: data.code,
+                percentage: data.discount_percentage,
+                description: data.description
+            };
+            
+            showFieldSuccess(discountInput, `Valid! ${data.discount_percentage}% discount applied`);
+            statusDiv.innerHTML = `
+                <div class="alert alert-success" style="padding: var(--space-2); border-radius: var(--radius-md); font-size: var(--text-sm);">
+                    <strong>✓ Discount Applied:</strong> ${data.discount_percentage}% off - ${data.description || 'Discount applied'}
+                </div>
+            `;
+            statusDiv.style.display = 'block';
+            
+            // Recalculate price with discount
+            if (window.CarRentalApp && window.CarRentalApp.calculatePrice) {
+                window.CarRentalApp.calculatePrice();
+            }
         } else {
-            showFieldError(discountInput, 'Invalid or expired discount code');
+            appliedDiscount = null;
+            showFieldError(discountInput, data.error || 'Invalid or expired discount code');
+            statusDiv.style.display = 'none';
         }
     } catch (error) {
         console.error('Discount validation error:', error);
         showFieldError(discountInput, 'Unable to validate discount code');
+        statusDiv.style.display = 'none';
+        appliedDiscount = null;
+    } finally {
+        applyBtn.disabled = false;
+        applyBtn.textContent = 'Apply';
     }
 }
 
@@ -948,6 +1045,7 @@ function removeInitialLoadingStates() {
 // Export functions for use in templates
 window.CarRentalApp = {
     calculatePrice,
+    validateDiscountCode,
     showSuccessMessage,
     showErrorMessage,
     showWarningMessage,
