@@ -747,6 +747,68 @@
             });
         }
 
+        // Load loyalty tokens for the user and populate the dropdown
+        function loadLoyaltyTokens() {
+            fetch('/api/loyalty_tokens')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('loyalty_token_id');
+                    // Remove all except the first option
+                    select.innerHTML = '<option value="">No loyalty token</option>';
+                    if (data.tokens && data.tokens.length > 0) {
+                        data.tokens.forEach(token => {
+                            const option = document.createElement('option');
+                            option.value = token.id;
+                            option.textContent = `₹${token.token_value} - ${token.description || 'Loyalty Reward'}` + (token.expiry_date ? ` (Expires: ${token.expiry_date})` : '');
+                            select.appendChild(option);
+                        });
+                    }
+                });
+        }
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', loadLoyaltyTokens);
+
+        // Booking form submission via AJAX
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Booking...';
+
+            const data = {
+                vehicle_id: form.vehicle_id.value,
+                start_date: form.start_date.value,
+                end_date: form.end_date.value,
+                discount_code: form.discount_code.value,
+                loyalty_token_id: form.loyalty_token_id.value
+            };
+
+            fetch('/api/create_booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Booking successful!');
+                    window.location.href = '/customer/dashboard';
+                } else {
+                    alert(result.error || 'Booking failed.');
+                }
+            })
+            .catch(() => {
+                alert('An error occurred while booking.');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> Book Now';
+            });
+        });
+
         // Mobile menu functionality
         document.addEventListener('DOMContentLoaded', () => {
             // Removed sidebar and sidebar overlay logic

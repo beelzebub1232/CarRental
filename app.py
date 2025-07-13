@@ -435,6 +435,29 @@ def api_create_booking():
         cursor.close()
         conn.close()
 
+@app.route('/api/loyalty_tokens', methods=['GET'])
+def api_loyalty_tokens():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT id, token_value, expiry_date, description
+            FROM loyalty_tokens
+            WHERE user_id = %s AND is_redeemed = FALSE AND (expiry_date IS NULL OR expiry_date > NOW())
+            ORDER BY issued_date DESC
+        """, (session['user_id'],))
+        tokens = cursor.fetchall()
+        # Convert expiry_date to string for JSON
+        for t in tokens:
+            if t['expiry_date']:
+                t['expiry_date'] = t['expiry_date'].strftime('%Y-%m-%d')
+        return jsonify({'tokens': tokens})
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/admin/simulate_price', methods=['POST'])
 def admin_simulate_price():
     if 'user_id' not in session or session['role'] != 'admin':
