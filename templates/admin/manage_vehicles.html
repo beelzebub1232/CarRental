@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Vehicles - Premium Car Rentals</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Premium Car Rentals Admin</div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('admin_manage_vehicles') }}">Vehicles</a></li>
+                <li><a href="{{ url_for('admin_reports') }}">Reports</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container" style="padding: 2rem 0;">
+        <div class="card mb-5">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="card-title">Vehicle Management</h1>
+                    <p style="color: #6b7280;">Manage your fleet and pricing settings.</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddVehicleModal()">
+                    Add New Vehicle
+                </button>
+            </div>
+        </div>
+
+        <!-- Vehicles Grid -->
+        <div class="grid grid-3">
+            {% for vehicle in vehicles %}
+            <div class="vehicle-card">
+                <img src="{{ vehicle.image_url }}" alt="{{ vehicle.make }} {{ vehicle.model }}" class="vehicle-image">
+                <div class="vehicle-info">
+                    <h3 class="vehicle-title">{{ vehicle.make }} {{ vehicle.model }}</h3>
+                    <p class="vehicle-type">{{ vehicle.year }} {{ vehicle.type }}</p>
+                    <div class="vehicle-price">${{ "%.2f"|format(vehicle.base_price) }}/hour</div>
+                    
+                    <div style="margin: 1rem 0;">
+                        <span class="status-badge {{ 'status-approved' if vehicle.availability else 'status-rejected' }}">
+                            {{ 'Available' if vehicle.availability else 'Unavailable' }}
+                        </span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem;" 
+                                onclick="editVehicle({{ vehicle.id }})">
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" style="flex: 1; padding: 0.5rem;" 
+                                onclick="deleteVehicle({{ vehicle.id }})">
+                            Delete
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 0.5rem;">
+                        <button class="btn {{ 'btn-danger' if vehicle.availability else 'btn-primary' }}" 
+                                style="width: 100%; padding: 0.5rem; font-size: 0.875rem;"
+                                onclick="toggleAvailability({{ vehicle.id }}, {{ vehicle.availability|lower }})">
+                            {{ 'Mark Unavailable' if vehicle.availability else 'Mark Available' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not vehicles %}
+        <div class="card text-center">
+            <h2>No Vehicles Found</h2>
+            <p style="color: #6b7280;">Start building your fleet by adding your first vehicle.</p>
+            <button class="btn btn-primary mt-3" onclick="showAddVehicleModal()">
+                Add Your First Vehicle
+            </button>
+        </div>
+        {% endif %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        function showAddVehicleModal() {
+            const content = `
+                <h2 style="margin-bottom: 1rem;">Add New Vehicle</h2>
+                <form id="add-vehicle-form">
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Make</label>
+                            <input type="text" name="make" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Model</label>
+                            <input type="text" name="model" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <input type="number" name="year" class="form-input" min="2000" max="2025" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select" required>
+                                <option value="">Select type...</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Luxury SUV">Luxury SUV</option>
+                                <option value="Luxury Sedan">Luxury Sedan</option>
+                                <option value="Electric">Electric</option>
+                                <option value="Truck">Truck</option>
+                                <option value="Convertible">Convertible</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Base Price (per hour)</label>
+                        <input type="number" name="base_price" class="form-input" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Pickup Latitude</label>
+                            <input type="number" name="pickup_lat" class="form-input" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pickup Longitude</label>
+                            <input type="number" name="pickup_lng" class="form-input" step="any">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Image URL</label>
+                        <input type="url" name="image_url" class="form-input" placeholder="https://example.com/image.jpg">
+                        <small style="color: #6b7280; font-size: 0.875rem;">Use high-quality car images from Pexels or similar</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-full">Add Vehicle</button>
+                </form>
+            `;
+            const modal = CarRentalApp.showModal(content);
+            
+            // Handle form submission
+            document.getElementById('add-vehicle-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
+                
+                fetch('/api/vehicles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        CarRentalApp.showSuccessMessage('Vehicle added successfully!');
+                        CarRentalApp.closeModal(modal);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        CarRentalApp.showErrorMessage(result.error || 'Failed to add vehicle');
+                    }
+                })
+                .catch(error => {
+                    CarRentalApp.showErrorMessage('An error occurred');
+                });
+            });
+        }
+
+        function editVehicle(vehicleId) {
+            // Fetch vehicle data and show edit modal
+            fetch(`/api/vehicles/${vehicleId}`)
+                .then(response => response.json())
+                .then(vehicle => {
+                    const content = `
+                        <h2 style="margin-bottom: 1rem;">Edit Vehicle</h2>
+                        <form id="edit-vehicle-form">
+                            <div class="grid grid-2" style="gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Make</label>
+                                    <input type="text" name="make" class="form-input" value="${vehicle.make}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Model</label>
+                                    <input type="text" name="model" class="form-input" value="${vehicle.model}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-2" style="gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Year</label>
+                                    <input type="number" name="year" class="form-input" value="${vehicle.year}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Type</label>
+                                    <select name="type" class="form-select" required>
+                                        <option value="Sedan" ${vehicle.type === 'Sedan' ? 'selected' : ''}>Sedan</option>
+                                        <option value="SUV" ${vehicle.type === 'SUV' ? 'selected' : ''}>SUV</option>
+                                        <option value="Luxury SUV" ${vehicle.type === 'Luxury SUV' ? 'selected' : ''}>Luxury SUV</option>
+                                        <option value="Luxury Sedan" ${vehicle.type === 'Luxury Sedan' ? 'selected' : ''}>Luxury Sedan</option>
+                                        <option value="Electric" ${vehicle.type === 'Electric' ? 'selected' : ''}>Electric</option>
+                                        <option value="Truck" ${vehicle.type === 'Truck' ? 'selected' : ''}>Truck</option>
+                                        <option value="Convertible" ${vehicle.type === 'Convertible' ? 'selected' : ''}>Convertible</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Base Price (per hour)</label>
+                                <input type="number" name="base_price" class="form-input" value="${vehicle.base_price}" step="0.01" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Image URL</label>
+                                <input type="url" name="image_url" class="form-input" value="${vehicle.image_url || ''}">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-full">Update Vehicle</button>
+                        </form>
+                    `;
+                    const modal = CarRentalApp.showModal(content);
+                    
+                    // Handle form submission
+                    document.getElementById('edit-vehicle-form').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData(this);
+                        const data = Object.fromEntries(formData);
+                        
+                        fetch(`/api/vehicles/${vehicleId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                CarRentalApp.showSuccessMessage('Vehicle updated successfully!');
+                                CarRentalApp.closeModal(modal);
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                CarRentalApp.showErrorMessage(result.error || 'Failed to update vehicle');
+                            }
+                        })
+                        .catch(error => {
+                            CarRentalApp.showErrorMessage('An error occurred');
+                        });
+                    });
+                })
+                .catch(error => {
+                    CarRentalApp.showErrorMessage('Failed to load vehicle data');
+                });
+        }
+
+        function deleteVehicle(vehicleId) {
+            if (confirm('Are you sure you want to delete this vehicle? This action cannot be undone.')) {
+                fetch(`/api/vehicles/${vehicleId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        CarRentalApp.showSuccessMessage('Vehicle deleted successfully!');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        CarRentalApp.showErrorMessage(result.error || 'Failed to delete vehicle');
+                    }
+                })
+                .catch(error => {
+                    CarRentalApp.showErrorMessage('An error occurred');
+                });
+            }
+        }
+
+        function toggleAvailability(vehicleId, currentAvailability) {
+            const newAvailability = !currentAvailability;
+            const action = newAvailability ? 'available' : 'unavailable';
+            
+            if (confirm(`Are you sure you want to mark this vehicle as ${action}?`)) {
+                fetch(`/api/vehicles/${vehicleId}/availability`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ availability: newAvailability })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        CarRentalApp.showSuccessMessage(`Vehicle marked as ${action}!`);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        CarRentalApp.showErrorMessage(result.error || 'Failed to update availability');
+                    }
+                })
+                .catch(error => {
+                    CarRentalApp.showErrorMessage('An error occurred');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

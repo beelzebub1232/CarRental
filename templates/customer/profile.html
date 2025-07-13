@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - DriveEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Customer Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
+            <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">My Profile</h1>
+                    <p class="page-subtitle">Manage your account and view your rental history</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <!-- Profile Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Profile Information</h2>
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <label>Full Name</label>
+                            <span>{{ user.full_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email Address</label>
+                            <span>{{ user.email }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Member Since</label>
+                            <span>{{ user.created_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Account Status</label>
+                            <span class="status-badge status-approved">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Statistics -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Statistics</h2>
+                    </div>
+                    <div class="stats-mini-grid">
+                        <div class="mini-stat-card">
+                            <div class="mini-stat-value">{{ bookings|length }}</div>
+                            <div class="mini-stat-label">Total Bookings</div>
+                        </div>
+                        <div class="mini-stat-card">
+                            <div class="mini-stat-value">{{ loyalty_tokens|length }}</div>
+                            <div class="mini-stat-label">Loyalty Tokens</div>
+                        </div>
+                    </div>
+                    {% set completed_bookings = bookings|selectattr('status', 'equalto', 'completed')|list %}
+                    {% if completed_bookings %}
+                        {% set total_spent = completed_bookings|sum(attribute='total_price') %}
+                        <div class="total-spent">
+                            <div class="spent-amount">${{ "%.2f"|format(total_spent) }}</div>
+                            <div class="spent-label">Total Spent</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Loyalty Tokens -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Loyalty Tokens</h2>
+                </div>
+                {% if loyalty_tokens %}
+                    <div class="tokens-grid">
+                        {% for token in loyalty_tokens %}
+                        <div class="loyalty-token-card {{ 'redeemed' if token.is_redeemed else 'available' }}">
+                            <div class="token-header">
+                                <div class="token-value">${{ "%.2f"|format(token.token_value) }}</div>
+                                <div class="token-status">
+                                    {% if token.is_redeemed %}
+                                        <span class="status-badge status-completed">Redeemed</span>
+                                    {% else %}
+                                        <span class="status-badge status-approved">Available</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="token-details">
+                                <div class="token-description">{{ token.description or 'Loyalty Reward' }}</div>
+                                <div class="token-dates">
+                                    <div>Issued: {{ token.issued_date.strftime('%m/%d/%Y') }}</div>
+                                    {% if token.expiry_date %}
+                                        <div>Expires: {{ token.expiry_date.strftime('%m/%d/%Y') }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <h4>No loyalty tokens yet</h4>
+                        <p>Complete bookings to earn rewards!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Booking History -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Booking History</h2>
+                </div>
+                {% if bookings %}
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Vehicle</th>
+                                    <th>Dates</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Booked</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td>
+                                        <div class="booking-id">#{{ booking.id }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="vehicle-info">
+                                            <div class="vehicle-name">{{ booking.make }} {{ booking.model }}</div>
+                                            <div class="vehicle-details">{{ booking.year }} {{ booking.type }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="booking-dates">
+                                            <div>{{ booking.start_date.strftime('%m/%d/%Y %I:%M %p') }}</div>
+                                            <div class="date-to">to {{ booking.end_date.strftime('%m/%d/%Y %I:%M %p') }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="pricing-info">
+                                            <div class="total-price">${{ "%.2f"|format(booking.total_price) }}</div>
+                                            {% if booking.discount_applied > 0 %}
+                                            <div class="discount-applied">-${{ "%.2f"|format(booking.discount_applied) }} discount</div>
+                                            {% endif %}
+                                            {% if booking.loyalty_token_used > 0 %}
+                                            <div class="loyalty-used">-${{ "%.2f"|format(booking.loyalty_token_used) }} loyalty</div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="booking-date">{{ booking.booking_date.strftime('%m/%d/%Y') }}</div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <h4>No bookings yet</h4>
+                        <p>Ready to start your journey?</p>
+                        <a href="{{ url_for('customer_booking') }}" class="btn btn-primary">Book Your First Vehicle</a>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <style>
+        /* Profile Page Specific Styles */
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4);
+            background: var(--neutral-50);
+            border-radius: var(--radius-xl);
+            transition: all var(--transition-fast);
+        }
+
+        .info-item:hover {
+            background: var(--primary-50);
+            transform: translateY(-1px);
+        }
+
+        .info-item label {
+            font-weight: 600;
+            color: var(--neutral-700);
+            font-size: var(--text-sm);
+        }
+
+        .info-item span {
+            font-weight: 500;
+            color: var(--neutral-900);
+        }
+
+        .stats-mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .mini-stat-card {
+            background: var(--primary-50);
+            border: 2px solid var(--primary-200);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-4);
+            text-align: center;
+            transition: all var(--transition-normal);
+        }
+
+        .mini-stat-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mini-stat-value {
+            font-size: var(--text-3xl);
+            font-weight: 900;
+            color: var(--primary-700);
+            margin-bottom: var(--space-1);
+        }
+
+        .mini-stat-label {
+            font-size: var(--text-sm);
+            color: var(--primary-600);
+            font-weight: 600;
+        }
+
+        .total-spent {
+            text-align: center;
+            padding: var(--space-6);
+            background: linear-gradient(135deg, var(--secondary-50), var(--primary-50));
+            border-radius: var(--radius-2xl);
+            border: 2px solid var(--secondary-200);
+        }
+
+        .spent-amount {
+            font-size: var(--text-4xl);
+            font-weight: 900;
+            color: var(--secondary-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .spent-label {
+            font-size: var(--text-base);
+            color: var(--secondary-600);
+            font-weight: 600;
+        }
+
+        /* Loyalty Tokens */
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .loyalty-token-card {
+            background: var(--success-50);
+            border: 2px solid var(--success-200);
+            border-radius: var(--radius-3xl);
+            padding: var(--space-6);
+            transition: all var(--transition-normal);
+        }
+
+        .loyalty-token-card.redeemed {
+            background: var(--neutral-50);
+            border-color: var(--neutral-200);
+            opacity: 0.7;
+        }
+
+        .loyalty-token-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .token-value {
+            font-size: var(--text-2xl);
+            font-weight: 900;
+            color: var(--success-700);
+        }
+
+        .loyalty-token-card.redeemed .token-value {
+            color: var(--neutral-600);
+        }
+
+        .token-details {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .token-description {
+            font-weight: 600;
+            color: var(--success-800);
+            font-size: var(--text-sm);
+        }
+
+        .loyalty-token-card.redeemed .token-description {
+            color: var(--neutral-600);
+        }
+
+        .token-dates {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            font-size: var(--text-xs);
+            color: var(--success-600);
+        }
+
+        .loyalty-token-card.redeemed .token-dates {
+            color: var(--neutral-500);
+        }
+
+        /* Table Styles */
+        .booking-id {
+            font-weight: 700;
+            color: var(--primary-600);
+            font-size: var(--text-sm);
+        }
+
+        .vehicle-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .vehicle-name {
+            font-weight: 600;
+            color: var(--neutral-900);
+            font-size: var(--text-sm);
+        }
+
+        .vehicle-details {
+            color: var(--neutral-600);
+            font-size: var(--text-xs);
+        }
+
+        .booking-dates {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            font-size: var(--text-sm);
+        }
+
+        .date-to {
+            color: var(--neutral-600);
+            font-size: var(--text-xs);
+        }
+
+        .pricing-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .total-price {
+            font-weight: 700;
+            color: var(--secondary-600);
+            font-size: var(--text-base);
+        }
+
+        .discount-applied {
+            color: var(--success-600);
+            font-size: var(--text-xs);
+            font-weight: 500;
+        }
+
+        .loyalty-used {
+            color: var(--primary-600);
+            font-size: var(--text-xs);
+            font-weight: 500;
+        }
+
+        .booking-date {
+            color: var(--neutral-600);
+            font-size: var(--text-sm);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--neutral-500);
+        }
+
+        .empty-state svg {
+            margin-bottom: var(--space-4);
+            color: var(--neutral-400);
+        }
+
+        .empty-state h4 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .empty-state p {
+            margin-bottom: var(--space-4);
+            color: var(--neutral-500);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-mini-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tokens-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .token-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-2);
+            }
+        }
+    </style>
+
+    <script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    sidebarOverlay.classList.toggle('show');
+                });
+            }
+            
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('show');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

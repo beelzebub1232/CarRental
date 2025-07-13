@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DriveEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Admin Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Admin Dashboard</h1>
+                    <p class="page-subtitle">Manage your car rental business with comprehensive tools and insights</p>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ total_vehicles }}</div>
+                    <div class="stat-label">Total Vehicles</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ total_customers }}</div>
+                    <div class="stat-label">Customers</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ pending_bookings }}</div>
+                    <div class="stat-label">Pending Bookings</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value">${{ "%.0f"|format(total_revenue) }}</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <!-- Price Simulator -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Price Simulator</h2>
+                    </div>
+                    <form id="price-simulator-form">
+                        <div class="form-group">
+                            <label for="sim-vehicle" class="form-label">Vehicle</label>
+                            <select id="sim-vehicle" name="vehicle_id" class="form-select" required>
+                                <option value="">Select a vehicle...</option>
+                                <!-- This would be populated with vehicles -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sim-start" class="form-label">Start Date & Time</label>
+                            <input type="datetime-local" id="sim-start" name="start_datetime" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sim-end" class="form-label">End Date & Time</label>
+                            <input type="datetime-local" id="sim-end" name="end_datetime" class="form-input" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-secondary btn-full">Simulate Price</button>
+                    </form>
+                    
+                    <div id="simulation-result" class="simulation-result"></div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Quick Actions</h2>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="{{ url_for('admin_manage_vehicles') }}" class="btn btn-primary btn-full">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                                <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                            </svg>
+                            Manage Vehicles
+                        </a>
+                        <button class="btn btn-secondary btn-full" onclick="showLoyaltyModal()">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Issue Loyalty Token
+                        </button>
+                        <button class="btn btn-secondary btn-full" onclick="showDiscountModal()">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                <path d="M21 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                                <path d="M3 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                            </svg>
+                            Create Discount Code
+                        </button>
+                        <a href="{{ url_for('admin_reports') }}" class="btn btn-secondary btn-full">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                            View Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Bookings</h2>
+                </div>
+                {% if recent_bookings %}
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Vehicle</th>
+                                    <th>Dates</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                <tr>
+                                    <td>
+                                        <div class="booking-id">#{{ booking.id }}</div>
+                                    </td>
+                                    <td>{{ booking.full_name }}</td>
+                                    <td>{{ booking.make }} {{ booking.model }}</td>
+                                    <td>
+                                        <div class="booking-dates">
+                                            <div>{{ booking.start_date.strftime('%m/%d %I:%M %p') }}</div>
+                                            <div class="date-to">to {{ booking.end_date.strftime('%m/%d %I:%M %p') }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="total-price">${{ "%.2f"|format(booking.total_price) }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
+                                    </td>
+                                    <td>
+                                        {% if booking.status == 'pending' %}
+                                        <button class="btn btn-primary btn-sm" onclick="updateBookingStatus({{ booking.id }}, 'approved')">
+                                            Approve
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <h4>No recent bookings</h4>
+                        <p>Bookings will appear here as customers make reservations</p>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <style>
+        /* Admin Dashboard Specific Styles */
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .simulation-result {
+            margin-top: var(--space-6);
+            padding: var(--space-4);
+            border-radius: var(--radius-xl);
+            background: var(--neutral-50);
+            border: 2px solid var(--neutral-200);
+            text-align: center;
+            display: none;
+        }
+
+        .simulation-result.show {
+            display: block;
+        }
+
+        .simulation-result.success {
+            background: var(--success-50);
+            border-color: var(--success-200);
+            color: var(--success-700);
+        }
+
+        .simulation-result.error {
+            background: var(--error-50);
+            border-color: var(--error-200);
+            color: var(--error-700);
+        }
+
+        .booking-id {
+            font-weight: 700;
+            color: var(--primary-600);
+            font-size: var(--text-sm);
+        }
+
+        .booking-dates {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            font-size: var(--text-sm);
+        }
+
+        .date-to {
+            color: var(--neutral-600);
+            font-size: var(--text-xs);
+        }
+
+        .total-price {
+            font-weight: 700;
+            color: var(--secondary-600);
+            font-size: var(--text-base);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--neutral-500);
+        }
+
+        .empty-state svg {
+            margin-bottom: var(--space-4);
+            color: var(--neutral-400);
+        }
+
+        .empty-state h4 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .empty-state p {
+            margin-bottom: var(--space-4);
+            color: var(--neutral-500);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Load vehicles for price simulator
+        fetch('/api/vehicles')
+            .then(response => response.json())
+            .then(vehicles => {
+                const select = document.getElementById('sim-vehicle');
+                vehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.year})`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                // Fallback: populate with example data
+                const select = document.getElementById('sim-vehicle');
+                const examples = [
+                    {id: 1, text: 'Toyota Camry (2023)'},
+                    {id: 2, text: 'Honda CR-V (2023)'},
+                    {id: 3, text: 'BMW X5 (2023)'}
+                ];
+                examples.forEach(ex => {
+                    const option = document.createElement('option');
+                    option.value = ex.id;
+                    option.textContent = ex.text;
+                    select.appendChild(option);
+                });
+            });
+
+        // Price simulator form handler
+        document.getElementById('price-simulator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('simulation-result');
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Calculating...';
+            resultDiv.className = 'simulation-result show';
+            resultDiv.innerHTML = 'Calculating price...';
+            
+            fetch('/admin/simulate_price', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vehicle_id: formData.get('vehicle_id'),
+                    start_datetime: formData.get('start_datetime'),
+                    end_datetime: formData.get('end_datetime')
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.simulated_price) {
+                    resultDiv.className = 'simulation-result show success';
+                    resultDiv.innerHTML = `
+                        <div style="font-size: var(--text-2xl); font-weight: 700; margin-bottom: var(--space-2);">
+                            $${result.simulated_price}
+                        </div>
+                        <div>Simulated price includes all dynamic pricing adjustments</div>
+                    `;
+                } else {
+                    resultDiv.className = 'simulation-result show error';
+                    resultDiv.innerHTML = `Error: ${result.error || 'Unable to simulate price'}`;
+                }
+            })
+            .catch(error => {
+                resultDiv.className = 'simulation-result show error';
+                resultDiv.innerHTML = 'An error occurred during simulation';
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Simulate Price';
+            });
+        });
+
+        function showLoyaltyModal() {
+            const content = `
+                <h2 style="margin-bottom: 1rem;">Issue Loyalty Token</h2>
+                <form id="loyalty-form">
+                    <div class="form-group">
+                        <label class="form-label">Customer Email</label>
+                        <input type="email" name="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Token Value ($)</label>
+                        <input type="number" name="value" class="form-input" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-input" placeholder="e.g., Holiday bonus">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Issue Token</button>
+                </form>
+            `;
+            showModal(content);
+        }
+
+        function showDiscountModal() {
+            const content = `
+                <h2 style="margin-bottom: 1rem;">Create Discount Code</h2>
+                <form id="discount-form">
+                    <div class="form-group">
+                        <label class="form-label">Discount Code</label>
+                        <input type="text" name="code" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Discount Percentage</label>
+                        <input type="number" name="percentage" class="form-input" min="1" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Discount</button>
+                </form>
+            `;
+            showModal(content);
+        }
+
+        function showModal(content) {
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    ${content}
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button class="btn btn-outline modal-close">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target.classList.contains('modal-close')) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        function updateBookingStatus(bookingId, status) {
+            if (confirm(`Are you sure you want to ${status} this booking?`)) {
+                // Simulate API call
+                setTimeout(() => {
+                    alert(`Booking ${status} successfully`);
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        // Set minimum date to current time
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        const nowString = now.toISOString().slice(0, 16);
+        document.getElementById('sim-start').min = nowString;
+        document.getElementById('sim-end').min = nowString;
+
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    sidebarOverlay.classList.toggle('show');
+                });
+            }
+            
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('show');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
