@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, abort
 import mysql.connector
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, SECRET_KEY, DEBUG
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -223,6 +223,123 @@ def customer_profile():
                          user=user, 
                          bookings=bookings, 
                          loyalty_tokens=loyalty_tokens)
+
+@app.route('/customer/payment', methods=['GET', 'POST'])
+def customer_payment():
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        # Store booking details in session
+        session['pending_booking'] = {
+            'vehicle_id': request.form.get('vehicle_id'),
+            'start_date': request.form.get('start_date'),
+            'end_date': request.form.get('end_date'),
+            'discount_code': request.form.get('discount_code'),
+            'loyalty_token_id': request.form.get('loyalty_token_id')
+        }
+        return redirect(url_for('customer_payment'))
+    # GET: render payment page with booking details
+    booking = session.get('pending_booking')
+    if not booking:
+        return redirect(url_for('customer_booking'))
+    # Optionally, fetch vehicle details for display
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM vehicles WHERE id = %s", (booking['vehicle_id'],))
+    vehicle = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return render_template('customer/payment.html', booking=booking, vehicle=vehicle)
+
+@app.route('/api/process_payment_and_booking', methods=['POST'])
+def api_process_payment_and_booking():
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('login'))
+    booking = session.get('pending_booking')
+    if not booking:
+        flash('No booking in progress.')
+        return redirect(url_for('customer_booking'))
+    user_id = session['user_id']
+    vehicle_id = booking.get('vehicle_id')
+    start_date = booking.get('start_date')
+    end_date = booking.get('end_date')
+    discount_code = booking.get('discount_code')
+    loyalty_token_id = booking.get('loyalty_token_id')
+    if not (vehicle_id and start_date and end_date):
+        flash('Incomplete booking details.')
+        return redirect(url_for('customer_booking'))
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        # Calculate price
+        from datetime import datetime
+        start_dt = datetime.strptime(start_date, '%Y-%m-%dT%H:%M') if 'T' in start_date else datetime.strptime(start_date, '%Y-%m-%d %H:%M')
+        end_dt = datetime.strptime(end_date, '%Y-%m-%dT%H:%M') if 'T' in end_date else datetime.strptime(end_date, '%Y-%m-%d %H:%M')
+        total_price = calculate_final_price(vehicle_id, start_dt, end_dt)
+        discount_applied = 0
+        loyalty_token_used = 0
+        # Apply discount code
+        if discount_code:
+            cursor.execute("""
+                SELECT * FROM discounts 
+                WHERE code = %s AND is_active = TRUE 
+                AND start_date <= CURDATE() AND end_date >= CURDATE()
+                AND (usage_limit = 0 OR times_used < usage_limit)
+            """, (discount_code,))
+            discount = cursor.fetchone()
+            if discount:
+                discount_applied = total_price * (float(discount['discount_percentage']) / 100)
+                total_price -= discount_applied
+                cursor.execute(
+                    "UPDATE discounts SET times_used = times_used + 1 WHERE id = %s",
+                    (discount['id'],)
+                )
+        # Apply loyalty token
+        if loyalty_token_id:
+            cursor.execute("""
+                SELECT * FROM loyalty_tokens 
+                WHERE id = %s AND user_id = %s AND is_redeemed = FALSE
+                AND (expiry_date IS NULL OR expiry_date > NOW())
+            """, (loyalty_token_id, user_id))
+            token = cursor.fetchone()
+            if token:
+                loyalty_token_used = min(float(token['token_value']), total_price)
+                total_price -= loyalty_token_used
+                cursor.execute(
+                    "UPDATE loyalty_tokens SET is_redeemed = TRUE WHERE id = %s",
+                    (loyalty_token_id,)
+                )
+        # Create booking
+        cursor.execute("""
+            INSERT INTO bookings 
+            (user_id, vehicle_id, start_date, end_date, total_price, discount_applied, loyalty_token_used)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (user_id, vehicle_id, start_dt, end_dt, total_price, discount_applied, loyalty_token_used))
+        booking_id = cursor.lastrowid
+        # Record dummy payment
+        cursor.execute("""
+            INSERT INTO payments (booking_id, user_id, amount, status, method)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (booking_id, user_id, total_price, 'success', 'dummy'))
+        # Issue loyalty token (5% of booking value)
+        loyalty_value = total_price * 0.05
+        from datetime import timedelta
+        expiry_date = datetime.now() + timedelta(days=365)
+        cursor.execute("""
+            INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
+            VALUES (%s, %s, %s, %s)
+        """, (user_id, loyalty_value, expiry_date, f'Earned from booking #{booking_id}'))
+        conn.commit()
+        session.pop('pending_booking', None)
+        flash('Payment successful! Booking confirmed.')
+        return redirect(url_for('customer_dashboard'))
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error processing payment/booking: {e}')
+        return redirect(url_for('customer_booking'))
+    finally:
+        cursor.close()
+        conn.close()
 
 # Admin routes
 @app.route('/admin/dashboard')
@@ -458,6 +575,42 @@ def api_loyalty_tokens():
         cursor.close()
         conn.close()
 
+@app.route('/api/loyalty_tokens', methods=['POST'])
+def api_issue_loyalty_token():
+    require_admin()
+    data = request.get_json()
+    email = data.get('email')
+    token_value = data.get('value')
+    expiry_date = data.get('expiry_date')
+    description = data.get('description')
+    if not email or not token_value:
+        return jsonify({'success': False, 'error': 'Email and value are required'}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            user['id'],
+            token_value,
+            expiry_date,
+            description
+        ))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/admin/simulate_price', methods=['POST'])
 def admin_simulate_price():
     if 'user_id' not in session or session['role'] != 'admin':
@@ -477,6 +630,295 @@ def admin_simulate_price():
         return jsonify({'simulated_price': simulated_price})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+# --- Vehicle Management API (Admin Only) ---
+
+def require_admin():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        abort(403)
+
+@app.route('/api/vehicles', methods=['GET'])
+def api_list_vehicles():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM vehicles ORDER BY make, model")
+    vehicles = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify({'vehicles': vehicles})
+
+@app.route('/api/vehicles', methods=['POST'])
+def api_add_vehicle():
+    require_admin()
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO vehicles (make, model, year, type, base_price, availability, pickup_location_lat, pickup_location_lng, image_url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            data.get('make'),
+            data.get('model'),
+            data.get('year'),
+            data.get('type'),
+            data.get('base_price'),
+            data.get('availability', True),
+            data.get('pickup_lat'),
+            data.get('pickup_lng'),
+            data.get('image_url')
+        ))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/vehicles/<int:vehicle_id>', methods=['GET'])
+def api_get_vehicle(vehicle_id):
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM vehicles WHERE id = %s", (vehicle_id,))
+    vehicle = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not vehicle:
+        return jsonify({'success': False, 'error': 'Vehicle not found'}), 404
+    return jsonify(vehicle)
+
+@app.route('/api/vehicles/<int:vehicle_id>', methods=['PUT'])
+def api_update_vehicle(vehicle_id):
+    require_admin()
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE vehicles SET make=%s, model=%s, year=%s, type=%s, base_price=%s, image_url=%s, pickup_location_lat=%s, pickup_location_lng=%s
+            WHERE id=%s
+        """, (
+            data.get('make'),
+            data.get('model'),
+            data.get('year'),
+            data.get('type'),
+            data.get('base_price'),
+            data.get('image_url'),
+            data.get('pickup_lat'),
+            data.get('pickup_lng'),
+            vehicle_id
+        ))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/vehicles/<int:vehicle_id>', methods=['DELETE'])
+def api_delete_vehicle(vehicle_id):
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM vehicles WHERE id = %s", (vehicle_id,))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/vehicles/<int:vehicle_id>/availability', methods=['PUT'])
+def api_toggle_vehicle_availability(vehicle_id):
+    require_admin()
+    data = request.get_json()
+    availability = data.get('availability', True)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE vehicles SET availability = %s WHERE id = %s", (availability, vehicle_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/discounts', methods=['POST'])
+def api_create_discount():
+    require_admin()
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO discounts (code, discount_percentage, start_date, end_date, vehicle_id, vehicle_type, usage_limit, times_used, is_active, description)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 0, %s, %s)
+        """, (
+            data.get('code'),
+            data.get('discount_percentage'),
+            data.get('start_date'),
+            data.get('end_date'),
+            data.get('vehicle_id'),
+            data.get('vehicle_type'),
+            data.get('usage_limit', 0),
+            data.get('is_active', True),
+            data.get('description')
+        ))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/bookings/<int:booking_id>/status', methods=['POST'])
+def api_update_booking_status(booking_id):
+    require_admin()
+    data = request.get_json()
+    status = data.get('status')
+    if status not in ['pending', 'approved', 'rejected', 'completed']:
+        return jsonify({'success': False, 'error': 'Invalid status'}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE bookings SET status = %s WHERE id = %s", (status, booking_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/customer/review/<int:booking_id>', methods=['GET', 'POST'])
+def customer_review(booking_id):
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    # Check booking ownership and status
+    cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
+    booking = cursor.fetchone()
+    if not booking or booking['status'] != 'completed':
+        flash('You can only review completed bookings.')
+        cursor.close()
+        conn.close()
+        return redirect(url_for('customer_dashboard'))
+    # Check if already reviewed
+    cursor.execute("SELECT * FROM reviews WHERE booking_id = %s AND user_id = %s", (booking_id, user_id))
+    review = cursor.fetchone()
+    if request.method == 'POST':
+        if review:
+            flash('You have already reviewed this booking.')
+            cursor.close()
+            conn.close()
+            return redirect(url_for('customer_dashboard'))
+        rating = int(request.form.get('rating', 0))
+        comment = request.form.get('comment', '')
+        if not (1 <= rating <= 5):
+            flash('Rating must be between 1 and 5.')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        cursor.execute("""
+            INSERT INTO reviews (booking_id, user_id, rating, comment)
+            VALUES (%s, %s, %s, %s)
+        """, (booking_id, user_id, rating, comment))
+        conn.commit()
+        flash('Thank you for your review!')
+        cursor.close()
+        conn.close()
+        return redirect(url_for('customer_dashboard'))
+    cursor.close()
+    conn.close()
+    return render_template('customer/review.html', booking=booking, review=review)
+
+@app.route('/api/users', methods=['GET'])
+def api_list_users():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, email, full_name, role FROM users ORDER BY id")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify({'users': users})
+
+@app.route('/api/users/<int:user_id>', methods=['PUT'])
+def api_edit_user(user_id):
+    require_admin()
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE users SET email=%s, full_name=%s, role=%s WHERE id=%s
+        """, (
+            data.get('email'),
+            data.get('full_name'),
+            data.get('role'),
+            user_id
+        ))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/users/<int:user_id>/reset_password', methods=['POST'])
+def api_reset_user_password(user_id):
+    require_admin()
+    data = request.get_json()
+    new_password = data.get('new_password')
+    if not new_password:
+        return jsonify({'success': False, 'error': 'New password required'}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE users SET password=%s WHERE id=%s", (new_password, user_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+def api_delete_user(user_id):
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE id=%s", (user_id,))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
 
 if __name__ == '__main__':
     app.run(debug=DEBUG)

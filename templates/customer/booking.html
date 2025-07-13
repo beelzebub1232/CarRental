@@ -50,7 +50,7 @@
                             <div class="booking-step">Step 1 of 2</div>
                         </div>
                         
-                        <form id="booking-form" class="booking-form">
+                        <form id="booking-form" class="booking-form" method="POST" action="{{ url_for('customer_payment') }}">
                             <div class="form-group">
                                 <label for="vehicle_id" class="form-label">
                                     <svg class="icon icon-sm" viewBox="0 0 24 24">
@@ -517,6 +517,32 @@
             font-weight: 500;
         }
 
+        /* Feedback Styles */
+        .feedback-success {
+            background: #e6ffed;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .feedback-error {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .feedback-info {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .grid-cols-2 {
@@ -686,26 +712,44 @@
             }
         });
 
-        // Calculate price function
+        // Add feedback div above the booking form
+        const bookingForm = document.getElementById('booking-form');
+        let feedbackDiv = document.getElementById('booking-feedback');
+        if (!feedbackDiv) {
+            feedbackDiv = document.createElement('div');
+            feedbackDiv.id = 'booking-feedback';
+            feedbackDiv.style.marginBottom = '1rem';
+            bookingForm.parentNode.insertBefore(feedbackDiv, bookingForm);
+        }
+
+        // Helper to show feedback
+        function showBookingFeedback(message, type = 'info') {
+            feedbackDiv.textContent = message;
+            feedbackDiv.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
+            feedbackDiv.style.display = 'block';
+        }
+        function clearBookingFeedback() {
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = '';
+            feedbackDiv.style.display = 'none';
+        }
+
+        // Update price calculation function
         function calculatePrice() {
             const vehicleId = document.getElementById('vehicle_id').value;
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
             const priceDisplay = document.getElementById('price-display');
-            
+            clearBookingFeedback();
             if (!vehicleId || !startDate || !endDate) {
                 priceDisplay.classList.add('hidden');
                 return;
             }
-            
-            // Show loading
             priceDisplay.innerHTML = `
                 <div class="price-amount">Calculating...</div>
                 <div class="price-details">Please wait</div>
             `;
             priceDisplay.classList.remove('hidden');
-            
-            // Calculate price via API
             fetch('/api/calculate_price', {
                 method: 'POST',
                 headers: {
@@ -723,7 +767,6 @@
                     const start = new Date(startDate);
                     const end = new Date(endDate);
                     const hours = Math.ceil((end - start) / (1000 * 60 * 60));
-                    
                     priceDisplay.innerHTML = `
                         <div class="price-amount">₹${data.price.toFixed(2)}</div>
                         <div class="price-details">
@@ -737,6 +780,7 @@
                         <div class="price-amount">Error</div>
                         <div class="price-details">${data.error || 'Unable to calculate price'}</div>
                     `;
+                    showBookingFeedback(data.error || 'Unable to calculate price', 'error');
                 }
             })
             .catch(error => {
@@ -744,6 +788,7 @@
                     <div class="price-amount">Error</div>
                     <div class="price-details">Please try again</div>
                 `;
+                showBookingFeedback('An error occurred while calculating price.', 'error');
             });
         }
 
@@ -767,47 +812,6 @@
         }
         // Call on page load
         document.addEventListener('DOMContentLoaded', loadLoyaltyTokens);
-
-        // Booking form submission via AJAX
-        document.getElementById('booking-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = this;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Booking...';
-
-            const data = {
-                vehicle_id: form.vehicle_id.value,
-                start_date: form.start_date.value,
-                end_date: form.end_date.value,
-                discount_code: form.discount_code.value,
-                loyalty_token_id: form.loyalty_token_id.value
-            };
-
-            fetch('/api/create_booking', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    alert('Booking successful!');
-                    window.location.href = '/customer/dashboard';
-                } else {
-                    alert(result.error || 'Booking failed.');
-                }
-            })
-            .catch(() => {
-                alert('An error occurred while booking.');
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> Book Now';
-            });
-        });
 
         // Mobile menu functionality
         document.addEventListener('DOMContentLoaded', () => {

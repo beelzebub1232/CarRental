@@ -186,6 +186,18 @@
                                     <td>
                                         <div class="booking-date">{{ booking.booking_date.strftime('%m/%d/%Y') }}</div>
                                     </td>
+                                    <td>
+                                        {% if booking.status == 'completed' %}
+                                            {% set review = None %}
+                                            {% for r in loyalty_tokens %}{% if r.booking_id == booking.id %}{% set review = r %}{% endif %}{% endfor %}
+                                            {% if review %}
+                                                <div>Rating: {{ review.rating }} / 5</div>
+                                                <div>Comment: {{ review.comment }}</div>
+                                            {% else %}
+                                                <a href="{{ url_for('customer_review', booking_id=booking.id) }}" class="btn btn-sm btn-primary">Leave Review</a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

@@ -127,6 +127,22 @@ def create_database():
             )
         """)
         
+        # Create payments table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS payments (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                booking_id INT,
+                user_id INT,
+                amount DECIMAL(10, 2) NOT NULL,
+                payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status VARCHAR(20) DEFAULT 'success',
+                method VARCHAR(50) DEFAULT 'dummy',
+                reference VARCHAR(100),
+                FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            )
+        """)
+        
         # Insert default admin user (password: admin123)
         cursor.execute("""
             INSERT IGNORE INTO users (email, password, full_name, role) 
