@@ -411,14 +411,10 @@
             const submitButton = this.querySelector('button[type="submit"]');
             const feedbackDiv = document.getElementById('simulator-feedback');
             function showSimulatorFeedback(message, type = 'info') {
-                feedbackDiv.textContent = message;
-                feedbackDiv.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
-                feedbackDiv.style.display = 'block';
+                showToast(message, type);
             }
             function clearSimulatorFeedback() {
-                feedbackDiv.textContent = '';
-                feedbackDiv.className = '';
-                feedbackDiv.style.display = 'none';
+                // Toast system handles clearing automatically
             }
             clearSimulatorFeedback();
             showSimulatorFeedback('Simulating price...', 'info');
@@ -589,6 +585,9 @@
                     sidebarOverlay.classList.remove('show');
                 });
             }
+            
+            // Show welcome toast for admin
+            showToast('Welcome to the Admin Dashboard!', 'info');
         });
     </script>
     <div id="notification-widget" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;">

@@ -385,6 +385,7 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
     // Tab switching logic with animation
     document.addEventListener('DOMContentLoaded', function() {
@@ -414,6 +415,31 @@
                 input.classList.add('filled');
             }
         });
+        // Show flashed messages as toasts
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    showToast('{{ message }}', '{{ category if category in ["success", "error", "warning"] else "info" }}');
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        // Test toast system (remove in production)
+        setTimeout(() => {
+            showToast('Toast system is working!', 'success');
+        }, 1000);
+        
+        setTimeout(() => {
+            showToast('This is an info message', 'info');
+        }, 3000);
+        
+        setTimeout(() => {
+            showToast('This is a warning message', 'warning');
+        }, 5000);
+        
+        setTimeout(() => {
+            showToast('This is an error message', 'error');
+        }, 7000);
     });
     // Show/hide password toggle
     function togglePassword(inputId, btn) {
@@ -428,24 +454,11 @@
     }
     // Custom form validation and focus management
     const loginForm = document.getElementById('login-form');
-    const loginMessage = document.getElementById('login-message');
-    function showLoginMessage(message, type = 'info') {
-        loginMessage.textContent = message;
-        loginMessage.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
-        loginMessage.style.display = 'block';
-        loginMessage.focus();
-    }
-    function clearLoginMessage() {
-        loginMessage.textContent = '';
-        loginMessage.className = '';
-        loginMessage.style.display = 'none';
-    }
     loginForm.addEventListener('submit', function(e) {
-        clearLoginMessage();
         let hasError = false;
         let firstErrorField = null;
         // Validate required fields
-        ['email','password'].forEach(id => {
+        ['login-email','login-password'].forEach(id => {
             const field = document.getElementById(id);
             if (!field.value) {
                 hasError = true;
@@ -454,11 +467,12 @@
         });
         if (hasError) {
             e.preventDefault();
-            showLoginMessage('Please enter both email and password.', 'error');
+            showToast('Please enter both email and password.', 'error');
             if (firstErrorField) firstErrorField.focus();
             return false;
         }
     });
+    // Registration form validation (optional, similar logic)
     </script>
 </body>
 </html>

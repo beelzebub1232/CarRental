@@ -139,6 +139,53 @@
             </div>
         </div>
     </main>
+    <div id="notification-widget" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;">
+      <div id="notification-icon" style="background: #2563eb; color: #fff; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 2rem;">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71L18 16z"/></svg>
+      </div>
+      <div id="notification-panel" style="display:none; position: absolute; bottom: 70px; right: 0; width: 320px; background: #fff; border-radius: 1rem; box-shadow: 0 4px 24px rgba(0,0,0,0.18); padding: 1.5rem; max-height: 400px; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #2563eb;">Notifications</h4>
+          <button onclick="document.getElementById('notification-panel').style.display='none'" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
+        </div>
+        <div id="notification-list">
+          <div style="color: #6b7280; text-align: center;">No notifications yet.</div>
+        </div>
+      </div>
+    </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Feedback helpers for bookings management
+        function showBookingsManagementFeedback(msg, type='info') {
+            showToast(msg, type);
+        }
+        
+        // Show welcome toast on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('Welcome to Booking Management!', 'info');
+        });
+        
+        // Notification widget functionality
+        const notifIcon = document.getElementById('notification-icon');
+        const notifPanel = document.getElementById('notification-panel');
+        if (notifIcon && notifPanel) {
+            notifIcon.onclick = () => {
+                notifPanel.style.display = notifPanel.style.display === 'block' ? 'none' : 'block';
+            };
+        }
+        
+        // Example: Add notification (call this from anywhere)
+        function addNotification(msg) {
+            const list = document.getElementById('notification-list');
+            if (list) {
+                if (list.children.length === 1 && list.children[0].textContent.includes('No notifications')) list.innerHTML = '';
+                const item = document.createElement('div');
+                item.style.padding = '0.75rem 0';
+                item.style.borderBottom = '1px solid #f3f4f6';
+                item.innerHTML = `<span style='color:#111827;'>${msg}</span>`;
+                list.prepend(item);
+            }
+        }
+    </script>
 </body>
 </html> 

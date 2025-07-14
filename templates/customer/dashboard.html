@@ -166,9 +166,9 @@
                                 <line x1="8" y1="2" x2="8" y2="6"/>
                                 <line x1="3" y1="10" x2="21" y2="10"/>
                             </svg>
-                            <h4>No bookings yet</h4>
-                            <p>Start your journey by booking your first vehicle</p>
-                            <a href="{{ url_for('customer_booking') }}" class="btn btn-primary btn-sm">Book Now</a>
+                            <h4>{{ messages['empty_bookings'] }}</h4>
+                            <p>{{ messages['start_journey'] }}</p>
+                            <a href="{{ url_for('customer_booking') }}" class="btn btn-primary btn-sm">{{ messages['book_now'] }}</a>
                         </div>
                     {% endif %}
                 </div>

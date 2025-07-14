@@ -736,16 +736,16 @@ function validateBookingForm() {
     
     // Validate vehicle selection
     if (!vehicleId) {
-        errors.push('Please select a vehicle');
+        errors.push(window.MESSAGES['select_vehicle'] || 'Please select a vehicle');
     }
     
     // Validate dates
     if (!startDate) {
-        errors.push('Please select a start date and time');
+        errors.push(window.MESSAGES['select_start_date'] || 'Please select a start date and time');
     }
     
     if (!endDate) {
-        errors.push('Please select an end date and time');
+        errors.push(window.MESSAGES['select_end_date'] || 'Please select an end date and time');
     }
     
     if (startDate && endDate) {
@@ -754,31 +754,33 @@ function validateBookingForm() {
         const now = new Date();
         
         if (start < now) {
-            errors.push('Start date cannot be in the past');
+            errors.push(window.MESSAGES['start_date_past'] || 'Start date cannot be in the past');
         }
         
         if (end <= start) {
-            errors.push('End date must be after start date');
+            errors.push(window.MESSAGES['end_after_start'] || 'End date must be after start date');
         }
         
-        // Check if booking is not more than 30 days in advance
+        // Check if booking is not more than BUSINESS_RULES.BOOKING_WINDOW_DAYS in advance
+        const bookingWindow = window.BUSINESS_RULES['BOOKING_WINDOW_DAYS'] || 30;
         const thirtyDaysFromNow = new Date();
-        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + bookingWindow);
         
         if (start > thirtyDaysFromNow) {
-            errors.push('Bookings cannot be made more than 30 days in advance');
+            errors.push(window.MESSAGES['booking_window'] || `Bookings cannot be made more than ${bookingWindow} days in advance`);
         }
         
-        // Check minimum booking duration (1 hour)
+        // Check minimum booking duration
+        const minDuration = window.BUSINESS_RULES['MIN_BOOKING_DURATION_HOURS'] || 1;
         const durationHours = (end - start) / (1000 * 60 * 60);
-        if (durationHours < 1) {
-            errors.push('Minimum booking duration is 1 hour');
+        if (durationHours < minDuration) {
+            errors.push(window.MESSAGES['min_booking_duration'] || `Minimum booking duration is ${minDuration} hour`);
         }
     }
     
     // Validate discount code format
     if (discountCode && discountCode.length > 50) {
-        errors.push('Discount code is too long');
+        errors.push(window.MESSAGES['discount_code_long'] || 'Discount code is too long');
     }
     
     return errors;
@@ -1145,6 +1147,43 @@ function removeToast(toast) {
         }
     }, 300);
 }
+
+// Toast system initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure toast system is available globally
+    window.showToast = showToast;
+    window.showSuccessMessage = showSuccessMessage;
+    window.showErrorMessage = showErrorMessage;
+    window.showWarningMessage = showWarningMessage;
+    
+    // Initialize notification widgets if present
+    const notifIcons = document.querySelectorAll('#notification-icon');
+    const notifPanels = document.querySelectorAll('#notification-panel');
+    
+    notifIcons.forEach((icon, index) => {
+        const panel = notifPanels[index];
+        if (icon && panel) {
+            icon.addEventListener('click', () => {
+                panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+            });
+        }
+    });
+    
+    // Global notification function
+    window.addNotification = function(msg) {
+        const list = document.getElementById('notification-list');
+        if (list) {
+            if (list.children.length === 1 && list.children[0].textContent.includes('No notifications')) {
+                list.innerHTML = '';
+            }
+            const item = document.createElement('div');
+            item.style.padding = '0.75rem 0';
+            item.style.borderBottom = '1px solid #f3f4f6';
+            item.innerHTML = `<span style='color:#111827;'>${msg}</span>`;
+            list.prepend(item);
+        }
+    };
+});
 
 // Enhanced Modal System
 function showModal(content, options = {}) {

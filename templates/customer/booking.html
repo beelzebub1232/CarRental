@@ -524,6 +524,15 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        window.BUSINESS_RULES = {
+            'LOYALTY_PERCENTAGE': {{ config['LOYALTY_PERCENTAGE'] if config and 'LOYALTY_PERCENTAGE' in config else 0.05 }},
+            'LOYALTY_EXPIRY_DAYS': {{ config['LOYALTY_EXPIRY_DAYS'] if config and 'LOYALTY_EXPIRY_DAYS' in config else 365 }},
+            'BOOKING_WINDOW_DAYS': {{ config['BOOKING_WINDOW_DAYS'] if config and 'BOOKING_WINDOW_DAYS' in config else 30 }},
+            'MIN_BOOKING_DURATION_HOURS': {{ config['MIN_BOOKING_DURATION_HOURS'] if config and 'MIN_BOOKING_DURATION_HOURS' in config else 1 }}
+        };
+        window.MESSAGES = {{ messages|tojson }};
+    </script>
+    <script>
         // Set minimum date to current time
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());

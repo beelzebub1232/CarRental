@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, abort
 import mysql.connector
-from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, SECRET_KEY, DEBUG
+from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, SECRET_KEY, DEBUG, LOYALTY_PERCENTAGE, LOYALTY_EXPIRY_DAYS, BOOKING_WINDOW_DAYS, MIN_BOOKING_DURATION_HOURS, MESSAGES
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import json
@@ -355,14 +355,16 @@ def customer_dashboard():
         
         return render_template('customer/dashboard.html', 
                              recent_bookings=recent_bookings, 
-                             loyalty_tokens=loyalty_tokens)
+                             loyalty_tokens=loyalty_tokens,
+                             messages=MESSAGES)
                              
     except Exception as e:
         logger.error(f"Customer dashboard error: {e}")
         flash('An error occurred while loading your dashboard. Please try again.')
         return render_template('customer/dashboard.html', 
                              recent_bookings=[], 
-                             loyalty_tokens=[])
+                             loyalty_tokens=[],
+                             messages=MESSAGES)
 
 @app.route('/customer/booking')
 def customer_booking():
@@ -379,12 +381,12 @@ def customer_booking():
         cursor.close()
         conn.close()
         
-        return render_template('customer/booking.html', vehicles=vehicles)
+        return render_template('customer/booking.html', vehicles=vehicles, messages=MESSAGES)
         
     except Exception as e:
         logger.error(f"Customer booking page error: {e}")
         flash('An error occurred while loading available vehicles. Please try again.')
-        return render_template('customer/booking.html', vehicles=[])
+        return render_template('customer/booking.html', vehicles=[], messages=MESSAGES)
 
 @app.route('/customer/profile')
 def customer_profile():
@@ -423,7 +425,8 @@ def customer_profile():
         return render_template('customer/profile.html', 
                              user=user, 
                              bookings=bookings, 
-                             loyalty_tokens=loyalty_tokens)
+                             loyalty_tokens=loyalty_tokens,
+                             messages=MESSAGES)
                              
     except Exception as e:
         logger.error(f"Customer profile error: {e}")
@@ -431,7 +434,8 @@ def customer_profile():
         return render_template('customer/profile.html', 
                              user=None, 
                              bookings=[], 
-                             loyalty_tokens=[])
+                             loyalty_tokens=[],
+                             messages=MESSAGES)
 
 @app.route('/customer/bookings')
 def customer_bookings():
@@ -454,12 +458,12 @@ def customer_bookings():
         cursor.close()
         conn.close()
         
-        return render_template('customer/bookings.html', bookings=bookings)
+        return render_template('customer/bookings.html', bookings=bookings, messages=MESSAGES)
         
     except Exception as e:
         logger.error(f"Customer bookings error: {e}")
         flash('An error occurred while loading your bookings. Please try again.')
-        return render_template('customer/bookings.html', bookings=[])
+        return render_template('customer/bookings.html', bookings=[], messages=MESSAGES)
 
 # Remove /customer/payment and /api/process_payment_and_booking routes and session['pending_booking'] logic
 
