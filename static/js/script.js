@@ -878,6 +878,139 @@ function closeModal(modal) {
     }, 300);
 }
 
+// Enhanced Modal System (additions)
+function showConfirmModal({ title = 'Are you sure?', message = '', confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, onCancel, danger = false }) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <h3 class="modal-title" style="margin-bottom: 1rem; color: ${danger ? 'var(--error-500)' : 'var(--accent-main)'};">${title}</h3>
+            <div style="margin-bottom: 2rem; color: var(--neutral-700);">${message}</div>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn ${danger ? 'btn-danger' : 'btn-primary'} modal-confirm">${confirmText}</button>
+                <button class="btn btn-outline modal-cancel">${cancelText}</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => modal.classList.add('show'), 50);
+    // Focus first button
+    setTimeout(() => modal.querySelector('.modal-confirm').focus(), 100);
+    // Handlers
+    modal.querySelector('.modal-confirm').onclick = () => {
+        closeModal(modal);
+        if (onConfirm) onConfirm();
+    };
+    modal.querySelector('.modal-cancel').onclick = () => {
+        closeModal(modal);
+        if (onCancel) onCancel();
+    };
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal(modal);
+    });
+    // ESC key
+    const escHandler = (e) => {
+        if (e.key === 'Escape') {
+            closeModal(modal);
+            document.removeEventListener('keydown', escHandler);
+            if (onCancel) onCancel();
+        }
+    };
+    document.addEventListener('keydown', escHandler);
+    return modal;
+}
+
+// Custom Dropdown System
+function customDropdown(select) {
+    if (!select || select.dataset.customized) return;
+    select.style.display = 'none';
+    select.dataset.customized = 'true';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-dropdown';
+    wrapper.tabIndex = 0;
+    wrapper.setAttribute('role', 'listbox');
+    wrapper.style.position = 'relative';
+    wrapper.style.width = select.offsetWidth + 'px';
+    // Button
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'custom-dropdown-btn';
+    button.innerHTML = select.options[select.selectedIndex]?.textContent || 'Select...';
+    button.setAttribute('aria-haspopup', 'listbox');
+    button.setAttribute('aria-expanded', 'false');
+    // List
+    const list = document.createElement('ul');
+    list.className = 'custom-dropdown-list';
+    list.style.display = 'none';
+    list.setAttribute('role', 'listbox');
+    // Populate
+    Array.from(select.options).forEach((opt, i) => {
+        const li = document.createElement('li');
+        li.className = 'custom-dropdown-item';
+        li.setAttribute('role', 'option');
+        li.tabIndex = -1;
+        li.textContent = opt.textContent;
+        if (opt.selected) li.classList.add('selected');
+        li.onclick = () => {
+            select.selectedIndex = i;
+            button.innerHTML = opt.textContent;
+            list.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            li.classList.add('selected');
+            list.style.display = 'none';
+            button.setAttribute('aria-expanded', 'false');
+            select.dispatchEvent(new Event('change'));
+        };
+        list.appendChild(li);
+    });
+    // Show/hide
+    button.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = list.style.display === 'block';
+        document.querySelectorAll('.custom-dropdown-list').forEach(l => l.style.display = 'none');
+        list.style.display = isOpen ? 'none' : 'block';
+        button.setAttribute('aria-expanded', !isOpen);
+        if (!isOpen) setTimeout(() => list.querySelector('.selected')?.focus(), 100);
+    };
+    // Keyboard nav
+    wrapper.addEventListener('keydown', (e) => {
+        const items = Array.from(list.children);
+        let idx = items.findIndex(item => item === document.activeElement);
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (idx < items.length - 1) items[idx + 1].focus();
+            else items[0].focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (idx > 0) items[idx - 1].focus();
+            else items[items.length - 1].focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            document.activeElement.click();
+        } else if (e.key === 'Escape') {
+            list.style.display = 'none';
+            button.setAttribute('aria-expanded', 'false');
+            button.focus();
+        }
+    });
+    // Click outside
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+            list.style.display = 'none';
+            button.setAttribute('aria-expanded', 'false');
+        }
+    });
+    // Assemble
+    wrapper.appendChild(button);
+    wrapper.appendChild(list);
+    select.parentNode.insertBefore(wrapper, select);
+}
+
+// Enhance all selects on DOMContentLoaded
+addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('select.form-select').forEach(customDropdown);
+});
+
 // Utility Functions
 function debounce(func, wait) {
     let timeout;

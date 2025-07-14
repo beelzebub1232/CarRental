@@ -751,5 +751,34 @@
             }
         });
     </script>
+    <script>
+        // Feedback helpers for booking
+        function showBookingFeedback(msg, type='info') {
+            showToast(msg, type);
+        }
+        // Example: Use showConfirmModal for any booking cancel or important confirmation
+        function confirmCancelBooking(bookingId) {
+            showConfirmModal({
+                title: 'Cancel Booking',
+                message: 'Are you sure you want to cancel this booking?',
+                confirmText: 'Cancel Booking',
+                cancelText: 'Keep Booking',
+                danger: true,
+                onConfirm: function() {
+                    fetch(`/api/bookings/${bookingId}/cancel`, { method: 'POST' })
+                        .then(r => r.json())
+                        .then(result => {
+                            if (result.success) {
+                                showToast('Booking cancelled!', 'success');
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                showToast(result.error || 'Error cancelling booking', 'error');
+                            }
+                        });
+                }
+            });
+        }
+        // (If there are any selects, customDropdown will be applied automatically)
+    </script>
 </body>
 </html>

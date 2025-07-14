@@ -199,14 +199,19 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        function exportData(type) {
-            CarRentalApp.showSuccessMessage(`Exporting ${type} data...`);
-            
-            // In a real implementation, this would trigger a download
-            setTimeout(() => {
-                CarRentalApp.showSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`);
-            }, 2000);
-        }
+    // Feedback helpers for reports
+    function showReportFeedback(msg, type='info') {
+        showToast(msg, type);
+    }
+    // Export actions
+    function exportData(type) {
+        showToast(`Exporting ${type} data...`, 'info');
+        // In a real implementation, this would trigger a download
+        setTimeout(() => {
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`, 'success');
+        }, 2000);
+    }
+    // (If there are any selects, customDropdown will be applied automatically)
     </script>
     <div id="notification-widget" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;">
   <div id="notification-icon" style="background: #2563eb; color: #fff; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 2rem;">

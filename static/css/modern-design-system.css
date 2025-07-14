@@ -702,3 +702,114 @@ h6 { font-size: var(--text-lg); font-weight: 500; }
     outline: 2px solid var(--primary-500);
     outline-offset: 2px;
 }
+
+/* Custom Dropdown Styles */
+.custom-dropdown,
+.custom-dropdown-btn {
+    width: 100% !important;
+    min-width: 220px;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    display: block;
+}
+.custom-dropdown-btn {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: var(--space-4) var(--space-5);
+    border: 2px solid var(--neutral-200);
+    border-radius: var(--radius-xl);
+    background: rgba(255,255,255,0.95);
+    color: var(--neutral-800);
+    font-size: var(--text-base);
+    text-align: left;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+.custom-dropdown-btn:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+}
+.custom-dropdown-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    border: 1.5px solid var(--neutral-200);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: var(--z-dropdown);
+    padding: 0.25rem 0;
+    display: none;
+    animation: fadeInUp 0.2s;
+}
+.custom-dropdown-item {
+    padding: var(--space-3) var(--space-5);
+    cursor: pointer;
+    color: var(--neutral-800);
+    background: none;
+    border: none;
+    font-size: var(--text-base);
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+.custom-dropdown-item.selected,
+.custom-dropdown-item:focus,
+.custom-dropdown-item:hover {
+    background: var(--accent-50);
+    color: var(--accent-main);
+    outline: none;
+}
+
+/* Modal Enhancements */
+.modal.show {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity var(--transition-normal);
+}
+.modal {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+    z-index: var(--z-modal);
+}
+.modal-content {
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    background: #fff;
+    padding: 2.5rem 2rem;
+    max-width: 90vw;
+    min-width: 320px;
+    color: var(--neutral-900);
+    position: relative;
+    animation: fadeInUp 0.3s;
+}
+.modal-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    color: var(--accent-main);
+}
+.modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--neutral-400);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+.modal-close:hover {
+    color: var(--accent-main);
+}

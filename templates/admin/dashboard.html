@@ -355,19 +355,38 @@
         // Load vehicles for price simulator
         fetch('/api/vehicles')
             .then(response => response.json())
-            .then(vehicles => {
+            .then(data => {
                 const select = document.getElementById('sim-vehicle');
-                vehicles.forEach(vehicle => {
+                // Remove any existing custom dropdown wrapper
+                if (select.previousElementSibling && select.previousElementSibling.classList.contains('custom-dropdown')) {
+                    select.previousElementSibling.remove();
+                    select.dataset.customized = '';
+                    select.style.display = '';
+                }
+                // Clear and repopulate options
+                select.innerHTML = '<option value="">Select a vehicle...</option>';
+                data.vehicles.forEach(vehicle => {
                     const option = document.createElement('option');
                     option.value = vehicle.id;
                     option.textContent = `${vehicle.make} ${vehicle.model} (${vehicle.year})`;
                     select.appendChild(option);
                 });
+                // Now re-initialize the custom dropdown
+                if (typeof customDropdown === 'function') {
+                    customDropdown(select);
+                }
             })
             .catch(error => {
-                // Show error if vehicle list cannot be loaded
                 const select = document.getElementById('sim-vehicle');
+                if (select.previousElementSibling && select.previousElementSibling.classList.contains('custom-dropdown')) {
+                    select.previousElementSibling.remove();
+                    select.dataset.customized = '';
+                    select.style.display = '';
+                }
                 select.innerHTML = '<option value="">Unable to load vehicles</option>';
+                if (typeof customDropdown === 'function') {
+                    customDropdown(select);
+                }
             });
 
         // Price simulator form handler

@@ -132,37 +132,55 @@
   }
 </script>
     <script>
-    function showBookingDetails(bookingId) {
-        fetch(`/api/bookings/${bookingId}`)
-            .then(r => r.text())
-            .then(html => {
-                const modal = document.getElementById('booking-details-modal');
-                modal.innerHTML = html;
-                modal.style.display = 'block';
-                modal.onclick = function(e) {
-                    if (e.target === modal || e.target.classList.contains('modal-close')) {
-                        modal.style.display = 'none';
-                    }
-                };
-            });
-    }
-    function updateBookingStatus(bookingId, status) {
-        if (confirm(`Are you sure you want to ${status} this booking?`)) {
+      // Notification widget logic remains unchanged
+      const notifIcon = document.getElementById('notification-icon');
+      const notifPanel = document.getElementById('notification-panel');
+      notifIcon.onclick = () => {
+        notifPanel.style.display = notifPanel.style.display === 'block' ? 'none' : 'block';
+      };
+      function addNotification(msg) {
+        const list = document.getElementById('notification-list');
+        if (list) {
+          if (list.children.length === 1 && list.children[0].textContent.includes('No notifications')) list.innerHTML = '';
+          const item = document.createElement('div');
+          item.style.padding = '0.75rem 0';
+          item.style.borderBottom = '1px solid #f3f4f6';
+          item.innerHTML = `<span style='color:#111827;'>${msg}</span>`;
+          list.prepend(item);
+        }
+      }
+      // Modal and booking status logic
+      function updateBookingStatus(bookingId, status) {
+        showConfirmModal({
+          title: `Change Booking Status`,
+          message: `Are you sure you want to <b>${status}</b> this booking?`,
+          confirmText: 'Yes',
+          cancelText: 'No',
+          danger: status === 'rejected' || status === 'cancelled',
+          onConfirm: function() {
             fetch(`/api/bookings/${bookingId}/status`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status })
             })
             .then(r => r.json())
             .then(result => {
-                if (result.success) {
-                    location.reload();
-                } else {
-                    alert(result.error || 'Failed to update booking status');
-                }
-            });
-        }
-    }
+              if (result.success) {
+                showToast('Booking status updated!', 'success');
+                // Optionally update the row or reload
+                setTimeout(() => location.reload(), 1000);
+              } else {
+                showToast(result.error || 'Failed to update booking status', 'error');
+              }
+            })
+            .catch(() => showToast('Network error', 'error'));
+          }
+        });
+      }
+      // Details modal logic (if needed)
+      function showBookingDetails(detailsHtml) {
+        showModal(detailsHtml, { maxWidth: '600px' });
+      }
     </script>
 </body>
 </html> 

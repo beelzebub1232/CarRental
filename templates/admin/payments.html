@@ -78,9 +78,7 @@
     // Feedback helpers
     const paymentFeedback = document.getElementById('payment-feedback');
     function showPaymentFeedback(msg, type='info') {
-        paymentFeedback.textContent = msg;
-        paymentFeedback.className = type === 'success' ? 'feedback-success' : type === 'error' ? 'feedback-error' : 'feedback-info';
-        paymentFeedback.style.display = 'block';
+        showToast(msg, type);
     }
     function clearPaymentFeedback() {
         paymentFeedback.textContent = '';
