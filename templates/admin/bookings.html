@@ -26,8 +26,10 @@
         <nav class="top-nav-links">
             <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
-            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link active">Bookings</a>
+            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
@@ -78,13 +80,32 @@
                                 <div class="date-to">to {{ booking.end_date.strftime('%m/%d %I:%M %p') }}</div>
                             </td>
                             <td>₹{{ '%.2f'|format(booking.total_price) }}</td>
-                            <td><span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span></td>
+                            <td>
+                                {% if booking.status == 'approved' %}
+                                    <span class="status-badge status-approved">Approved</span>
+                                {% elif booking.status == 'paid' %}
+                                    <span class="status-badge status-paid">Paid</span>
+                                {% elif booking.status == 'completed' %}
+                                    <span class="status-badge status-completed">Completed</span>
+                                {% elif booking.status == 'pending' %}
+                                    <span class="status-badge status-pending">Pending</span>
+                                {% elif booking.status == 'rejected' %}
+                                    <span class="status-badge status-rejected">Rejected</span>
+                                {% elif booking.status == 'cancelled' %}
+                                    <span class="status-badge status-cancelled">Cancelled</span>
+                                {% else %}
+                                    <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-info" onclick="showBookingDetails({{ booking.id }})">Details</button>
                                 {% if booking.status == 'pending' %}
-                                    <button class="btn btn-sm btn-primary" onclick="updateBookingStatus({{ booking.id }}, 'approved')">Approve</button>
+                                    <button class="btn btn-sm btn-primary" onclick="updateBookingStatus({{ booking.id }}, 'approved')" title="After approval, user must pay before completion">Approve</button>
                                     <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'rejected')">Reject</button>
                                 {% elif booking.status == 'approved' %}
+                                    <button class="btn btn-sm btn-success" disabled title="User must pay before you can complete this booking">Mark Completed</button>
+                                    <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
+                                {% elif booking.status == 'paid' %}
                                     <button class="btn btn-sm btn-success" onclick="updateBookingStatus({{ booking.id }}, 'completed')">Mark Completed</button>
                                     <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
                                 {% endif %}
@@ -95,8 +116,6 @@
                 </table>
             </div>
         </div>
-        <!-- Booking Details Modal (hidden by default) -->
-        <div id="booking-details-modal" class="modal" style="display:none;"></div>
     </main>
     <div id="notification-widget" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;">
   <div id="notification-icon" style="background: #2563eb; color: #fff; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 2rem;">
@@ -131,6 +150,7 @@
     }
   }
 </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
       // Notification widget logic remains unchanged
       const notifIcon = document.getElementById('notification-icon');
@@ -177,9 +197,14 @@
           }
         });
       }
-      // Details modal logic (if needed)
-      function showBookingDetails(detailsHtml) {
-        showModal(detailsHtml, { maxWidth: '600px' });
+      // Details modal logic (dynamic AJAX loading)
+      function showBookingDetails(bookingId) {
+        fetch(`/api/bookings/${bookingId}`)
+          .then(response => response.text())
+          .then(html => {
+            showModal(html, { maxWidth: '600px' });
+          })
+          .catch(() => showToast('Failed to load booking details', 'error'));
       }
     </script>
 </body>

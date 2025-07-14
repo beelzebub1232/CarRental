@@ -26,7 +26,10 @@
         <nav class="top-nav-links">
             <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
@@ -204,7 +207,21 @@
                                         <div class="total-price">₹{{ "%.2f"|format(booking.total_price) }}</div>
                                     </td>
                                     <td>
+                                        {% if booking.status == 'approved' %}
+                                        <span class="status-badge status-approved">Approved</span>
+                                        {% elif booking.status == 'paid' %}
+                                        <span class="status-badge status-paid">Paid</span>
+                                        {% elif booking.status == 'completed' %}
+                                        <span class="status-badge status-completed">Completed</span>
+                                        {% elif booking.status == 'pending' %}
+                                        <span class="status-badge status-pending">Pending</span>
+                                        {% elif booking.status == 'rejected' %}
+                                        <span class="status-badge status-rejected">Rejected</span>
+                                        {% elif booking.status == 'cancelled' %}
+                                        <span class="status-badge status-cancelled">Cancelled</span>
+                                        {% else %}
                                         <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if booking.status == 'pending' %}
@@ -340,6 +357,36 @@
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending {
+            background-color: var(--neutral-100);
+            color: var(--neutral-800);
+        }
+        .status-approved {
+            background-color: var(--success-100);
+            color: var(--success-800);
+        }
+        .status-paid {
+            background-color: var(--success-100);
+            color: var(--success-800);
+        }
+        .status-rejected, .status-cancelled {
+            background-color: var(--error-100);
+            color: var(--error-800);
+        }
+        .status-completed {
+            background-color: var(--info-100);
+            color: var(--info-800);
         }
 
         /* Responsive Design */
@@ -524,13 +571,30 @@
         }
 
         function updateBookingStatus(bookingId, status) {
-            if (confirm(`Are you sure you want to ${status} this booking?`)) {
-                // Simulate API call
-                setTimeout(() => {
-                    alert(`Booking ${status} successfully`);
-                    location.reload();
-                }, 1000);
-            }
+            showConfirmModal({
+                title: `Change Booking Status`,
+                message: `Are you sure you want to <b>${status}</b> this booking?`,
+                confirmText: 'Yes',
+                cancelText: 'No',
+                danger: status === 'rejected' || status === 'cancelled',
+                onConfirm: function() {
+                    fetch(`/api/bookings/${bookingId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status })
+                    })
+                    .then(r => r.json())
+                    .then(result => {
+                        if (result.success) {
+                            showToast('Booking status updated!', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showToast(result.error || 'Failed to update booking status', 'error');
+                        }
+                    })
+                    .catch(() => showToast('Network error', 'error'));
+                }
+            });
         }
 
         // Set minimum date to current time

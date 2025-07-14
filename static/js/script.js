@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (discountStatusDiv) discountStatusDiv.style.display = 'none';
         });
     }
+
+    // Notification widget open/close logic for all pages
+    const notificationIcon = document.getElementById('notification-icon');
+    const notificationPanel = document.getElementById('notification-panel');
+    if (notificationIcon && notificationPanel) {
+        notificationIcon.addEventListener('click', function() {
+            notificationPanel.style.display = (notificationPanel.style.display === 'none' || !notificationPanel.style.display) ? 'block' : 'none';
+        });
+    }
 });
 
 function initializeApp() {
@@ -360,7 +369,7 @@ async function handleBookingSubmission(event) {
         if (discountStatusDiv) discountStatusDiv.style.display = 'none';
     }
     // --- End discount code robust validation ---
-
+    
     try {
         const bookingData = {
             vehicle_id: formData.get('vehicle_id'),
@@ -382,17 +391,32 @@ async function handleBookingSubmission(event) {
         
         if (result.success) {
             showSuccessMessage('Booking created successfully! Redirecting...');
-            
             // Animate form out
             event.target.style.transition = 'all 0.5s ease';
             event.target.style.opacity = '0.5';
             event.target.style.transform = 'scale(0.98)';
-            
             setTimeout(() => {
                 window.location.href = '/customer/dashboard';
             }, 2000);
         } else {
+            // Show backend error message clearly
             showErrorMessage(result.error || 'Booking failed. Please try again.');
+            // Optionally highlight fields if error is field-specific
+            if (result.error && result.error.toLowerCase().includes('date')) {
+                showFieldError(startInput, '');
+                showFieldError(endInput, result.error);
+            }
+            if (result.error && result.error.toLowerCase().includes('vehicle')) {
+                const vehicleInput = document.getElementById('vehicle_id');
+                if (vehicleInput) showFieldError(vehicleInput, result.error);
+            }
+            if (result.error && result.error.toLowerCase().includes('discount')) {
+                showFieldError(discountInput, result.error);
+            }
+            if (result.error && result.error.toLowerCase().includes('loyalty')) {
+                const loyaltyInput = document.getElementById('loyalty_token_id');
+                if (loyaltyInput) showFieldError(loyaltyInput, result.error);
+            }
         }
     } catch (error) {
         console.error('Booking error:', error);
@@ -947,9 +971,6 @@ function showModal(content, options = {}) {
     modal.innerHTML = `
         <div class="modal-content" style="max-width: ${options.maxWidth || '600px'};">
             ${content}
-            <div style="margin-top: 2rem; text-align: center;">
-                <button class="btn btn-outline modal-close">Close</button>
-            </div>
         </div>
     `;
     
@@ -1293,6 +1314,182 @@ function removeInitialLoadingStates() {
     // Add loaded class to body
     document.body.classList.add('loaded');
 }
+
+function payForBooking(bookingId) {
+    if (!bookingId) return;
+    const btn = document.querySelector(`button[onclick="payForBooking(${bookingId})"]`);
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+    }
+    fetch('/api/pay_for_booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking_id: bookingId })
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            showToast('Payment successful! Booking confirmed.', 'success');
+            setTimeout(() => window.location.reload(), 1200);
+        } else {
+            showToast(result.error || 'Payment failed.', 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Pay Now';
+            }
+        }
+    })
+    .catch(() => {
+        showToast('Payment error. Please try again.', 'error');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Pay Now';
+        }
+    });
+}
+
+function showPaymentModal(bookingId) {
+    const content = `
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+            <div class="modal-title" style="font-size: var(--text-xl); font-weight: 800; color: var(--accent-main); display: flex; align-items: center; gap: var(--space-2);">Payment</div>
+            <button class="modal-close" style="background: none; border: none; font-size: 1.5rem; color: var(--neutral-400); cursor: pointer; transition: color var(--transition-fast);" onclick="closeModal(this.closest('.modal'))">&times;</button>
+        </div>
+        <div style="padding: 0 0 1.5rem 0; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; background: #fff; border-radius: var(--radius-2xl);">
+            <div style="display: flex; flex-direction: column; gap: 1.2rem; width: 100%; max-width: 340px;">
+                <button class="payment-method-card" data-method="card" style="display: flex; align-items: center; gap: 1rem; background: var(--neutral-100); border: 2px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.1rem 1.2rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-600); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(37,99,235,0.04);">
+                    <span style="font-size: 1.7rem;">💳</span> Credit/Debit Card
+                </button>
+                <button class="payment-method-card" data-method="upi" style="display: flex; align-items: center; gap: 1rem; background: var(--neutral-100); border: 2px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.1rem 1.2rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-600); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(16,185,129,0.04);">
+                    <span style="font-size: 1.7rem;">🇮🇳</span> UPI
+                </button>
+                <button class="payment-method-card" data-method="netbanking" style="display: flex; align-items: center; gap: 1rem; background: var(--neutral-100); border: 2px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.1rem 1.2rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-600); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.04);">
+                    <span style="font-size: 1.7rem;">🏦</span> Netbanking
+                </button>
+            </div>
+            <div id="payment-processing" style="display:none; margin-top:2rem; text-align:center; width:100%; min-height: 48px;"></div>
+        </div>
+        <style>
+            .payment-method-card:hover {
+                background: var(--accent-50) !important;
+                border-color: var(--accent-main) !important;
+                color: var(--accent-main) !important;
+                box-shadow: 0 4px 16px rgba(111,191,115,0.10) !important;
+            }
+            .modal-content { font-family: var(--font-body); }
+            @media (max-width: 600px) {
+                .modal-content { padding: var(--space-4) !important; }
+            }
+        </style>
+    `;
+    const modal = showModal(content, { maxWidth: '420px' });
+    // Add event listeners for payment method buttons
+    modal.querySelectorAll('.payment-method-card').forEach(btn => {
+        btn.onclick = function() {
+            const method = btn.getAttribute('data-method');
+            const processingDiv = modal.querySelector('#payment-processing');
+            processingDiv.style.display = 'block';
+            processingDiv.innerHTML = `<div class='loading-spinner' style='margin-bottom:1rem;'></div><span style='font-size:1.1rem;'>Processing <b>${method === 'card' ? 'Card' : method === 'upi' ? 'UPI' : 'Netbanking'}</b> payment...</span>`;
+            // Simulate payment processing delay
+            setTimeout(() => {
+                processingDiv.innerHTML = `<span style='color:var(--success-500); font-size:2.2rem;'>✔️</span><div style='font-size:1.1rem; margin-top:0.5rem;'>Payment successful!</div>`;
+                setTimeout(() => {
+                    closeModal(modal);
+                    payForBooking(bookingId);
+                }, 1100);
+            }, 1800);
+        };
+    });
+}
+
+// Enhance booking status feedback
+function showStatusToast(status, context) {
+    switch (status) {
+        case 'approved':
+            showToast('Booking approved! Please pay to confirm your booking.', 'info');
+            break;
+        case 'paid':
+            showToast('Payment successful! Booking confirmed.', 'success');
+            break;
+        case 'completed':
+            showToast('Booking marked as completed. Thank you!', 'success');
+            break;
+        case 'rejected':
+            showToast('Booking was rejected by admin.', 'error');
+            break;
+        case 'cancelled':
+            showToast('Booking was cancelled.', 'error');
+            break;
+        default:
+            if (context && context.error) showToast(context.error, 'error');
+            break;
+    }
+}
+
+// Patch updateBookingStatus to show toasts for status changes
+const originalUpdateBookingStatus = window.updateBookingStatus;
+window.updateBookingStatus = function(bookingId, status) {
+    showConfirmModal({
+        title: `Change Booking Status`,
+        message: `Are you sure you want to <b>${status}</b> this booking?`,
+        confirmText: 'Yes',
+        cancelText: 'No',
+        danger: status === 'rejected' || status === 'cancelled',
+        onConfirm: function() {
+            fetch(`/api/bookings/${bookingId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            })
+            .then(r => r.json())
+            .then(result => {
+                if (result.success) {
+                    showStatusToast(status);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showStatusToast('error', result);
+                }
+            })
+            .catch(() => showToast('Network error', 'error'));
+        }
+    });
+};
+
+// Patch payForBooking to show toast for payment
+const originalPayForBooking = window.payForBooking;
+window.payForBooking = function(bookingId) {
+    if (!bookingId) return;
+    const btn = document.querySelector(`button[onclick="payForBooking(${bookingId})"]`);
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+    }
+    fetch('/api/pay_for_booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking_id: bookingId })
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            showStatusToast('paid');
+            setTimeout(() => window.location.reload(), 1200);
+        } else {
+            showStatusToast('error', result);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Pay Now';
+            }
+        }
+    })
+    .catch(() => {
+        showToast('Payment error. Please try again.', 'error');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Pay Now';
+        }
+    });
+};
 
 // Export functions for use in templates
 window.CarRentalApp = {

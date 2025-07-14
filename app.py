@@ -166,7 +166,7 @@ def customer_dashboard():
     
     # Get recent bookings
     cursor.execute("""
-        SELECT b.*, v.make, v.model, v.year, v.type, v.image_url
+        SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type, v.image_url
         FROM bookings b
         JOIN vehicles v ON b.vehicle_id = v.id
         WHERE b.user_id = %s
@@ -198,7 +198,7 @@ def customer_booking():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    cursor.execute("SELECT * FROM vehicles WHERE availability = TRUE ORDER BY make, model")
+    cursor.execute("SELECT * FROM vehicles WHERE status = 'available' ORDER BY make, model")
     vehicles = cursor.fetchall()
     
     cursor.close()
@@ -220,7 +220,7 @@ def customer_profile():
     
     # Get all bookings
     cursor.execute("""
-        SELECT b.*, v.make, v.model, v.year, v.type
+        SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type
         FROM bookings b
         JOIN vehicles v ON b.vehicle_id = v.id
         WHERE b.user_id = %s
@@ -244,122 +244,7 @@ def customer_profile():
                          bookings=bookings, 
                          loyalty_tokens=loyalty_tokens)
 
-@app.route('/customer/payment', methods=['GET', 'POST'])
-def customer_payment():
-    if 'user_id' not in session or session.get('role') != 'customer':
-        return redirect(url_for('login'))
-    if request.method == 'POST':
-        # Store booking details in session
-        session['pending_booking'] = {
-            'vehicle_id': request.form.get('vehicle_id'),
-            'start_date': request.form.get('start_date'),
-            'end_date': request.form.get('end_date'),
-            'discount_code': request.form.get('discount_code'),
-            'loyalty_token_id': request.form.get('loyalty_token_id')
-        }
-        return redirect(url_for('customer_payment'))
-    # GET: render payment page with booking details
-    booking = session.get('pending_booking')
-    if not booking:
-        return redirect(url_for('customer_booking'))
-    # Optionally, fetch vehicle details for display
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM vehicles WHERE id = %s", (booking['vehicle_id'],))
-    vehicle = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return render_template('customer/payment.html', booking=booking, vehicle=vehicle)
-
-@app.route('/api/process_payment_and_booking', methods=['POST'])
-def api_process_payment_and_booking():
-    if 'user_id' not in session or session.get('role') != 'customer':
-        return redirect(url_for('login'))
-    booking = session.get('pending_booking')
-    if not booking:
-        flash('No booking in progress.')
-        return redirect(url_for('customer_booking'))
-    user_id = session['user_id']
-    vehicle_id = booking.get('vehicle_id')
-    start_date = booking.get('start_date')
-    end_date = booking.get('end_date')
-    discount_code = booking.get('discount_code')
-    loyalty_token_id = booking.get('loyalty_token_id')
-    if not (vehicle_id and start_date and end_date):
-        flash('Incomplete booking details.')
-        return redirect(url_for('customer_booking'))
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    try:
-        # Calculate price
-        from datetime import datetime
-        start_dt = datetime.strptime(start_date, '%Y-%m-%dT%H:%M') if 'T' in start_date else datetime.strptime(start_date, '%Y-%m-%d %H:%M')
-        end_dt = datetime.strptime(end_date, '%Y-%m-%dT%H:%M') if 'T' in end_date else datetime.strptime(end_date, '%Y-%m-%d %H:%M')
-        total_price = calculate_final_price(vehicle_id, start_dt, end_dt)
-        discount_applied = 0
-        loyalty_token_used = 0
-        # Apply discount code
-        if discount_code:
-            cursor.execute("""
-                SELECT * FROM discounts 
-                WHERE code = %s AND is_active = TRUE 
-                AND start_date <= CURDATE() AND end_date >= CURDATE()
-                AND (usage_limit = 0 OR times_used < usage_limit)
-            """, (discount_code,))
-            discount = cursor.fetchone()
-            if discount:
-                discount_applied = total_price * (float(discount['discount_percentage']) / 100)
-                total_price -= discount_applied
-                cursor.execute(
-                    "UPDATE discounts SET times_used = times_used + 1 WHERE id = %s",
-                    (discount['id'],)
-                )
-        # Apply loyalty token
-        if loyalty_token_id:
-            cursor.execute("""
-                SELECT * FROM loyalty_tokens 
-                WHERE id = %s AND user_id = %s AND is_redeemed = FALSE
-                AND (expiry_date IS NULL OR expiry_date > NOW())
-            """, (loyalty_token_id, user_id))
-            token = cursor.fetchone()
-            if token:
-                loyalty_token_used = min(float(token['token_value']), total_price)
-                total_price -= loyalty_token_used
-                cursor.execute(
-                    "UPDATE loyalty_tokens SET is_redeemed = TRUE WHERE id = %s",
-                    (loyalty_token_id,)
-                )
-        # Create booking
-        cursor.execute("""
-            INSERT INTO bookings 
-            (user_id, vehicle_id, start_date, end_date, total_price, discount_applied, loyalty_token_used)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (user_id, vehicle_id, start_dt, end_dt, total_price, discount_applied, loyalty_token_used))
-        booking_id = cursor.lastrowid
-        # Record dummy payment
-        cursor.execute("""
-            INSERT INTO payments (booking_id, user_id, amount, status, method)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (booking_id, user_id, total_price, 'success', 'dummy'))
-        # Issue loyalty token (5% of booking value)
-        loyalty_value = total_price * 0.05
-        from datetime import timedelta
-        expiry_date = datetime.now() + timedelta(days=365)
-        cursor.execute("""
-            INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
-            VALUES (%s, %s, %s, %s)
-        """, (user_id, loyalty_value, expiry_date, f'Earned from booking #{booking_id}'))
-        conn.commit()
-        session.pop('pending_booking', None)
-        flash('Payment successful! Booking confirmed.')
-        return redirect(url_for('customer_dashboard'))
-    except Exception as e:
-        conn.rollback()
-        flash(f'Error processing payment/booking: {e}')
-        return redirect(url_for('customer_booking'))
-    finally:
-        cursor.close()
-        conn.close()
+# Remove /customer/payment and /api/process_payment_and_booking routes and session['pending_booking'] logic
 
 # Admin routes
 @app.route('/admin/dashboard')
@@ -506,7 +391,7 @@ def api_calculate_price():
 @app.route('/api/create_booking', methods=['POST'])
 def api_create_booking():
     if 'user_id' not in session:
-        return jsonify({'error': 'Not authenticated'}), 401
+        return jsonify({'success': False, 'error': 'Not authenticated'}), 401
     
     data = request.get_json()
     vehicle_id = data.get('vehicle_id')
@@ -515,18 +400,41 @@ def api_create_booking():
     discount_code = data.get('discount_code', '')
     loyalty_token_id = data.get('loyalty_token_id')
     
+    # Validate required fields
+    if not vehicle_id or not start_date or not end_date:
+        return jsonify({'success': False, 'error': 'Missing required booking information.'}), 400
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
     try:
+        # Parse dates
         start_datetime = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
         end_datetime = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
-        
+        if end_datetime <= start_datetime:
+            return jsonify({'success': False, 'error': 'End date/time must be after start date/time.'}), 400
+        # Check vehicle exists and is available
+        cursor.execute("SELECT * FROM vehicles WHERE id = %s AND status = 'available'", (vehicle_id,))
+        vehicle = cursor.fetchone()
+        if not vehicle:
+            return jsonify({'success': False, 'error': 'Selected vehicle is not available.'}), 400
+        # Check for overlapping bookings
+        cursor.execute("""
+            SELECT * FROM bookings WHERE vehicle_id = %s AND status IN ('pending', 'approved')
+            AND (
+                (start_date <= %s AND end_date > %s) OR
+                (start_date < %s AND end_date >= %s) OR
+                (start_date >= %s AND end_date <= %s)
+            )
+        """, (vehicle_id, start_datetime, start_datetime, end_datetime, end_datetime, start_datetime, end_datetime))
+        overlap = cursor.fetchone()
+        if overlap:
+            return jsonify({'success': False, 'error': 'This vehicle is already booked for the selected time range.'}), 400
         # Calculate base price
         total_price = calculate_final_price(vehicle_id, start_datetime, end_datetime)
+        if total_price is None:
+            return jsonify({'success': False, 'error': 'Could not calculate price for this booking.'}), 400
         discount_applied = 0
         loyalty_token_used = 0
-        
         # Apply discount code if provided
         if discount_code:
             cursor.execute("""
@@ -536,17 +444,16 @@ def api_create_booking():
                 AND (usage_limit = 0 OR times_used < usage_limit)
             """, (discount_code,))
             discount = cursor.fetchone()
-            
             if discount:
                 discount_applied = total_price * (float(discount['discount_percentage']) / 100)
                 total_price -= discount_applied
-                
                 # Update discount usage
                 cursor.execute(
                     "UPDATE discounts SET times_used = times_used + 1 WHERE id = %s",
                     (discount['id'],)
                 )
-        
+            else:
+                return jsonify({'success': False, 'error': 'Invalid or expired discount code.'}), 400
         # Apply loyalty token if provided
         if loyalty_token_id:
             cursor.execute("""
@@ -555,17 +462,16 @@ def api_create_booking():
                 AND (expiry_date IS NULL OR expiry_date > NOW())
             """, (loyalty_token_id, session['user_id']))
             token = cursor.fetchone()
-            
             if token:
                 loyalty_token_used = min(float(token['token_value']), total_price)
                 total_price -= loyalty_token_used
-                
                 # Mark token as redeemed
                 cursor.execute(
                     "UPDATE loyalty_tokens SET is_redeemed = TRUE WHERE id = %s",
                     (loyalty_token_id,)
                 )
-        
+            else:
+                return jsonify({'success': False, 'error': 'Invalid or expired loyalty token.'}), 400
         # Create booking
         cursor.execute("""
             INSERT INTO bookings 
@@ -573,30 +479,26 @@ def api_create_booking():
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (session['user_id'], vehicle_id, start_datetime, end_datetime, 
               total_price, discount_applied, loyalty_token_used))
-        
         booking_id = cursor.lastrowid
-        
         # Issue loyalty token (5% of booking value)
         loyalty_value = total_price * 0.05
         expiry_date = datetime.now() + timedelta(days=365)
-        
         cursor.execute("""
             INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
             VALUES (%s, %s, %s, %s)
         """, (session['user_id'], loyalty_value, expiry_date, f'Earned from booking #{booking_id}'))
-        
         conn.commit()
-        
         return jsonify({
             'success': True, 
             'booking_id': booking_id,
             'total_price': total_price,
             'loyalty_earned': loyalty_value
         })
-        
     except Exception as e:
+        import traceback
+        print('Booking error:', traceback.format_exc())
         conn.rollback()
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'success': False, 'error': 'An unexpected error occurred while creating your booking. Please try again or contact support.'}), 500
     finally:
         cursor.close()
         conn.close()
@@ -758,8 +660,8 @@ def api_add_vehicle():
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO vehicles (make, model, year, type, base_price, availability, pickup_location_lat, pickup_location_lng, image_url)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO vehicles (make, model, year, type, base_price, availability, status, pickup_location_lat, pickup_location_lng, image_url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             data.get('make'),
             data.get('model'),
@@ -767,6 +669,7 @@ def api_add_vehicle():
             data.get('type'),
             data.get('base_price'),
             data.get('availability', True),
+            data.get('status', 'available'),
             data.get('pickup_lat'),
             data.get('pickup_lng'),
             data.get('image_url')
@@ -801,7 +704,7 @@ def api_update_vehicle(vehicle_id):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            UPDATE vehicles SET make=%s, model=%s, year=%s, type=%s, base_price=%s, image_url=%s, pickup_location_lat=%s, pickup_location_lng=%s
+            UPDATE vehicles SET make=%s, model=%s, year=%s, type=%s, base_price=%s, image_url=%s, pickup_location_lat=%s, pickup_location_lng=%s, status=%s
             WHERE id=%s
         """, (
             data.get('make'),
@@ -812,6 +715,7 @@ def api_update_vehicle(vehicle_id):
             data.get('image_url'),
             data.get('pickup_lat'),
             data.get('pickup_lng'),
+            data.get('status', 'available'),
             vehicle_id
         ))
         conn.commit()
@@ -956,11 +860,22 @@ def api_update_booking_status_v2(booking_id):
     require_admin()
     data = request.get_json()
     status = data.get('status')
-    if status not in ['pending', 'approved', 'rejected', 'completed', 'cancelled']:
+    if status not in ['pending', 'approved', 'rejected', 'completed', 'cancelled', 'paid']:
         return jsonify({'success': False, 'error': 'Invalid status'}), 400
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
+        cursor.execute("SELECT * FROM bookings WHERE id = %s", (booking_id,))
+        booking = cursor.fetchone()
+        if not booking:
+            return jsonify({'success': False, 'error': 'Booking not found'}), 404
+        # Only allow marking as completed if status is 'paid' and end_date has passed
+        if status == 'completed':
+            from datetime import datetime
+            if booking['status'] != 'paid':
+                return jsonify({'success': False, 'error': 'Booking must be paid before completion'}), 400
+            if booking['end_date'] > datetime.now():
+                return jsonify({'success': False, 'error': 'Cannot complete booking before rental period ends'}), 400
         cursor.execute("UPDATE bookings SET status = %s WHERE id = %s", (status, booking_id))
         conn.commit()
         return jsonify({'success': True})
@@ -1166,6 +1081,46 @@ def api_vehicle_types():
     cursor.close()
     conn.close()
     return jsonify({'types': types})
+
+@app.route('/admin/users')
+def admin_users():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    return render_template('admin/users.html')
+
+@app.route('/api/pay_for_booking', methods=['POST'])
+def api_pay_for_booking():
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+    data = request.get_json()
+    booking_id = data.get('booking_id')
+    if not booking_id:
+        return jsonify({'success': False, 'error': 'Missing booking ID'}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        # Check booking exists, is approved, and belongs to user
+        cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, session['user_id']))
+        booking = cursor.fetchone()
+        if not booking:
+            return jsonify({'success': False, 'error': 'Booking not found'}), 404
+        if booking['status'] != 'approved':
+            return jsonify({'success': False, 'error': 'Booking is not approved or already paid'}), 400
+        # Record payment (status 'success' is for the payment record, not the booking)
+        cursor.execute("""
+            INSERT INTO payments (booking_id, user_id, amount, status, method)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (booking_id, session['user_id'], booking['total_price'], 'success', 'dummy'))
+        # Update booking status to 'paid' (this is the key line)
+        cursor.execute("UPDATE bookings SET status = %s WHERE id = %s", ('paid', booking_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 if __name__ == '__main__':
     app.run(debug=DEBUG)

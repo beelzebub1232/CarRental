@@ -25,7 +25,10 @@
         <nav class="top-nav-links">
             <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
@@ -36,8 +39,16 @@
         </div>
         <div id="user-feedback" style="margin-bottom: 1rem;"></div>
         <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2 class="card-title">All Users</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="user-search" class="form-input" placeholder="Search by email or name" style="min-width: 200px;">
+                    <select id="user-role-filter" class="form-select">
+                        <option value="">All Roles</option>
+                        <option value="customer">Customer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
             </div>
             <div class="card-body">
                 <table class="table" id="users-table">
@@ -110,6 +121,7 @@
         </div>
       </div>
     </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
     // Feedback helpers
     const userFeedback = document.getElementById('user-feedback');
@@ -242,6 +254,22 @@
     });
     // Initial load
     loadUsers();
+    // Search/filter logic for users
+    document.getElementById('user-search').addEventListener('input', filterUsers);
+    document.getElementById('user-role-filter').addEventListener('change', filterUsers);
+    function filterUsers() {
+        const search = document.getElementById('user-search').value.toLowerCase();
+        const role = document.getElementById('user-role-filter').value;
+        const rows = document.querySelectorAll('#users-table tbody tr');
+        rows.forEach(row => {
+            const email = row.children[1].textContent.toLowerCase();
+            const name = row.children[2].textContent.toLowerCase();
+            const userRole = row.children[3].textContent;
+            const matchesSearch = email.includes(search) || name.includes(search);
+            const matchesRole = !role || userRole === role;
+            row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
+        });
+    }
     </script>
     <style>
     .feedback-success {

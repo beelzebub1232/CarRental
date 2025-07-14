@@ -26,7 +26,10 @@
         <nav class="top-nav-links">
             <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
@@ -64,9 +67,9 @@
                         </span>
                     </div>
                     <div class="vehicle-actions">
-                        <button class="btn btn-secondary btn-sm" onclick="editVehicle({{ vehicle.id }})">Edit</button>
+                        <button class="btn btn-accent btn-sm" onclick="editVehicle({{ vehicle.id }})">Edit</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteVehicle({{ vehicle.id }})">Delete</button>
-                        <button class="btn btn-sm {{ 'btn-danger' if vehicle.availability else 'btn-primary' }}" 
+                        <button class="btn btn-sm {% if vehicle.availability %}btn-warning{% else %}btn-success{% endif %}" 
                                 onclick="toggleAvailability({{ vehicle.id }}, {{ vehicle.availability|lower }})">
                             {{ 'Mark Unavailable' if vehicle.availability else 'Mark Available' }}
                         </button>
@@ -220,7 +223,10 @@
         }
         function showAddVehicleModal() {
             const content = `
-                <h2 style="margin-bottom: 1rem;">Add New Vehicle</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin-bottom: 1rem;">Add New Vehicle</h2>
+                    <button type="button" class="modal-close modal-close-x" style="background: none; border: none; font-size: 2rem; line-height: 1; cursor: pointer; color: #888; margin-left: 1rem;">&times;</button>
+                </div>
                 <form id="add-vehicle-form">
                     <div class="grid grid-2" style="gap: 1rem;">
                         <div class="form-group">
@@ -262,9 +268,16 @@
                         <label class="form-label">Image URL</label>
                         <input type="text" name="image_url" class="form-input">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" id="add-status-select" required>
+                            <option value="available" selected>Available</option>
+                            <option value="unavailable">Unavailable</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
                     <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
                         <button type="submit" class="btn btn-primary">Add Vehicle</button>
-                        <button type="button" class="btn btn-outline modal-close">Cancel</button>
                     </div>
                 </form>
             `;
@@ -348,6 +361,14 @@
                             <div class="form-group">
                                 <label class="form-label">Image URL</label>
                                 <input type="text" name="image_url" class="form-input" value="${vehicle.image_url}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select" id="edit-status-select" required>
+                                    <option value="available" ${vehicle.status === 'available' ? 'selected' : ''}>Available</option>
+                                    <option value="unavailable" ${vehicle.status === 'unavailable' ? 'selected' : ''}>Unavailable</option>
+                                    <option value="maintenance" ${vehicle.status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                                </select>
                             </div>
                             <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
                                 <button type="submit" class="btn btn-primary">Save Changes</button>

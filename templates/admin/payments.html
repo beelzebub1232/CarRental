@@ -25,8 +25,10 @@
         <nav class="top-nav-links">
             <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
-            <a href="{{ url_for('admin_payments') }}" class="top-nav-link active">Payments</a>
+            <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
@@ -42,21 +44,23 @@
                 <button class="btn btn-secondary" onclick="window.location='/api/export/payments'" style="float:right;">Export CSV</button>
             </div>
             <div class="card-body">
-                <table class="table" id="payments-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Booking ID</th>
-                            <th>User</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Method</th>
-                            <th>Reference</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table" id="payments-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Booking ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -72,6 +76,7 @@
         <div id="notification-list">
           <div style="color: #6b7280; text-align: center;">No notifications yet.</div>
         </div>
+        <button id="test-notif-btn" class="btn btn-primary btn-sm" style="margin-top:1rem; width:100%;">Test Notification</button>
       </div>
     </div>
     <script>
@@ -92,16 +97,22 @@
             .then(data => {
                 const tbody = document.querySelector('#payments-table tbody');
                 tbody.innerHTML = '';
+                if (!data.payments || data.payments.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888; padding:2rem;">No payments found.</td></tr>`;
+                    return;
+                }
                 data.payments.forEach(p => {
+                    const statusClass = p.status === 'success' ? 'status-approved' : p.status === 'pending' ? 'status-pending' : 'status-rejected';
+                    const methodClass = p.method && p.method.toLowerCase().includes('upi') ? 'status-completed' : p.method && p.method.toLowerCase().includes('card') ? 'status-approved' : 'status-pending';
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${p.id}</td>
+                        <td style="font-weight:600; color:var(--primary-600);">${p.id}</td>
                         <td>${p.booking_id || ''}</td>
-                        <td>${p.full_name ? p.full_name + ' (' + p.email + ')' : p.user_id}</td>
-                        <td>₹${Number(p.amount).toFixed(2)}</td>
-                        <td>${p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}</td>
-                        <td>${p.status}</td>
-                        <td>${p.method}</td>
+                        <td>${p.full_name ? `<span style='font-weight:600;'>${p.full_name}</span> <span style='color:#888;'>(${p.email})</span>` : p.user_id}</td>
+                        <td><span style="font-weight:700; color:var(--accent-main);">₹${Number(p.amount).toFixed(2)}</span></td>
+                        <td><span style="color:var(--neutral-700); font-size:0.98em;">${p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}</span></td>
+                        <td><span class="status-badge ${statusClass}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
+                        <td><span class="status-badge ${methodClass}">${p.method}</span></td>
                         <td>${p.reference || ''}</td>
                     `;
                     tbody.appendChild(tr);
@@ -154,6 +165,13 @@
           list.prepend(item);
         }
       }
+      // Add test notification button handler
+      document.addEventListener('DOMContentLoaded', function() {
+        const testBtn = document.getElementById('test-notif-btn');
+        if (testBtn) testBtn.onclick = function() { addNotification('This is a test notification!'); };
+        // Optionally, add a notification on page load for demo
+        addNotification('Welcome to the Payments page!');
+      });
     </script>
 </body>
 </html> 

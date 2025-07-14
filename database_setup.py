@@ -28,22 +28,27 @@ def create_database():
             )
         """)
         
-        # Create vehicles table
+        # Create vehicles table with status column
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS vehicles (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                make VARCHAR(50) NOT NULL,
-                model VARCHAR(50) NOT NULL,
+                make VARCHAR(100) NOT NULL,
+                model VARCHAR(100) NOT NULL,
                 year INT NOT NULL,
                 type VARCHAR(50) NOT NULL,
                 base_price DECIMAL(10, 2) NOT NULL,
                 availability BOOLEAN DEFAULT TRUE,
-                pickup_location_lat DECIMAL(10, 8),
-                pickup_location_lng DECIMAL(11, 8),
+                status ENUM('available', 'unavailable', 'maintenance') DEFAULT 'available',
+                pickup_location_lat DECIMAL(9,6),
+                pickup_location_lng DECIMAL(9,6),
                 image_url VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        # Migration: add status column if missing
+        cursor.execute("SHOW COLUMNS FROM vehicles LIKE 'status'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE vehicles ADD COLUMN status ENUM('available', 'unavailable', 'maintenance') DEFAULT 'available' AFTER availability")
         
         # Create bookings table
         cursor.execute("""
