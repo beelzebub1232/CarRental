@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - DriveEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Customer Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
+            <a href="{{ url_for('customer_bookings') }}" class="top-nav-link active">Bookings</a>
+            <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">My Bookings</h1>
+            <p class="page-subtitle">View all your car rental bookings</p>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Booking History</h2>
+            </div>
+            {% if bookings %}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Vehicle</th>
+                            <th>Dates</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Booked</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>#{{ booking.id }}</td>
+                            <td>
+                                <div class="vehicle-info">
+                                    <div class="vehicle-name">{{ booking.make }} {{ booking.model }}</div>
+                                    <div class="vehicle-details">{{ booking.year }} {{ booking.type }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="booking-dates">
+                                    <div>{{ booking.start_date.strftime('%m/%d/%Y %I:%M %p') }}</div>
+                                    <div class="date-to">to {{ booking.end_date.strftime('%m/%d/%Y %I:%M %p') }}</div>
+                                </div>
+                            </td>
+                            <td>₹{{ "%.2f"|format(booking.total_price) }}</td>
+                            <td>
+                                <span class="status-badge status-{{ booking.booking_status }}">{{ booking.booking_status|title }}</span>
+                            </td>
+                            <td>{{ booking.booking_date.strftime('%m/%d/%Y') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg class="icon icon-xl" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <h4>No bookings yet</h4>
+                <p>Ready to start your journey?</p>
+                <a href="{{ url_for('customer_booking') }}" class="btn btn-primary">Book Your First Vehicle</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html> 

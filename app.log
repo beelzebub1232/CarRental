@@ -1,0 +1,64 @@
+2025-07-15 04:10:49,882 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:10:49,884 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:10:58,062 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:10:58,377 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:10:58,379 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:00,736 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:01,024 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:01,026 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:09,264 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:09,579 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:09,584 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:11,884 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:12,178 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:12,180 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:20,336 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:20,659 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:20,661 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:22,976 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:23,265 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:23,267 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:28,474 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:28,807 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:28,809 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:31,055 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:31,347 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:31,349 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:39,585 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:39,926 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:39,929 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:42,144 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:42,452 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:42,454 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:49,021 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:49,354 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:49,357 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:11:51,615 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:11:51,903 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:11:51,905 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:12:12,076 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:12:12,414 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:12:12,416 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:12:14,598 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 04:12:14,886 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 04:12:14,887 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 04:14:41,223 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:41] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 04:14:41,294 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:41] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:41,296 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:41] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:41,304 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:41] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 04:14:41,480 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:41] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 04:14:42,085 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 04:14:42,111 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:42,111 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:42,119 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 04:14:42,313 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 04:14:42,827 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 04:14:42,847 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:42,847 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:42,854 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:42] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 04:14:43,034 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:43] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 04:14:50,740 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:50] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 04:14:50,769 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:50] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:50,771 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:50] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 04:14:50,775 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:50] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 04:14:50,842 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 04:14:50] "GET /api/loyalty_tokens HTTP/1.1" 200 -

@@ -7,20 +7,142 @@ import json
 import csv
 from io import StringIO
 from flask import Response
+import re
+import logging
+from functools import wraps
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config['DEBUG'] = DEBUG
 
+# Custom error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error_code=404, error_message="Page not found"), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error.html', error_code=500, error_message="Internal server error"), 500
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    return render_template('error.html', error_code=403, error_message="Access forbidden"), 403
+
+# Input validation functions
+def validate_email(email):
+    """Validate email format"""
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validate_password(password):
+    """Validate password strength"""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long"
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain at least one uppercase letter"
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain at least one lowercase letter"
+    if not re.search(r'\d', password):
+        return False, "Password must contain at least one number"
+    return True, "Password is valid"
+
+def validate_booking_data(vehicle_id, start_date, end_date):
+    """Validate booking data"""
+    errors = []
+    
+    if not vehicle_id or not isinstance(vehicle_id, int):
+        errors.append("Invalid vehicle ID")
+    
+    try:
+        start_datetime = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
+        end_datetime = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
+        
+        if end_datetime <= start_datetime:
+            errors.append("End date/time must be after start date/time")
+        
+        if start_datetime < datetime.now():
+            errors.append("Start date cannot be in the past")
+            
+        # Check if booking is not more than 30 days in advance
+        if start_datetime > datetime.now() + timedelta(days=30):
+            errors.append("Bookings cannot be made more than 30 days in advance")
+            
+    except ValueError:
+        errors.append("Invalid date format")
+    
+    return errors, start_datetime if 'start_datetime' in locals() else None, end_datetime if 'end_datetime' in locals() else None
+
+# Database connection with error handling
 def get_db_connection():
-    """Get database connection"""
-    conn = mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME
-    )
-    return conn
+    """Get database connection with proper error handling"""
+    try:
+        conn = mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME,
+            autocommit=False
+        )
+        return conn
+    except mysql.connector.Error as e:
+        logger.error(f"Database connection error: {e}")
+        raise Exception("Database connection failed. Please try again later.")
+
+def safe_db_operation(operation_func):
+    """Decorator for safe database operations"""
+    @wraps(operation_func)
+    def wrapper(*args, **kwargs):
+        conn = None
+        cursor = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            result = operation_func(cursor, *args, **kwargs)
+            conn.commit()
+            return result
+        except mysql.connector.Error as e:
+            if conn:
+                conn.rollback()
+            logger.error(f"Database operation error: {e}")
+            raise Exception("Database operation failed. Please try again later.")
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            logger.error(f"Unexpected error: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+    return wrapper
+
+# Duplicate booking prevention
+def check_duplicate_booking(cursor, user_id, vehicle_id, start_datetime, end_datetime):
+    """Check for duplicate bookings within a short time window"""
+    # Check for recent bookings by the same user for the same vehicle
+    cursor.execute("""
+        SELECT id FROM bookings 
+        WHERE user_id = %s AND vehicle_id = %s 
+        AND booking_date > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+        AND status IN ('pending', 'approved')
+    """, (user_id, vehicle_id))
+    
+    if cursor.fetchone():
+        return True, "You have already made a booking for this vehicle recently. Please wait a few minutes before trying again."
+    
+    return False, None
 
 def calculate_final_price(vehicle_id, start_datetime, end_datetime):
     """Calculate final price with dynamic pricing rules"""
@@ -98,52 +220,96 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
         
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        # Input validation
+        if not email or not password:
+            flash('Please provide both email and password')
+            return render_template('login.html')
         
-        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-        user = cursor.fetchone()
+        if not validate_email(email):
+            flash('Please enter a valid email address')
+            return render_template('login.html')
         
-        if user and user['password'] == password:
-            session['user_id'] = user['id']
-            session['role'] = user['role']
-            session['full_name'] = user['full_name']
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
             
-            if user['role'] == 'admin':
-                return redirect(url_for('admin_dashboard'))
+            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            user = cursor.fetchone()
+            
+            if user and check_password_hash(user['password'], password):
+                session['user_id'] = user['id']
+                session['role'] = user['role']
+                session['full_name'] = user['full_name']
+                
+                logger.info(f"User {user['email']} logged in successfully")
+                
+                if user['role'] == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                else:
+                    return redirect(url_for('customer_dashboard'))
             else:
-                return redirect(url_for('customer_dashboard'))
-        else:
-            flash('Invalid email or password')
-        
-        cursor.close()
-        conn.close()
+                logger.warning(f"Failed login attempt for email: {email}")
+                flash('Invalid email or password')
+            
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            logger.error(f"Login error: {e}")
+            flash('An error occurred during login. Please try again.')
     
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        full_name = request.form['full_name']
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        full_name = request.form.get('full_name', '').strip()
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Input validation
+        if not email or not password or not full_name:
+            flash('Please fill in all required fields')
+            return render_template('login.html')
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address')
+            return render_template('login.html')
+        
+        is_valid, password_message = validate_password(password)
+        if not is_valid:
+            flash(password_message)
+            return render_template('login.html')
+        
+        if len(full_name) < 2 or len(full_name) > 100:
+            flash('Full name must be between 2 and 100 characters')
+            return render_template('login.html')
         
         try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Hash the password
+            hashed_password = generate_password_hash(password)
+            
             cursor.execute(
                 "INSERT INTO users (email, password, full_name, role) VALUES (%s, %s, %s, 'customer')",
-                (email, password, full_name)
+                (email, hashed_password, full_name)
             )
             conn.commit()
+            
+            logger.info(f"New user registered: {email}")
             flash('Registration successful! Please login.')
             return redirect(url_for('login'))
+            
         except mysql.connector.IntegrityError:
             flash('Email already exists')
+        except Exception as e:
+            logger.error(f"Registration error: {e}")
+            flash('An error occurred during registration. Please try again.')
         finally:
             cursor.close()
             conn.close()
@@ -161,88 +327,139 @@ def customer_dashboard():
     if 'user_id' not in session or session['role'] != 'customer':
         return redirect(url_for('login'))
     
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    
-    # Get recent bookings
-    cursor.execute("""
-        SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type, v.image_url
-        FROM bookings b
-        JOIN vehicles v ON b.vehicle_id = v.id
-        WHERE b.user_id = %s
-        ORDER BY b.booking_date DESC
-        LIMIT 5
-    """, (session['user_id'],))
-    recent_bookings = cursor.fetchall()
-    
-    # Get loyalty tokens
-    cursor.execute("""
-        SELECT * FROM loyalty_tokens 
-        WHERE user_id = %s AND is_redeemed = FALSE AND (expiry_date IS NULL OR expiry_date > NOW())
-        ORDER BY issued_date DESC
-    """, (session['user_id'],))
-    loyalty_tokens = cursor.fetchall()
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('customer/dashboard.html', 
-                         recent_bookings=recent_bookings, 
-                         loyalty_tokens=loyalty_tokens)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get recent bookings
+        cursor.execute("""
+            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type, v.image_url
+            FROM bookings b
+            JOIN vehicles v ON b.vehicle_id = v.id
+            WHERE b.user_id = %s
+            ORDER BY b.booking_date DESC
+            LIMIT 5
+        """, (session['user_id'],))
+        recent_bookings = cursor.fetchall()
+        
+        # Get loyalty tokens
+        cursor.execute("""
+            SELECT * FROM loyalty_tokens 
+            WHERE user_id = %s AND is_redeemed = FALSE AND (expiry_date IS NULL OR expiry_date > NOW())
+            ORDER BY issued_date DESC
+        """, (session['user_id'],))
+        loyalty_tokens = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('customer/dashboard.html', 
+                             recent_bookings=recent_bookings, 
+                             loyalty_tokens=loyalty_tokens)
+                             
+    except Exception as e:
+        logger.error(f"Customer dashboard error: {e}")
+        flash('An error occurred while loading your dashboard. Please try again.')
+        return render_template('customer/dashboard.html', 
+                             recent_bookings=[], 
+                             loyalty_tokens=[])
 
 @app.route('/customer/booking')
 def customer_booking():
     if 'user_id' not in session or session['role'] != 'customer':
         return redirect(url_for('login'))
     
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM vehicles WHERE status = 'available' ORDER BY make, model")
-    vehicles = cursor.fetchall()
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('customer/booking.html', vehicles=vehicles)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("SELECT * FROM vehicles WHERE status = 'available' ORDER BY make, model")
+        vehicles = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('customer/booking.html', vehicles=vehicles)
+        
+    except Exception as e:
+        logger.error(f"Customer booking page error: {e}")
+        flash('An error occurred while loading available vehicles. Please try again.')
+        return render_template('customer/booking.html', vehicles=[])
 
 @app.route('/customer/profile')
 def customer_profile():
     if 'user_id' not in session or session['role'] != 'customer':
         return redirect(url_for('login'))
     
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get user details
+        cursor.execute("SELECT * FROM users WHERE id = %s", (session['user_id'],))
+        user = cursor.fetchone()
+        
+        # Get all bookings
+        cursor.execute("""
+            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type
+            FROM bookings b
+            JOIN vehicles v ON b.vehicle_id = v.id
+            WHERE b.user_id = %s
+            ORDER BY b.booking_date DESC
+        """, (session['user_id'],))
+        bookings = cursor.fetchall()
+        
+        # Get loyalty tokens history
+        cursor.execute("""
+            SELECT * FROM loyalty_tokens 
+            WHERE user_id = %s
+            ORDER BY issued_date DESC
+        """, (session['user_id'],))
+        loyalty_tokens = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('customer/profile.html', 
+                             user=user, 
+                             bookings=bookings, 
+                             loyalty_tokens=loyalty_tokens)
+                             
+    except Exception as e:
+        logger.error(f"Customer profile error: {e}")
+        flash('An error occurred while loading your profile. Please try again.')
+        return render_template('customer/profile.html', 
+                             user=None, 
+                             bookings=[], 
+                             loyalty_tokens=[])
+
+@app.route('/customer/bookings')
+def customer_bookings():
+    if 'user_id' not in session or session['role'] != 'customer':
+        return redirect(url_for('login'))
     
-    # Get user details
-    cursor.execute("SELECT * FROM users WHERE id = %s", (session['user_id'],))
-    user = cursor.fetchone()
-    
-    # Get all bookings
-    cursor.execute("""
-        SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type
-        FROM bookings b
-        JOIN vehicles v ON b.vehicle_id = v.id
-        WHERE b.user_id = %s
-        ORDER BY b.booking_date DESC
-    """, (session['user_id'],))
-    bookings = cursor.fetchall()
-    
-    # Get loyalty tokens history
-    cursor.execute("""
-        SELECT * FROM loyalty_tokens 
-        WHERE user_id = %s
-        ORDER BY issued_date DESC
-    """, (session['user_id'],))
-    loyalty_tokens = cursor.fetchall()
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('customer/profile.html', 
-                         user=user, 
-                         bookings=bookings, 
-                         loyalty_tokens=loyalty_tokens)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type
+            FROM bookings b
+            JOIN vehicles v ON b.vehicle_id = v.id
+            WHERE b.user_id = %s
+            ORDER BY b.booking_date DESC
+        """, (session['user_id'],))
+        bookings = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('customer/bookings.html', bookings=bookings)
+        
+    except Exception as e:
+        logger.error(f"Customer bookings error: {e}")
+        flash('An error occurred while loading your bookings. Please try again.')
+        return render_template('customer/bookings.html', bookings=[])
 
 # Remove /customer/payment and /api/process_payment_and_booking routes and session['pending_booking'] logic
 
@@ -393,115 +610,144 @@ def api_create_booking():
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not authenticated'}), 401
     
-    data = request.get_json()
-    vehicle_id = data.get('vehicle_id')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    discount_code = data.get('discount_code', '')
-    loyalty_token_id = data.get('loyalty_token_id')
-    
-    # Validate required fields
-    if not vehicle_id or not start_date or not end_date:
-        return jsonify({'success': False, 'error': 'Missing required booking information.'}), 400
-    
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
     try:
-        # Parse dates
-        start_datetime = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
-        end_datetime = datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
-        if end_datetime <= start_datetime:
-            return jsonify({'success': False, 'error': 'End date/time must be after start date/time.'}), 400
-        # Check vehicle exists and is available
-        cursor.execute("SELECT * FROM vehicles WHERE id = %s AND status = 'available'", (vehicle_id,))
-        vehicle = cursor.fetchone()
-        if not vehicle:
-            return jsonify({'success': False, 'error': 'Selected vehicle is not available.'}), 400
-        # Check for overlapping bookings
-        cursor.execute("""
-            SELECT * FROM bookings WHERE vehicle_id = %s AND status IN ('pending', 'approved')
-            AND (
-                (start_date <= %s AND end_date > %s) OR
-                (start_date < %s AND end_date >= %s) OR
-                (start_date >= %s AND end_date <= %s)
-            )
-        """, (vehicle_id, start_datetime, start_datetime, end_datetime, end_datetime, start_datetime, end_datetime))
-        overlap = cursor.fetchone()
-        if overlap:
-            return jsonify({'success': False, 'error': 'This vehicle is already booked for the selected time range.'}), 400
-        # Calculate base price
-        total_price = calculate_final_price(vehicle_id, start_datetime, end_datetime)
-        if total_price is None:
-            return jsonify({'success': False, 'error': 'Could not calculate price for this booking.'}), 400
-        discount_applied = 0
-        loyalty_token_used = 0
-        # Apply discount code if provided
-        if discount_code:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Invalid request data'}), 400
+        
+        vehicle_id = data.get('vehicle_id')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        discount_code = data.get('discount_code', '').strip()
+        loyalty_token_id = data.get('loyalty_token_id')
+        
+        # Comprehensive input validation
+        validation_errors, start_datetime, end_datetime = validate_booking_data(vehicle_id, start_date, end_date)
+        if validation_errors:
+            return jsonify({'success': False, 'error': validation_errors[0]}), 400
+        
+        # Validate discount code format if provided
+        if discount_code and len(discount_code) > 50:
+            return jsonify({'success': False, 'error': 'Discount code is too long'}), 400
+        
+        # Validate loyalty token ID if provided
+        if loyalty_token_id and not isinstance(loyalty_token_id, int):
+            return jsonify({'success': False, 'error': 'Invalid loyalty token ID'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        try:
+            # Check for duplicate booking
+            is_duplicate, duplicate_message = check_duplicate_booking(cursor, session['user_id'], vehicle_id, start_datetime, end_datetime)
+            if is_duplicate:
+                return jsonify({'success': False, 'error': duplicate_message}), 400
+            
+            # Check vehicle exists and is available
+            cursor.execute("SELECT * FROM vehicles WHERE id = %s AND status = 'available'", (vehicle_id,))
+            vehicle = cursor.fetchone()
+            if not vehicle:
+                return jsonify({'success': False, 'error': 'Selected vehicle is not available.'}), 400
+            
+            # Check for overlapping bookings
             cursor.execute("""
-                SELECT * FROM discounts 
-                WHERE code = %s AND is_active = TRUE 
-                AND start_date <= CURDATE() AND end_date >= CURDATE()
-                AND (usage_limit = 0 OR times_used < usage_limit)
-            """, (discount_code,))
-            discount = cursor.fetchone()
-            if discount:
-                discount_applied = total_price * (float(discount['discount_percentage']) / 100)
-                total_price -= discount_applied
-                # Update discount usage
-                cursor.execute(
-                    "UPDATE discounts SET times_used = times_used + 1 WHERE id = %s",
-                    (discount['id'],)
+                SELECT * FROM bookings WHERE vehicle_id = %s AND status IN ('pending', 'approved')
+                AND (
+                    (start_date <= %s AND end_date > %s) OR
+                    (start_date < %s AND end_date >= %s) OR
+                    (start_date >= %s AND end_date <= %s)
                 )
-            else:
-                return jsonify({'success': False, 'error': 'Invalid or expired discount code.'}), 400
-        # Apply loyalty token if provided
-        if loyalty_token_id:
+            """, (vehicle_id, start_datetime, start_datetime, end_datetime, end_datetime, start_datetime, end_datetime))
+            overlap = cursor.fetchone()
+            if overlap:
+                return jsonify({'success': False, 'error': 'This vehicle is already booked for the selected time range.'}), 400
+            
+            # Calculate base price
+            total_price = calculate_final_price(vehicle_id, start_datetime, end_datetime)
+            if total_price is None:
+                return jsonify({'success': False, 'error': 'Could not calculate price for this booking.'}), 400
+            
+            discount_applied = 0
+            loyalty_token_used = 0
+            
+            # Apply discount code if provided
+            if discount_code:
+                cursor.execute("""
+                    SELECT * FROM discounts 
+                    WHERE code = %s AND is_active = TRUE 
+                    AND start_date <= CURDATE() AND end_date >= CURDATE()
+                    AND (usage_limit = 0 OR times_used < usage_limit)
+                """, (discount_code,))
+                discount = cursor.fetchone()
+                if discount:
+                    discount_applied = total_price * (float(discount['discount_percentage']) / 100)
+                    total_price -= discount_applied
+                    # Update discount usage
+                    cursor.execute(
+                        "UPDATE discounts SET times_used = times_used + 1 WHERE id = %s",
+                        (discount['id'],)
+                    )
+                else:
+                    return jsonify({'success': False, 'error': 'Invalid or expired discount code.'}), 400
+            
+            # Apply loyalty token if provided
+            if loyalty_token_id:
+                cursor.execute("""
+                    SELECT * FROM loyalty_tokens 
+                    WHERE id = %s AND user_id = %s AND is_redeemed = FALSE
+                    AND (expiry_date IS NULL OR expiry_date > NOW())
+                """, (loyalty_token_id, session['user_id']))
+                token = cursor.fetchone()
+                if token:
+                    loyalty_token_used = min(float(token['token_value']), total_price)
+                    total_price -= loyalty_token_used
+                    # Mark token as redeemed
+                    cursor.execute(
+                        "UPDATE loyalty_tokens SET is_redeemed = TRUE WHERE id = %s",
+                        (loyalty_token_id,)
+                    )
+                else:
+                    return jsonify({'success': False, 'error': 'Invalid or expired loyalty token.'}), 400
+            
+            # Create booking
             cursor.execute("""
-                SELECT * FROM loyalty_tokens 
-                WHERE id = %s AND user_id = %s AND is_redeemed = FALSE
-                AND (expiry_date IS NULL OR expiry_date > NOW())
-            """, (loyalty_token_id, session['user_id']))
-            token = cursor.fetchone()
-            if token:
-                loyalty_token_used = min(float(token['token_value']), total_price)
-                total_price -= loyalty_token_used
-                # Mark token as redeemed
-                cursor.execute(
-                    "UPDATE loyalty_tokens SET is_redeemed = TRUE WHERE id = %s",
-                    (loyalty_token_id,)
-                )
-            else:
-                return jsonify({'success': False, 'error': 'Invalid or expired loyalty token.'}), 400
-        # Create booking
-        cursor.execute("""
-            INSERT INTO bookings 
-            (user_id, vehicle_id, start_date, end_date, total_price, discount_applied, loyalty_token_used)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (session['user_id'], vehicle_id, start_datetime, end_datetime, 
-              total_price, discount_applied, loyalty_token_used))
-        booking_id = cursor.lastrowid
-        # Issue loyalty token (5% of booking value)
-        loyalty_value = total_price * 0.05
-        expiry_date = datetime.now() + timedelta(days=365)
-        cursor.execute("""
-            INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
-            VALUES (%s, %s, %s, %s)
-        """, (session['user_id'], loyalty_value, expiry_date, f'Earned from booking #{booking_id}'))
-        conn.commit()
-        return jsonify({
-            'success': True, 
-            'booking_id': booking_id,
-            'total_price': total_price,
-            'loyalty_earned': loyalty_value
-        })
+                INSERT INTO bookings 
+                (user_id, vehicle_id, start_date, end_date, total_price, discount_applied, loyalty_token_used)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (session['user_id'], vehicle_id, start_datetime, end_datetime, 
+                  total_price, discount_applied, loyalty_token_used))
+            booking_id = cursor.lastrowid
+            
+            # Issue loyalty token (5% of booking value)
+            loyalty_value = total_price * 0.05
+            expiry_date = datetime.now() + timedelta(days=365)
+            cursor.execute("""
+                INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
+                VALUES (%s, %s, %s, %s)
+            """, (session['user_id'], loyalty_value, expiry_date, f'Earned from booking #{booking_id}'))
+            
+            conn.commit()
+            
+            logger.info(f"Booking created successfully: ID {booking_id} by user {session['user_id']}")
+            
+            return jsonify({
+                'success': True, 
+                'booking_id': booking_id,
+                'total_price': total_price,
+                'loyalty_earned': loyalty_value
+            })
+            
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Booking creation error: {e}")
+            return jsonify({'success': False, 'error': 'An unexpected error occurred while creating your booking. Please try again or contact support.'}), 500
+        finally:
+            cursor.close()
+            conn.close()
+            
     except Exception as e:
-        import traceback
-        print('Booking error:', traceback.format_exc())
-        conn.rollback()
-        return jsonify({'success': False, 'error': 'An unexpected error occurred while creating your booking. Please try again or contact support.'}), 500
-    finally:
-        cursor.close()
-        conn.close()
+        logger.error(f"API create booking error: {e}")
+        return jsonify({'success': False, 'error': 'Invalid request format'}), 400
 
 @app.route('/api/validate_discount', methods=['POST'])
 def api_validate_discount():
@@ -838,20 +1084,30 @@ def api_booking_details(booking_id):
     cursor.close()
     conn.close()
     if not booking:
-        return '<div class="modal-content"><h3>Booking not found</h3><button class="btn btn-outline modal-close">Close</button></div>'
-    # Render details as HTML for modal
+        return '<div><h3>Booking not found</h3><button class="btn btn-outline modal-close modal-close-x" aria-label="Close">&times;</button></div>'
+    # Render details as HTML for modal (structured, modern, grouped)
     return f'''
-    <div class="modal-content">
-        <h3>Booking Details</h3>
-        <p><strong>ID:</strong> #{booking['id']}</p>
-        <p><strong>Customer:</strong> {booking['full_name']} ({booking['email']})</p>
-        <p><strong>Vehicle:</strong> {booking['make']} {booking['model']} ({booking['year']}, {booking['type']})</p>
-        <p><strong>Dates:</strong> {booking['start_date']} to {booking['end_date']}</p>
-        <p><strong>Total Price:</strong> ₹{booking['total_price']:.2f}</p>
-        <p><strong>Status:</strong> {booking['status'].title()}</p>
-        <p><strong>Discount Applied:</strong> ₹{booking['discount_applied']:.2f}</p>
-        <p><strong>Loyalty Token Used:</strong> ₹{booking['loyalty_token_used']:.2f}</p>
-        <button class="btn btn-outline modal-close">Close</button>
+    <div style="position: relative; min-width: 320px; max-width: 480px;">
+        <button class="modal-close modal-close-x" aria-label="Close" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; line-height: 1; cursor: pointer; color: #888;">&times;</button>
+        <h2 style="margin-top:0; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px;">Booking Details</h2>
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                {'<img src="' + booking['image_url'] + '" alt="Vehicle" style="width: 72px; height: 48px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #eee;">' if booking['image_url'] else ''}
+                <div>
+                    <div style="font-weight: 700; font-size: 1.1rem; color: #222;">{booking['make']} {booking['model']}</div>
+                    <div style="color: #666; font-size: 0.95rem;">{booking['year']} {booking['type']}</div>
+                </div>
+            </div>
+            <dl style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; font-size: 1rem;">
+                <dt style="color: #888;">Booking ID</dt><dd style="font-weight: 600; color: #2563eb;">#{booking['id']}</dd>
+                <dt style="color: #888;">Customer</dt><dd style="font-weight: 600;">{booking['full_name']}<br><span style='color:#888;font-size:0.95em'>{booking['email']}</span></dd>
+                <dt style="color: #888;">Dates</dt><dd>{booking['start_date']}<br>to {booking['end_date']}</dd>
+                <dt style="color: #888;">Status</dt><dd style="font-weight: 600; text-transform: uppercase;">{booking['status'].title()}</dd>
+                <dt style="color: #888;">Total Price</dt><dd style="font-weight: 700; color: #22c55e;">₹{booking['total_price']:.2f}</dd>
+                <dt style="color: #888;">Discount</dt><dd>₹{booking['discount_applied']:.2f}</dd>
+                <dt style="color: #888;">Loyalty Used</dt><dd>₹{booking['loyalty_token_used']:.2f}</dd>
+            </dl>
+        </div>
     </div>
     '''
 
@@ -860,27 +1116,27 @@ def api_update_booking_status_v2(booking_id):
     require_admin()
     data = request.get_json()
     status = data.get('status')
+    print(f"[DEBUG] Incoming status update for booking {booking_id}: {data}")
     if status not in ['pending', 'approved', 'rejected', 'completed', 'cancelled', 'paid']:
+        print(f"[DEBUG] Invalid status value: {status}")
         return jsonify({'success': False, 'error': 'Invalid status'}), 400
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("SELECT * FROM bookings WHERE id = %s", (booking_id,))
         booking = cursor.fetchone()
+        print(f"[DEBUG] Booking lookup result: {booking}")
         if not booking:
+            print(f"[DEBUG] Booking not found for ID: {booking_id}")
             return jsonify({'success': False, 'error': 'Booking not found'}), 404
-        # Only allow marking as completed if status is 'paid' and end_date has passed
-        if status == 'completed':
-            from datetime import datetime
-            if booking['status'] != 'paid':
-                return jsonify({'success': False, 'error': 'Booking must be paid before completion'}), 400
-            if booking['end_date'] > datetime.now():
-                return jsonify({'success': False, 'error': 'Cannot complete booking before rental period ends'}), 400
+        print(f"[DEBUG] Updating booking {booking_id} to status: {status}")
         cursor.execute("UPDATE bookings SET status = %s WHERE id = %s", (status, booking_id))
         conn.commit()
+        print(f"[DEBUG] Booking {booking_id} status updated successfully.")
         return jsonify({'success': True})
     except Exception as e:
         conn.rollback()
+        print(f"[DEBUG] Exception during status update: {e}")
         return jsonify({'success': False, 'error': str(e)}), 400
     finally:
         cursor.close()

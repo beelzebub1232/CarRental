@@ -57,155 +57,88 @@
                 </div>
             </div>
             <div class="card-body">
-                <table class="table" id="bookings-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Customer</th>
-                            <th>Vehicle</th>
-                            <th>Dates</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for booking in bookings %}
-                        <tr>
-                            <td>#{{ booking.id }}</td>
-                            <td>{{ booking.full_name }}</td>
-                            <td>{{ booking.make }} {{ booking.model }}</td>
-                            <td>
-                                <div>{{ booking.start_date.strftime('%m/%d %I:%M %p') }}</div>
-                                <div class="date-to">to {{ booking.end_date.strftime('%m/%d %I:%M %p') }}</div>
-                            </td>
-                            <td>₹{{ '%.2f'|format(booking.total_price) }}</td>
-                            <td>
-                                {% if booking.status == 'approved' %}
-                                    <span class="status-badge status-approved">Approved</span>
-                                {% elif booking.status == 'paid' %}
-                                    <span class="status-badge status-paid">Paid</span>
-                                {% elif booking.status == 'completed' %}
-                                    <span class="status-badge status-completed">Completed</span>
-                                {% elif booking.status == 'pending' %}
-                                    <span class="status-badge status-pending">Pending</span>
-                                {% elif booking.status == 'rejected' %}
-                                    <span class="status-badge status-rejected">Rejected</span>
-                                {% elif booking.status == 'cancelled' %}
-                                    <span class="status-badge status-cancelled">Cancelled</span>
-                                {% else %}
-                                    <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-info" onclick="showBookingDetails({{ booking.id }})">Details</button>
-                                {% if booking.status == 'pending' %}
-                                    <button class="btn btn-sm btn-primary" onclick="updateBookingStatus({{ booking.id }}, 'approved')" title="After approval, user must pay before completion">Approve</button>
-                                    <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'rejected')">Reject</button>
-                                {% elif booking.status == 'approved' %}
-                                    <button class="btn btn-sm btn-success" disabled title="User must pay before you can complete this booking">Mark Completed</button>
-                                    <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
-                                {% elif booking.status == 'paid' %}
-                                    <button class="btn btn-sm btn-success" onclick="updateBookingStatus({{ booking.id }}, 'completed')">Mark Completed</button>
-                                    <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table" id="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                                <th>Dates</th>
+                                <th>Total</th>
+                                <th>Status & Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>
+                                    <div class="booking-id">#{{ booking.id }}</div>
+                                </td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="customer-name">{{ booking.full_name }}</div>
+                                        {% if booking.email %}
+                                            <div class="customer-email">{{ booking.email }}</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="vehicle-info">
+                                        <div class="vehicle-name">{{ booking.make }} {{ booking.model }}</div>
+                                        {% if booking.year or booking.type %}
+                                            <div class="vehicle-details">{{ booking.year }} {{ booking.type }}</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="booking-dates">
+                                        <div>{{ booking.start_date.strftime('%m/%d/%Y %I:%M %p') }}</div>
+                                        <div class="date-to">to {{ booking.end_date.strftime('%m/%d/%Y %I:%M %p') }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="pricing-info">
+                                        <div class="total-price">₹{{ '%.2f'|format(booking.total_price) }}</div>
+                                        {% if booking.discount_applied and booking.discount_applied > 0 %}
+                                            <div class="discount-applied">-₹{{ '%.2f'|format(booking.discount_applied) }} discount</div>
+                                        {% endif %}
+                                        {% if booking.loyalty_token_used and booking.loyalty_token_used > 0 %}
+                                            <div class="loyalty-used">-₹{{ '%.2f'|format(booking.loyalty_token_used) }} loyalty</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="booking-status-cell">
+                                        {% if booking.status == 'approved' %}
+                                            <span class="status-badge status-approved">Approved</span>
+                                            <span class="status-badge status-warning">Awaiting Payment</span>
+                                        {% elif booking.status == 'paid' %}
+                                            <span class="status-badge status-paid">Paid</span>
+                                        {% else %}
+                                            <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-info" onclick="showBookingDetails({{ booking.id }})">Details</button>
+                                        {% if booking.status == 'pending' %}
+                                            <button class="btn btn-sm btn-primary" onclick="updateBookingStatus({{ booking.id }}, 'approved')" title="After approval, user must pay before completion">Approve</button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'rejected')">Reject</button>
+                                        {% elif booking.status == 'approved' %}
+                                            <button class="btn btn-sm btn-success" disabled title="User must pay before you can complete this booking">Mark Completed</button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
+                                        {% elif booking.status == 'paid' %}
+                                            <button class="btn btn-sm btn-success" onclick="updateBookingStatus({{ booking.id }}, 'completed')">Mark Completed</button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
-    <div id="notification-widget" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;">
-  <div id="notification-icon" style="background: #2563eb; color: #fff; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; font-size: 2rem;">
-    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71L18 16z"/></svg>
-  </div>
-  <div id="notification-panel" style="display:none; position: absolute; bottom: 70px; right: 0; width: 320px; background: #fff; border-radius: 1rem; box-shadow: 0 4px 24px rgba(0,0,0,0.18); padding: 1.5rem; max-height: 400px; overflow-y: auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #2563eb;">Notifications</h4>
-      <button onclick="document.getElementById('notification-panel').style.display='none'" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
-    </div>
-    <div id="notification-list">
-      <div style="color: #6b7280; text-align: center;">No notifications yet.</div>
-    </div>
-  </div>
-</div>
-<script>
-  const notifIcon = document.getElementById('notification-icon');
-  const notifPanel = document.getElementById('notification-panel');
-  notifIcon.onclick = () => {
-    notifPanel.style.display = notifPanel.style.display === 'block' ? 'none' : 'block';
-  };
-  // Example: Add notification (call this from anywhere)
-  function addNotification(msg) {
-    const list = document.getElementById('notification-list');
-    if (list) {
-      if (list.children.length === 1 && list.children[0].textContent.includes('No notifications')) list.innerHTML = '';
-      const item = document.createElement('div');
-      item.style.padding = '0.75rem 0';
-      item.style.borderBottom = '1px solid #f3f4f6';
-      item.innerHTML = `<span style='color:#111827;'>${msg}</span>`;
-      list.prepend(item);
-    }
-  }
-</script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script>
-      // Notification widget logic remains unchanged
-      const notifIcon = document.getElementById('notification-icon');
-      const notifPanel = document.getElementById('notification-panel');
-      notifIcon.onclick = () => {
-        notifPanel.style.display = notifPanel.style.display === 'block' ? 'none' : 'block';
-      };
-      function addNotification(msg) {
-        const list = document.getElementById('notification-list');
-        if (list) {
-          if (list.children.length === 1 && list.children[0].textContent.includes('No notifications')) list.innerHTML = '';
-          const item = document.createElement('div');
-          item.style.padding = '0.75rem 0';
-          item.style.borderBottom = '1px solid #f3f4f6';
-          item.innerHTML = `<span style='color:#111827;'>${msg}</span>`;
-          list.prepend(item);
-        }
-      }
-      // Modal and booking status logic
-      function updateBookingStatus(bookingId, status) {
-        showConfirmModal({
-          title: `Change Booking Status`,
-          message: `Are you sure you want to <b>${status}</b> this booking?`,
-          confirmText: 'Yes',
-          cancelText: 'No',
-          danger: status === 'rejected' || status === 'cancelled',
-          onConfirm: function() {
-            fetch(`/api/bookings/${bookingId}/status`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ status })
-            })
-            .then(r => r.json())
-            .then(result => {
-              if (result.success) {
-                showToast('Booking status updated!', 'success');
-                // Optionally update the row or reload
-                setTimeout(() => location.reload(), 1000);
-              } else {
-                showToast(result.error || 'Failed to update booking status', 'error');
-              }
-            })
-            .catch(() => showToast('Network error', 'error'));
-          }
-        });
-      }
-      // Details modal logic (dynamic AJAX loading)
-      function showBookingDetails(bookingId) {
-        fetch(`/api/bookings/${bookingId}`)
-          .then(response => response.text())
-          .then(html => {
-            showModal(html, { maxWidth: '600px' });
-          })
-          .catch(() => showToast('Failed to load booking details', 'error'));
-      }
-    </script>
 </body>
 </html> 

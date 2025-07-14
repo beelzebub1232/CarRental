@@ -346,7 +346,7 @@
             </div>
             <div id="login-tab" class="auth-content active">
                 <div id="login-message" tabindex="-1" style="outline: none; display: none;" aria-live="polite"></div>
-                <form id="login-form" method="POST" action="{{ url_for('login') }}" class="auth-form" novalidate autocomplete="on">
+                <form id="login-form" method="POST" action="{{ url_for('login') }}" class="auth-form" data-form="login" novalidate autocomplete="on">
                     <div class="form-group">
                         <input type="email" id="login-email" name="email" class="form-input" placeholder=" " required autocomplete="email">
                         <label for="login-email" class="form-label">Email Address</label>
@@ -363,7 +363,7 @@
                 </form>
             </div>
             <div id="register-tab" class="auth-content">
-                <form method="POST" action="{{ url_for('register') }}" class="auth-form" novalidate autocomplete="on">
+                <form method="POST" action="{{ url_for('register') }}" class="auth-form" data-form="registration" novalidate autocomplete="on">
                     <div class="form-group">
                         <input type="text" id="register-name" name="full_name" class="form-input" placeholder=" " required autocomplete="name">
                         <label for="register-name" class="form-label">Full Name</label>

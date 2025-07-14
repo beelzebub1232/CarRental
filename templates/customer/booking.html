@@ -325,6 +325,7 @@
         <nav class="top-nav-links">
             <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
+            <a href="{{ url_for('customer_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
@@ -349,7 +350,7 @@
                         </div>
                         <!-- Custom error/confirmation message area -->
                         <div id="booking-message" tabindex="-1" style="outline: none;" aria-live="polite"></div>
-                        <form id="booking-form" class="booking-form" novalidate>
+                        <form id="booking-form" class="booking-form" data-form="booking" novalidate>
                             <div class="form-group">
                                 <label for="vehicle_id" class="form-label">
                                     <svg class="icon icon-sm" viewBox="0 0 24 24">

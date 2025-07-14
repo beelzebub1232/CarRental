@@ -33,6 +33,7 @@ function initializeApp() {
     initBookingSystem();
     initAdminTools();
     initFormValidation();
+    initEnhancedFormValidation(); // Add enhanced form validation
     initTooltips();
     initProgressiveEnhancement();
     
@@ -724,75 +725,256 @@ function initFormValidation() {
     });
 }
 
+// Enhanced frontend validation functions
+function validateBookingForm() {
+    const vehicleId = document.getElementById('vehicle_id')?.value;
+    const startDate = document.getElementById('start_date')?.value;
+    const endDate = document.getElementById('end_date')?.value;
+    const discountCode = document.getElementById('discount_code')?.value;
+    
+    const errors = [];
+    
+    // Validate vehicle selection
+    if (!vehicleId) {
+        errors.push('Please select a vehicle');
+    }
+    
+    // Validate dates
+    if (!startDate) {
+        errors.push('Please select a start date and time');
+    }
+    
+    if (!endDate) {
+        errors.push('Please select an end date and time');
+    }
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const now = new Date();
+        
+        if (start < now) {
+            errors.push('Start date cannot be in the past');
+        }
+        
+        if (end <= start) {
+            errors.push('End date must be after start date');
+        }
+        
+        // Check if booking is not more than 30 days in advance
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+        
+        if (start > thirtyDaysFromNow) {
+            errors.push('Bookings cannot be made more than 30 days in advance');
+        }
+        
+        // Check minimum booking duration (1 hour)
+        const durationHours = (end - start) / (1000 * 60 * 60);
+        if (durationHours < 1) {
+            errors.push('Minimum booking duration is 1 hour');
+        }
+    }
+    
+    // Validate discount code format
+    if (discountCode && discountCode.length > 50) {
+        errors.push('Discount code is too long');
+    }
+    
+    return errors;
+}
+
+function validateEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+    const errors = [];
+    
+    if (password.length < 8) {
+        errors.push('Password must be at least 8 characters long');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+        errors.push('Password must contain at least one uppercase letter');
+    }
+    
+    if (!/[a-z]/.test(password)) {
+        errors.push('Password must contain at least one lowercase letter');
+    }
+    
+    if (!/\d/.test(password)) {
+        errors.push('Password must contain at least one number');
+    }
+    
+    return errors;
+}
+
+function validateRegistrationForm() {
+    const email = document.getElementById('email')?.value?.trim();
+    const password = document.getElementById('password')?.value;
+    const fullName = document.getElementById('full_name')?.value?.trim();
+    
+    const errors = [];
+    
+    if (!email) {
+        errors.push('Email is required');
+    } else if (!validateEmail(email)) {
+        errors.push('Please enter a valid email address');
+    }
+    
+    if (!password) {
+        errors.push('Password is required');
+    } else {
+        const passwordErrors = validatePassword(password);
+        errors.push(...passwordErrors);
+    }
+    
+    if (!fullName) {
+        errors.push('Full name is required');
+    } else if (fullName.length < 2 || fullName.length > 100) {
+        errors.push('Full name must be between 2 and 100 characters');
+    }
+    
+    return errors;
+}
+
+function validateLoginForm() {
+    const email = document.getElementById('email')?.value?.trim();
+    const password = document.getElementById('password')?.value;
+    
+    const errors = [];
+    
+    if (!email) {
+        errors.push('Email is required');
+    } else if (!validateEmail(email)) {
+        errors.push('Please enter a valid email address');
+    }
+    
+    if (!password) {
+        errors.push('Password is required');
+    }
+    
+    return errors;
+}
+
+// Enhanced form validation with real-time feedback
+function initEnhancedFormValidation() {
+    // Booking form validation
+    const bookingForm = document.querySelector('form[data-form="booking"]');
+    if (bookingForm) {
+        const inputs = bookingForm.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => clearFieldError(input));
+        });
+        
+        bookingForm.addEventListener('submit', (e) => {
+            const errors = validateBookingForm();
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrorMessage(errors.join('<br>'));
+                return false;
+            }
+        });
+    }
+    
+    // Registration form validation
+    const registrationForm = document.querySelector('form[data-form="registration"]');
+    if (registrationForm) {
+        const inputs = registrationForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => clearFieldError(input));
+        });
+        
+        registrationForm.addEventListener('submit', (e) => {
+            const errors = validateRegistrationForm();
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrorMessage(errors.join('<br>'));
+                return false;
+            }
+        });
+    }
+    
+    // Login form validation
+    const loginForm = document.querySelector('form[data-form="login"]');
+    if (loginForm) {
+        const inputs = loginForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => clearFieldError(input));
+        });
+        
+        loginForm.addEventListener('submit', (e) => {
+            const errors = validateLoginForm();
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrorMessage(errors.join('<br>'));
+                return false;
+            }
+        });
+    }
+}
+
+// Enhanced field validation with specific rules
 function validateField(field) {
+    const fieldType = field.type;
+    const fieldName = field.name;
     const value = field.value.trim();
-    const type = field.type;
-    const name = field.name;
     
     clearFieldError(field);
     
-    // Required field validation
-    if (field.hasAttribute('required') && !value) {
-        showFieldError(field, 'This field is required');
-        return false;
-    }
-    
-    // Email validation with better regex
-    if (type === 'email' && value) {
-        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        if (!emailRegex.test(value)) {
+    // Email validation
+    if (fieldType === 'email' || fieldName === 'email') {
+        if (value && !validateEmail(value)) {
             showFieldError(field, 'Please enter a valid email address');
             return false;
         }
     }
     
-    // Enhanced password validation
-    if (name === 'password' && value) {
-        if (value.length < 6) {
-            showFieldError(field, 'Password must be at least 6 characters');
-            return false;
-        }
-        if (value.length > 0 && value.length < 8) {
-            showFieldWarning(field, 'Consider using a longer password for better security');
+    // Password validation
+    if (fieldType === 'password' || fieldName === 'password') {
+        if (value) {
+            const passwordErrors = validatePassword(value);
+            if (passwordErrors.length > 0) {
+                showFieldError(field, passwordErrors[0]);
+                return false;
+            }
         }
     }
     
-    // Date validation
-    if (type === 'datetime-local' && value) {
-        const selectedDate = new Date(value);
-        const now = new Date();
-        if (selectedDate < now) {
-            showFieldError(field, 'Please select a future date and time');
-            return false;
-        }
-        // Additional validation for start and end date relationship
-        if (name === 'end_date') {
-            const startInput = document.getElementById('start_date');
-            if (startInput && startInput.value) {
-                const startDate = new Date(startInput.value);
-                if (selectedDate <= startDate) {
-                    showFieldError(field, 'End date/time must be after start date/time');
+    // Required field validation
+    if (field.hasAttribute('required') && !value) {
+        const fieldLabel = field.getAttribute('placeholder') || fieldName;
+        showFieldError(field, `${fieldLabel} is required`);
+        return false;
+    }
+    
+    // Date validation for booking
+    if (fieldName === 'start_date' || fieldName === 'end_date') {
+        if (value) {
+            const date = new Date(value);
+            const now = new Date();
+            
+            if (fieldName === 'start_date' && date < now) {
+                showFieldError(field, 'Start date cannot be in the past');
+                return false;
+            }
+            
+            if (fieldName === 'end_date') {
+                const startDate = document.getElementById('start_date')?.value;
+                if (startDate && date <= new Date(startDate)) {
+                    showFieldError(field, 'End date must be after start date');
                     return false;
                 }
             }
         }
-        if (name === 'start_date') {
-            const endInput = document.getElementById('end_date');
-            if (endInput && endInput.value) {
-                const endDate = new Date(endInput.value);
-                if (endDate <= selectedDate) {
-                    showFieldError(endInput, 'End date/time must be after start date/time');
-                    return true; // Still show success for start_date, but mark end_date as error
-                }
-            }
-        }
     }
     
-    // Show success for valid fields
-    if (value && !field.classList.contains('error')) {
-        showFieldSuccess(field);
-    }
-    
+    showFieldSuccess(field);
     return true;
 }
 
@@ -1426,10 +1608,18 @@ function showStatusToast(status, context) {
     }
 }
 
-// Patch updateBookingStatus to show toasts for status changes
-const originalUpdateBookingStatus = window.updateBookingStatus;
+// --- Ensure booking management handlers are globally available ---
+window.showBookingDetails = function(bookingId) {
+    fetch(`/api/bookings/${bookingId}`)
+        .then(response => response.text())
+        .then(html => {
+            window.showModal(html, { maxWidth: '600px' });
+        })
+        .catch(() => window.showToast('Failed to load booking details', 'error'));
+};
+
 window.updateBookingStatus = function(bookingId, status) {
-    showConfirmModal({
+    window.showConfirmModal({
         title: `Change Booking Status`,
         message: `Are you sure you want to <b>${status}</b> this booking?`,
         confirmText: 'Yes',
@@ -1444,16 +1634,21 @@ window.updateBookingStatus = function(bookingId, status) {
             .then(r => r.json())
             .then(result => {
                 if (result.success) {
-                    showStatusToast(status);
+                    window.showToast('Booking status updated!', 'success');
                     setTimeout(() => location.reload(), 1000);
                 } else {
-                    showStatusToast('error', result);
+                    window.showToast(result.error || 'Failed to update booking status', 'error');
                 }
             })
-            .catch(() => showToast('Network error', 'error'));
+            .catch(() => window.showToast('Network error', 'error'));
         }
     });
 };
+
+// Ensure modal and toast helpers are global
+window.showModal = showModal;
+window.showConfirmModal = showConfirmModal;
+window.showToast = showToast;
 
 // Patch payForBooking to show toast for payment
 const originalPayForBooking = window.payForBooking;
