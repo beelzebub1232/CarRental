@@ -5,6 +5,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     initializeAnimations();
     initializeIntersectionObserver();
+
+    // Discount code: require re-validation if changed after validation
+    const discountInput = document.getElementById('discount_code');
+    if (discountInput) {
+        discountInput.addEventListener('input', function() {
+            appliedDiscount = null;
+            const discountStatusDiv = document.getElementById('discount_status');
+            if (discountStatusDiv) discountStatusDiv.style.display = 'none';
+        });
+    }
 });
 
 function initializeApp() {
@@ -259,9 +269,98 @@ async function handleBookingSubmission(event) {
         </div>
     `;
     
-    // Add loading spinner styles if not present
     addLoadingSpinnerStyles();
-    
+
+    // --- Custom validation for start/end date relationship ---
+    const startDate = formData.get('start_date');
+    const endDate = formData.get('end_date');
+    const startInput = document.getElementById('start_date');
+    const endInput = document.getElementById('end_date');
+    clearFieldError(startInput);
+    clearFieldError(endInput);
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (end <= start) {
+            showFieldError(endInput, 'End date/time must be after start date/time');
+            showFieldError(startInput, '');
+            showErrorMessage('End date/time must be after start date/time');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+            return;
+        }
+    }
+    // --- End custom validation ---
+
+    // --- Discount code robust validation ---
+    const discountInput = document.getElementById('discount_code');
+    const discountStatusDiv = document.getElementById('discount_status');
+    const code = discountInput.value.trim();
+    // If a code is entered, ensure it is validated and valid
+    if (code) {
+        // If no appliedDiscount or code changed after validation, force validation
+        if (!appliedDiscount || appliedDiscount.code !== code) {
+            // Show loading state
+            showFieldLoading(discountInput);
+            if (discountStatusDiv) discountStatusDiv.style.display = 'none';
+            try {
+                // Get current vehicle info
+                const vehicleId = document.getElementById('vehicle_id')?.value;
+                const vehicleSelect = document.getElementById('vehicle_id');
+                const selectedOption = vehicleSelect?.options[vehicleSelect.selectedIndex];
+                const vehicleType = selectedOption?.textContent.split('(')[1]?.split(')')[0] || '';
+                const response = await fetch('/api/validate_discount', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        discount_code: code,
+                        vehicle_id: vehicleId,
+                        vehicle_type: vehicleType
+                    })
+                });
+                const data = await response.json();
+                if (response.ok && data.valid) {
+                    appliedDiscount = {
+                        code: data.code,
+                        percentage: data.discount_percentage,
+                        description: data.description
+                    };
+                    showFieldSuccess(discountInput, `Valid! ${data.discount_percentage}% discount applied`);
+                    if (discountStatusDiv) {
+                        discountStatusDiv.innerHTML = `
+                            <div class="alert alert-success" style="padding: var(--space-2); border-radius: var(--radius-md); font-size: var(--text-sm);">
+                                <strong>✓ Discount Applied:</strong> ${data.discount_percentage}% off - ${data.description || 'Discount applied'}
+                            </div>
+                        `;
+                        discountStatusDiv.style.display = 'block';
+                    }
+                } else {
+                    appliedDiscount = null;
+                    showFieldError(discountInput, data.error || 'Invalid or expired discount code');
+                    if (discountStatusDiv) discountStatusDiv.style.display = 'none';
+                    showErrorMessage(data.error || 'Invalid or expired discount code');
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                    return;
+                }
+            } catch (error) {
+                appliedDiscount = null;
+                showFieldError(discountInput, 'Unable to validate discount code');
+                if (discountStatusDiv) discountStatusDiv.style.display = 'none';
+                showErrorMessage('Unable to validate discount code');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                return;
+            }
+        }
+    } else {
+        appliedDiscount = null;
+        if (discountStatusDiv) discountStatusDiv.style.display = 'none';
+    }
+    // --- End discount code robust validation ---
+
     try {
         const bookingData = {
             vehicle_id: formData.get('vehicle_id'),
@@ -638,10 +737,30 @@ function validateField(field) {
     if (type === 'datetime-local' && value) {
         const selectedDate = new Date(value);
         const now = new Date();
-        
         if (selectedDate < now) {
             showFieldError(field, 'Please select a future date and time');
             return false;
+        }
+        // Additional validation for start and end date relationship
+        if (name === 'end_date') {
+            const startInput = document.getElementById('start_date');
+            if (startInput && startInput.value) {
+                const startDate = new Date(startInput.value);
+                if (selectedDate <= startDate) {
+                    showFieldError(field, 'End date/time must be after start date/time');
+                    return false;
+                }
+            }
+        }
+        if (name === 'start_date') {
+            const endInput = document.getElementById('end_date');
+            if (endInput && endInput.value) {
+                const endDate = new Date(endInput.value);
+                if (endDate <= selectedDate) {
+                    showFieldError(endInput, 'End date/time must be after start date/time');
+                    return true; // Still show success for start_date, but mark end_date as error
+                }
+            }
         }
     }
     
