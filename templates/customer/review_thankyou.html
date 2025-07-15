@@ -1,0 +1,21 @@
+{% extends 'customer/base.html' %}
+{% block title %}Thank You - DriveEase{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 480px; margin: 3rem auto 2rem auto; text-align:center; box-shadow: var(--shadow-lg); padding: 2.5rem 2rem; border-radius: var(--radius-2xl);">
+    <div class="card-header" style="background: none; border: none; margin-bottom: 0; display: flex; justify-content: center; align-items: center; gap: 1.25rem; flex-direction: row;">
+        <h2 class="card-title" style="font-size: 2rem; font-weight: 800; color: var(--success-700); margin-bottom: 0;">Thank You!</h2>
+        <span style="display: flex; align-items: center;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background: #e6ffed; border-radius: 50%; padding: 0.4rem;"><circle cx="12" cy="12" r="10"/><polyline points="20,6 9,17 4,12"/></svg>
+        </span>
+    </div>
+    <div class="card-body" style="margin-bottom: 1.5rem;">
+        <div style="background: var(--accent-50); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; color: var(--accent-900); font-size: 1.05rem;">
+            <strong>Booking #{{ booking.id }}</strong><br>
+            {{ booking.make }} {{ booking.model }}, {{ booking.year }}
+        </div>
+        <p style="margin-bottom: 0.5rem; color: var(--neutral-700); font-size: 1.08rem;">Your review has been submitted successfully.</p>
+        <p style="color: var(--neutral-600); font-size: 1rem;">We appreciate your feedback and will use it to improve our service.</p>
+    </div>
+    <a href="{{ url_for('customer_bookings') }}" class="btn btn-primary btn-lg" style="width: 100%; max-width: 320px; margin: 0 auto; font-size: 1.1rem;">Back to My Bookings</a>
+</div>
+{% endblock %} 

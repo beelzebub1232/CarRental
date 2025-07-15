@@ -28,79 +28,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Review Modal Logic
-    const reviewModal = document.getElementById('review-modal');
-    const reviewModalBody = document.getElementById('review-modal-body');
-    const closeReviewModal = document.getElementById('close-review-modal');
-
-    function openReviewModal(bookingId, url) {
-        console.log('openReviewModal called with:', bookingId, url); // DEBUG
-        reviewModal.style.display = 'flex';
-        reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;">Loading...</div>';
-        fetch(url + '?modal=1', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-            .then(res => res.text())
-            .then(html => {
-                reviewModalBody.innerHTML = html;
-                attachReviewFormHandler();
-                initReviewForm();
-            })
-            .catch((err) => {
-                console.error('Failed to load review form:', err); // DEBUG
-                reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Failed to load review form. Please check your connection or contact support.</div>';
-            });
-    }
-
-    function closeModal() {
-        reviewModal.style.display = 'none';
-        reviewModalBody.innerHTML = '';
-    }
-
-    if (closeReviewModal) {
-        closeReviewModal.addEventListener('click', closeModal);
-    }
-    window.addEventListener('click', function(e) {
-        if (e.target === reviewModal) closeModal();
-    });
-
-    document.querySelectorAll('.open-review-modal').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+    // Use event delegation for review modal buttons
+    document.body.addEventListener('click', function(e) {
+        const btn = e.target.closest('.open-review-modal');
+        if (btn) {
             e.preventDefault();
-            const bookingId = this.getAttribute('data-booking-id');
-            const url = this.getAttribute('href');
+            const bookingId = btn.getAttribute('data-booking-id');
+            const url = btn.getAttribute('href');
             openReviewModal(bookingId, url);
-        });
+        }
     });
-
-    function attachReviewFormHandler() {
-        const form = reviewModalBody.querySelector('form#review-form');
-        if (!form) return;
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) submitBtn.disabled = true;
-            fetch(form.action + '?modal=1', {
-                method: 'POST',
-                body: formData,
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
-            })
-            .then(res => res.text())
-            .then(html => {
-                reviewModalBody.innerHTML = html;
-                attachReviewFormHandler();
-                initReviewForm();
-            })
-            .catch(() => {
-                reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Failed to submit review.</div>';
-            })
-            .finally(() => {
-                if (submitBtn) submitBtn.disabled = false;
-            });
-        });
-    }
 
     // Review form interactivity for both page and modal
     window.initReviewForm = function() {
+        console.log('initReviewForm called');
         const form = document.getElementById('review-form');
         if (!form) return;
         const ratingInput = document.getElementById('rating-input');
@@ -242,6 +183,12 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     // Also call on page load for non-modal review forms
     initReviewForm();
+
+    // Ensure toast system is available globally
+    window.showToast = showToast;
+    window.showSuccessMessage = showSuccessMessage;
+    window.showErrorMessage = showErrorMessage;
+    window.showWarningMessage = showWarningMessage;
 });
 
 function initializeApp() {

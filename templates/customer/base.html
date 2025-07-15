@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DriveEase{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Customer Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link{% if request.endpoint == 'customer_dashboard' %} active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('customer_booking') }}" class="top-nav-link{% if request.endpoint == 'customer_booking' %} active{% endif %}">Book Vehicle</a>
+            <a href="{{ url_for('customer_bookings') }}" class="top-nav-link{% if request.endpoint == 'customer_bookings' %} active{% endif %}">Bookings</a>
+            <a href="{{ url_for('customer_reviews') }}" class="top-nav-link{% if request.endpoint == 'customer_reviews' %} active{% endif %}">My Reviews</a>
+            <a href="{{ url_for('customer_profile') }}" class="top-nav-link{% if request.endpoint == 'customer_profile' %} active{% endif %}">My Profile</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    <style>
+.top-nav-link.reviews-link {
+    font-weight: 700;
+    color: var(--primary-700);
+    background: var(--primary-50);
+    border-radius: 0.5em;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+.top-nav-link.reviews-link.active {
+    background: var(--primary-100);
+    color: var(--primary-900);
+    box-shadow: 0 2px 8px rgba(245,179,1,0.08);
+}
+</style>
+</body>
+</html> 

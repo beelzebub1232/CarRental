@@ -489,17 +489,6 @@ def customer_profile():
         """, (session['user_id'],))
         loyalty_tokens = cursor.fetchall()
         
-        # Get user's reviews
-        cursor.execute("""
-            SELECT r.*, v.make, v.model, v.type as vehicle_type
-            FROM reviews r
-            JOIN bookings b ON r.booking_id = b.id
-            JOIN vehicles v ON b.vehicle_id = v.id
-            WHERE r.user_id = %s
-            ORDER BY r.review_date DESC
-        """, (session['user_id'],))
-        reviews = cursor.fetchall()
-        
         cursor.close()
         conn.close()
         
@@ -507,7 +496,6 @@ def customer_profile():
                              user=user, 
                              bookings=bookings, 
                              loyalty_tokens=loyalty_tokens,
-                             reviews=reviews,
                              messages=MESSAGES)
                              
     except Exception as e:
@@ -517,7 +505,6 @@ def customer_profile():
                              user=None, 
                              bookings=[], 
                              loyalty_tokens=[],
-                             reviews=[],
                              messages=MESSAGES)
 
 @app.route('/customer/bookings')
@@ -1320,6 +1307,8 @@ def api_update_booking_status_v2(booking_id):
         cursor.close()
         conn.close()
 
+# Remove all review system logic: routes, queries, and context variables related to reviews
+
 @app.route('/customer/review/<int:booking_id>', methods=['GET', 'POST'])
 def customer_review(booking_id):
     if 'user_id' not in session or session.get('role') != 'customer':
@@ -1327,369 +1316,140 @@ def customer_review(booking_id):
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Get booking with vehicle details
+
+    # Get booking and check eligibility
     cursor.execute("""
-        SELECT b.*, v.make, v.model, v.year, v.type, v.image_url 
-        FROM bookings b 
-        JOIN vehicles v ON b.vehicle_id = v.id 
+        SELECT b.*, v.make, v.model, v.year, v.type
+        FROM bookings b
+        JOIN vehicles v ON b.vehicle_id = v.id
         WHERE b.id = %s AND b.user_id = %s
     """, (booking_id, user_id))
     booking = cursor.fetchone()
-    
     if not booking:
         flash('Booking not found.', 'error')
         cursor.close()
         conn.close()
         return redirect(url_for('customer_bookings'))
-    
-    # Use booking_status for consistency
-    booking_status = booking.get('booking_status') or booking.get('status')
-    if booking_status != 'completed':
+    if (booking.get('status') or booking.get('booking_status')) != 'completed':
         flash('You can only review completed bookings.', 'error')
         cursor.close()
         conn.close()
         return redirect(url_for('customer_bookings'))
-    
     # Check if already reviewed
-    cursor.execute("SELECT * FROM reviews WHERE booking_id = %s AND user_id = %s", (booking_id, user_id))
-    review = cursor.fetchone()
-    
-    is_modal = request.args.get('modal') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    
+    cursor.execute("SELECT id FROM reviews WHERE booking_id = %s AND user_id = %s", (booking_id, user_id))
+    if cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return render_template('customer/review_thankyou.html', booking=booking)
+
     if request.method == 'POST':
-        if review:
-            flash('You have already reviewed this booking.', 'info')
-            cursor.close()
-            conn.close()
-            if is_modal:
-                return render_template('customer/_review_modal_content.html', booking=booking, review=review, messages=MESSAGES)
-            return redirect(url_for('customer_bookings'))
-        
         rating = int(request.form.get('rating', 0))
         comment = request.form.get('comment', '').strip()
         recommend = request.form.get('recommend', '')
-        
         # Validation
         if not (1 <= rating <= 5):
             flash('Rating must be between 1 and 5.', 'error')
-            cursor.close()
-            conn.close()
-            return redirect(request.url)
-        
+            return render_template('customer/review_form.html', booking=booking)
         if len(comment) < 10:
             flash('Please provide a detailed review (at least 10 characters).', 'error')
-            cursor.close()
-            conn.close()
-            return redirect(request.url)
-        
-        if not recommend:
+            return render_template('customer/review_form.html', booking=booking)
+        if recommend not in ['yes', 'maybe', 'no']:
             flash('Please indicate if you would recommend us.', 'error')
-            cursor.close()
-            conn.close()
-            return redirect(request.url)
-        
-        # Get category ratings from form
-        condition_rating = request.form.get('condition_rating')
-        service_rating = request.form.get('service_rating')
-        value_rating = request.form.get('value_rating')
-
-        # Validate category ratings
-        try:
-            condition_rating = int(condition_rating)
-            service_rating = int(service_rating)
-            value_rating = int(value_rating)
-        except (TypeError, ValueError):
-            flash('Please rate all specific aspects (condition, service, value).', 'error')
-            cursor.close()
-            conn.close()
-            return redirect(request.url)
-        if not (1 <= condition_rating <= 5 and 1 <= service_rating <= 5 and 1 <= value_rating <= 5):
-            flash('All aspect ratings must be between 1 and 5.', 'error')
-            cursor.close()
-            conn.close()
-            return redirect(request.url)
-        
-        # Insert review with additional data
-        cursor.execute("""
-            INSERT INTO reviews (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """, (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating))
-        
+            return render_template('customer/review_form.html', booking=booking)
+        # Insert review
+        cursor.execute('''
+            INSERT INTO reviews (booking_id, user_id, rating, comment, recommend, review_date)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+        ''', (booking_id, user_id, rating, comment, recommend))
         conn.commit()
-        flash('Thank you for your review! Your feedback helps us improve our service.', 'success')
         cursor.close()
         conn.close()
-        if is_modal:
-            # Show thank you and review summary in modal
-            return render_template('customer/_review_modal_content.html', booking=booking, review={
-                'rating': rating, 'comment': comment, 'recommend': recommend,
-                'condition_rating': condition_rating, 'service_rating': service_rating, 'value_rating': value_rating
-            }, messages=MESSAGES, submitted=True)
-        return redirect(url_for('customer_bookings'))
-    
+        flash('Your review has been submitted. Thank you!', 'success')
+        return redirect(url_for('customer_reviews'))
+
     cursor.close()
     conn.close()
-    if is_modal:
-        return render_template('customer/_review_modal_content.html', booking=booking, review=review, messages=MESSAGES)
-    return render_template('customer/review.html', booking=booking, review=review, messages=MESSAGES)
+    return render_template('customer/review_form.html', booking=booking, messages=MESSAGES)
+
+@app.route('/customer/review/edit/<int:review_id>', methods=['GET', 'POST'])
+def customer_review_edit(review_id):
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('''
+        SELECT r.*, b.id as booking_id, v.make, v.model, v.year
+        FROM reviews r
+        JOIN bookings b ON r.booking_id = b.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        WHERE r.id = %s AND r.user_id = %s
+    ''', (review_id, user_id))
+    review = cursor.fetchone()
+    if not review:
+        cursor.close()
+        conn.close()
+        flash('Review not found or not authorized.', 'error')
+        return redirect(url_for('customer_reviews'))
+    if request.method == 'POST':
+        rating = int(request.form.get('rating', 0))
+        comment = request.form.get('comment', '').strip()
+        recommend = request.form.get('recommend', '')
+        if not (1 <= rating <= 5):
+            flash('Rating must be between 1 and 5.', 'error')
+            return render_template('customer/review_edit_form.html', review=review)
+        if len(comment) < 10:
+            flash('Please provide a detailed review (at least 10 characters).', 'error')
+            return render_template('customer/review_edit_form.html', review=review)
+        if recommend not in ['yes', 'maybe', 'no']:
+            flash('Please indicate if you would recommend us.', 'error')
+            return render_template('customer/review_edit_form.html', review=review)
+        cursor.execute('''
+            UPDATE reviews SET rating=%s, comment=%s, recommend=%s, review_date=NOW()
+            WHERE id=%s AND user_id=%s
+        ''', (rating, comment, recommend, review_id, user_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash('Review updated successfully.', 'success')
+        return redirect(url_for('customer_reviews'))
+    cursor.close()
+    conn.close()
+    return render_template('customer/review_edit_form.html', review=review)
+
+@app.route('/customer/review/delete/<int:review_id>', methods=['POST'])
+def customer_review_delete(review_id):
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM reviews WHERE id = %s AND user_id = %s', (review_id, user_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    flash('Review deleted successfully.', 'success')
+    return redirect(url_for('customer_reviews'))
 
 @app.route('/customer/reviews')
 def customer_reviews():
     if 'user_id' not in session or session.get('role') != 'customer':
         return redirect(url_for('login'))
-    
+    user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Get all reviews with vehicle and customer details
-    cursor.execute("""
-        SELECT r.*, u.full_name as customer_name, v.make, v.model, v.type as vehicle_type, v.image_url
+    cursor.execute('''
+        SELECT r.*, b.id as booking_id, v.make, v.model, v.year
         FROM reviews r
-        JOIN users u ON r.user_id = u.id
         JOIN bookings b ON r.booking_id = b.id
         JOIN vehicles v ON b.vehicle_id = v.id
+        WHERE r.user_id = %s
         ORDER BY r.review_date DESC
-    """)
-    reviews = cursor.fetchall()
-    
-    # Calculate statistics
-    total_reviews = len(reviews)
-    if total_reviews > 0:
-        average_rating = sum(r['rating'] for r in reviews) / total_reviews
-        recommend_count = sum(1 for r in reviews if r['recommend'] == 'yes')
-        recommend_percentage = round((recommend_count / total_reviews) * 100, 1)
-        
-        # Rating distribution
-        rating_counts = {i: 0 for i in range(1, 6)}
-        for review in reviews:
-            rating_counts[review['rating']] += 1
-        
-        rating_distribution = {}
-        for rating in range(1, 6):
-            rating_distribution[rating] = round((rating_counts[rating] / total_reviews) * 100, 1)
-        
-        # Unique vehicles reviewed
-        unique_vehicles = len(set(r['vehicle_type'] for r in reviews))
-        
-        # Vehicle types for filter
-        vehicle_types = sorted(list(set(r['vehicle_type'] for r in reviews)))
-    else:
-        average_rating = 0
-        recommend_percentage = 0
-        rating_counts = {i: 0 for i in range(1, 6)}
-        rating_distribution = {i: 0 for i in range(1, 6)}
-        unique_vehicles = 0
-        vehicle_types = []
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('customer/reviews.html', 
-                         reviews=reviews,
-                         total_reviews=total_reviews,
-                         average_rating=average_rating,
-                         recommend_percentage=recommend_percentage,
-                         rating_counts=rating_counts,
-                         rating_distribution=rating_distribution,
-                         unique_vehicles=unique_vehicles,
-                         vehicle_types=vehicle_types)
-
-@app.route('/api/reviews/<int:review_id>', methods=['DELETE'])
-def api_delete_review(review_id):
-    require_admin()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("DELETE FROM reviews WHERE id = %s", (review_id,))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 400
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/api/export/reviews')
-def export_reviews():
-    require_admin()
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT r.id, r.rating, r.comment, r.recommend, r.review_date,
-               u.full_name as customer_name, u.email as customer_email,
-               v.make, v.model, v.type as vehicle_type
-        FROM reviews r
-        JOIN users u ON r.user_id = u.id
-        JOIN bookings b ON r.booking_id = b.id
-        JOIN vehicles v ON b.vehicle_id = v.id
-        ORDER BY r.review_date DESC
-    """)
+    ''', (user_id,))
     reviews = cursor.fetchall()
     cursor.close()
     conn.close()
-    
-    si = StringIO()
-    writer = csv.DictWriter(si, fieldnames=reviews[0].keys() if reviews else [])
-    writer.writeheader()
-    writer.writerows(reviews)
-    output = si.getvalue()
-    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=reviews.csv"})
-
-@app.route('/admin/reviews')
-def admin_reviews():
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    
-    # Get all reviews with vehicle and customer details
-    cursor.execute("""
-        SELECT r.*, u.full_name as customer_name, u.email as customer_email, v.make, v.model, v.type as vehicle_type, v.image_url
-        FROM reviews r
-        JOIN users u ON r.user_id = u.id
-        JOIN bookings b ON r.booking_id = b.id
-        JOIN vehicles v ON b.vehicle_id = v.id
-        ORDER BY r.review_date DESC
-    """)
-    reviews = cursor.fetchall()
-    
-    # Calculate statistics
-    total_reviews = len(reviews)
-    if total_reviews > 0:
-        average_rating = sum(r['rating'] for r in reviews) / total_reviews
-        recommend_count = sum(1 for r in reviews if r['recommend'] == 'yes')
-        recommend_percentage = round((recommend_count / total_reviews) * 100, 1)
-        
-        # Rating distribution
-        rating_counts = {i: 0 for i in range(1, 6)}
-        for review in reviews:
-            rating_counts[review['rating']] += 1
-        
-        rating_distribution = {}
-        for rating in range(1, 6):
-            rating_distribution[rating] = round((rating_counts[rating] / total_reviews) * 100, 1)
-        
-        # Unique vehicles reviewed
-        unique_vehicles = len(set(r['vehicle_type'] for r in reviews))
-        
-        # Vehicle types for filter
-        vehicle_types = sorted(list(set(r['vehicle_type'] for r in reviews)))
-    else:
-        average_rating = 0
-        recommend_percentage = 0
-        rating_counts = {i: 0 for i in range(1, 6)}
-        rating_distribution = {i: 0 for i in range(1, 6)}
-        unique_vehicles = 0
-        vehicle_types = []
-    
-    cursor.close()
-    conn.close()
-    
-    return render_template('admin/reviews.html', 
-                         reviews=reviews,
-                         total_reviews=total_reviews,
-                         average_rating=average_rating,
-                         recommend_percentage=recommend_percentage,
-                         rating_counts=rating_counts,
-                         rating_distribution=rating_distribution,
-                         unique_vehicles=unique_vehicles,
-                         vehicle_types=vehicle_types)
-
-@app.route('/api/users', methods=['GET'])
-def api_list_users():
-    require_admin()
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT id, email, full_name, role FROM users ORDER BY id")
-    users = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify({'users': users})
-
-@app.route('/api/users/<int:user_id>', methods=['PUT'])
-def api_edit_user(user_id):
-    require_admin()
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            UPDATE users SET email=%s, full_name=%s, role=%s WHERE id=%s
-        """, (
-            data.get('email'),
-            data.get('full_name'),
-            data.get('role'),
-            user_id
-        ))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 400
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/api/users/<int:user_id>/reset_password', methods=['POST'])
-def api_reset_user_password(user_id):
-    require_admin()
-    data = request.get_json()
-    new_password = data.get('new_password')
-    if not new_password:
-        return jsonify({'success': False, 'error': 'New password required'}), 400
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("UPDATE users SET password=%s WHERE id=%s", (new_password, user_id))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 400
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/api/users/<int:user_id>', methods=['DELETE'])
-def api_delete_user(user_id):
-    require_admin()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("DELETE FROM users WHERE id=%s", (user_id,))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 400
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/api/payments', methods=['GET'])
-def api_list_payments():
-    require_admin()
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT p.id, p.booking_id, p.user_id, u.email, u.full_name, p.amount, p.payment_date, p.status, p.method, p.reference
-        FROM payments p
-        LEFT JOIN users u ON p.user_id = u.id
-        ORDER BY p.payment_date DESC
-    """)
-    payments = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify({'payments': payments})
-
-@app.route('/admin/payments')
-def admin_payments():
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    return render_template('admin/payments.html')
+    return render_template('customer/reviews_list.html', reviews=reviews)
 
 @app.route('/api/export/bookings')
 def export_bookings():
