@@ -39,6 +39,33 @@
                     <option value="no">No</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="condition_rating" class="form-label">Vehicle Condition</label>
+                <select name="condition_rating" id="condition_rating" class="form-input" required>
+                    <option value="">Select rating</option>
+                    {% for i in range(1, 6) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="service_rating" class="form-label">Service Quality</label>
+                <select name="service_rating" id="service_rating" class="form-input" required>
+                    <option value="">Select rating</option>
+                    {% for i in range(1, 6) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="value_rating" class="form-label">Value for Money</label>
+                <select name="value_rating" id="value_rating" class="form-input" required>
+                    <option value="">Select rating</option>
+                    {% for i in range(1, 6) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-full">Submit Review</button>
                 <a href="{{ url_for('customer_bookings') }}" class="btn btn-ghost btn-full">Cancel</a>

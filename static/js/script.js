@@ -661,7 +661,12 @@ async function handleBookingSubmission(event) {
             start_date: formData.get('start_date'),
             end_date: formData.get('end_date'),
             discount_code: appliedDiscount ? appliedDiscount.code : formData.get('discount_code'),
-            loyalty_token_id: formData.get('loyalty_token_id')
+            loyalty_token_id: (() => {
+                const val = formData.get('loyalty_token_id');
+                if (val === '' || val === null || val === undefined) return null;
+                const parsed = parseInt(val, 10);
+                return isNaN(parsed) ? null : parsed;
+            })()
         };
         
         const response = await fetch('/api/create_booking', {
@@ -675,7 +680,11 @@ async function handleBookingSubmission(event) {
         const result = await response.json();
         
         if (result.success) {
-            showSuccessMessage('Booking created successfully! You will earn loyalty rewards when your booking is completed.');
+            let msg = 'Booking created successfully! You will earn loyalty rewards when your booking is completed.';
+            if (result.loyalty_token_used && result.loyalty_token_used > 0) {
+                msg += ` Loyalty token applied: ₹${result.loyalty_token_used} deducted.`;
+            }
+            showSuccessMessage(msg);
             // Animate form out
             event.target.style.transition = 'all 0.5s ease';
             event.target.style.opacity = '0.5';
@@ -1471,6 +1480,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function showModal(content, options = {}) {
     const modal = document.createElement('div');
     modal.className = 'modal';
+    modal.style.background = 'rgba(0,0,0,0.15)'; // lighter overlay
     modal.innerHTML = `
         <div class="modal-content" style="max-width: ${options.maxWidth || '600px'};">
             ${content}
@@ -1854,52 +1864,109 @@ function payForBooking(bookingId) {
 
 function showPaymentModal(bookingId) {
     const content = `
-        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-            <div class="modal-title" style="font-size: var(--text-xl); font-weight: 800; color: var(--accent-main); display: flex; align-items: center; gap: var(--space-2);">Payment</div>
-            <button class="modal-close" style="background: none; border: none; font-size: 1.5rem; color: var(--neutral-400); cursor: pointer; transition: color var(--transition-fast);" onclick="closeModal(this.closest('.modal'))">&times;</button>
-        </div>
-        <div style="padding: 0 0 1.5rem 0; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; background: #fff; border-radius: var(--radius-2xl);">
-            <div style="display: flex; flex-direction: column; gap: 1.2rem; width: 100%; max-width: 340px;">
-                <button class="payment-method-card" data-method="card" style="display: flex; align-items: center; gap: 1rem; background: var(--neutral-100); border: 2px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.1rem 1.2rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-600); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(37,99,235,0.04);">
-                    <span style="font-size: 1.7rem;">💳</span> Credit/Debit Card
-                </button>
-                <button class="payment-method-card" data-method="upi" style="display: flex; align-items: center; gap: 1rem; background: var(--neutral-100); border: 2px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.1rem 1.2rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-600); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(16,185,129,0.04);">
-                    <span style="font-size: 1.7rem;">🇮🇳</span> UPI
-                </button>
-                <button class="payment-method-card" data-method="netbanking" style="display: flex; align-items: center; gap: 1rem; background: var(--neutral-100); border: 2px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.1rem 1.2rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-600); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.04);">
-                    <span style="font-size: 1.7rem;">🏦</span> Netbanking
-                </button>
+        <div class="payment-modal-wrapper" style="background: #fff; border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(31,38,135,0.10); max-width: 420px; margin: auto; overflow: hidden;">
+            <div class="payment-modal-header" style="background: #f3f6fa; padding: 1.5rem 2rem 1rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5eaf2; position: relative;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                    <span style="font-size: 1.5rem; font-weight: 700; color: #1e293b; letter-spacing: -1px;">Payment</span>
+                </div>
+                <button class="modal-close" style="background: none; border: none; font-size: 2rem; color: #64748b; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; height: 2.2rem; width: 2.2rem; padding: 0; margin-left: 1rem;" onclick="closeModal(this.closest('.modal'))">&times;</button>
             </div>
-            <div id="payment-processing" style="display:none; margin-top:2rem; text-align:center; width:100%; min-height: 48px;"></div>
+            <div class="payment-modal-body" style="padding: 2rem 2rem 2.2rem 2rem; display: flex; flex-direction: column; gap: 2rem; align-items: center; background: #fff;">
+                <div class="payment-summary-card" style="width: 100%; max-width: 340px; background: #f8fafc; border-radius: 1rem; box-shadow: 0 2px 8px rgba(37,99,235,0.04); padding: 1.1rem 1.3rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; align-items: center;">
+                    <div style="font-size: 1.05rem; color: #2563eb; font-weight: 600; margin-bottom: 0.2rem; text-align: center; letter-spacing: 0.5px;">Booking Payment</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: #2563eb; text-align: center; letter-spacing: -1px;">₹<span id="payment-amount">--</span></div>
+                    <div style="font-size: 0.98rem; color: #64748b; margin-top: 0.1rem;">Pay securely to confirm your booking</div>
+                </div>
+                <div style="width: 100%; max-width: 360px;">
+                    <div style="font-size: 1.08rem; font-weight: 600; color: #1e293b; margin-bottom: 1.1rem; text-align: center;">Choose Payment Method</div>
+                    <div class="payment-methods" style="display: flex; flex-direction: column; gap: 1.1rem;">
+                        <button class="payment-method-card" data-method="card" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #2563eb; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(37,99,235,0.04);">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                            Credit/Debit Card
+                        </button>
+                        <button class="payment-method-card" data-method="upi" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #059669; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(16,185,129,0.04);">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                            UPI
+                        </button>
+                        <button class="payment-method-card" data-method="netbanking" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #0ea5e9; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.04);">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                            Netbanking
+                        </button>
+                    </div>
+                </div>
+                <div id="payment-processing" style="display:none; margin-top:1.5rem; text-align:center; width:100%; min-height: 48px;"></div>
+            </div>
         </div>
         <style>
-            .payment-method-card:hover {
-                background: var(--accent-50) !important;
-                border-color: var(--accent-main) !important;
-                color: var(--accent-main) !important;
-                box-shadow: 0 4px 16px rgba(111,191,115,0.10) !important;
+            .payment-modal-wrapper { animation: fadeInUp 0.5s cubic-bezier(.39,.575,.56,1.000); }
+            .payment-method-card:hover, .payment-method-card:focus {
+                background: #f1f5f9 !important;
+                border-color: #2563eb !important;
+                color: #1e293b !important;
+                box-shadow: 0 4px 16px rgba(37,99,235,0.08) !important;
+                outline: none;
             }
-            .modal-content { font-family: var(--font-body); }
+            .modal-content { font-family: var(--font-body); background: transparent; box-shadow: none; }
             @media (max-width: 600px) {
-                .modal-content { padding: var(--space-4) !important; }
+                .payment-modal-wrapper { border-radius: 1rem; }
+                .payment-modal-header, .payment-modal-body { padding: 1rem !important; }
+            }
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(40px); }
+                to { opacity: 1; transform: translateY(0); }
             }
         </style>
     `;
-    const modal = showModal(content, { maxWidth: '420px' });
+    const modal = showModal(content, { maxWidth: '480px' });
+    // Set lighter overlay
+    modal.style.background = 'rgba(0,0,0,0.07)';
+    // Fetch and set payment amount
+    fetch(`/api/bookings/${bookingId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && (data.total_price !== undefined || (data.booking && data.booking.total_price !== undefined))) {
+                const amount = data.total_price !== undefined ? data.total_price : (data.booking ? data.booking.total_price : undefined);
+                const el = modal.querySelector('#payment-amount');
+                if (el && amount !== undefined) {
+                    el.textContent = parseFloat(amount).toFixed(2);
+                }
+            }
+        })
+        .catch(() => {});
     // Add event listeners for payment method buttons
     modal.querySelectorAll('.payment-method-card').forEach(btn => {
         btn.onclick = function() {
             const method = btn.getAttribute('data-method');
             const processingDiv = modal.querySelector('#payment-processing');
             processingDiv.style.display = 'block';
-            processingDiv.innerHTML = `<div class='loading-spinner' style='margin-bottom:1rem;'></div><span style='font-size:1.1rem;'>Processing <b>${method === 'card' ? 'Card' : method === 'upi' ? 'UPI' : 'Netbanking'}</b> payment...</span>`;
+            processingDiv.innerHTML = `
+                <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:1rem;">
+                    <div class="progress-bar-animated" style="width: 80%; height: 8px; background: #e0e7ef; border-radius: 4px; overflow: hidden; margin-bottom: 1.2rem;">
+                        <div style="width: 0; height: 100%; background: linear-gradient(90deg, #2563eb, #0ea5e9); border-radius: 4px; animation: progressBarAnim 1.8s linear forwards;"></div>
+                    </div>
+                    <span style="font-size:1.1rem; color:#2563eb; font-weight:600;">Processing <b>${method === 'card' ? 'Card' : method === 'upi' ? 'UPI' : 'Netbanking'}</b> payment...</span>
+                </div>
+                <style>
+                    @keyframes progressBarAnim {
+                        from { width: 0; }
+                        to { width: 100%; }
+                    }
+                </style>
+            `;
             // Simulate payment processing delay
             setTimeout(() => {
-                processingDiv.innerHTML = `<span style='color:var(--success-500); font-size:2.2rem;'>✔️</span><div style='font-size:1.1rem; margin-top:0.5rem;'>Payment successful!</div>`;
+                processingDiv.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:0.7rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="20,6 9,17 4,12"/></svg>
+                        <div style="font-size:1.2rem; color:#059669; font-weight:700;">Payment Successful!</div>
+                        <div style="font-size:1rem; color:#64748b;">Thank you for your payment.</div>
+                    </div>
+                `;
                 setTimeout(() => {
                     closeModal(modal);
                     payForBooking(bookingId);
-                }, 1100);
+                }, 1200);
             }, 1800);
         };
     });

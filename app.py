@@ -10,6 +10,7 @@ from flask import Response
 import re
 import logging
 from functools import wraps
+from typing import Any, Dict, List, Optional, cast
 
 # Configure logging
 logging.basicConfig(
@@ -167,6 +168,7 @@ def calculate_final_price(vehicle_id, start_datetime, end_datetime, return_break
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT base_price, type FROM vehicles WHERE id = %s", (vehicle_id,))
         vehicle = cursor.fetchone()
+        vehicle = cast(Optional[Dict[str, Any]], vehicle)
         cursor.close()
         if not vehicle:
             return None
@@ -184,6 +186,7 @@ def calculate_final_price(vehicle_id, start_datetime, end_datetime, return_break
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM pricing_rules WHERE rule_type = 'time_peak' AND is_active = TRUE")
         time_rules = cursor.fetchall()
+        time_rules = cast(List[Dict[str, Any]], time_rules)
         cursor.close()
 
         # Get demand modifier for car type
@@ -193,6 +196,7 @@ def calculate_final_price(vehicle_id, start_datetime, end_datetime, return_break
             (vehicle_type,)
         )
         demand_rule = cursor.fetchone()
+        demand_rule = cast(Optional[Dict[str, Any]], demand_rule)
         cursor.close()
         demand_multiplier = 1.0
         demand_percentage = 0.0
@@ -295,6 +299,7 @@ def login():
             
             cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
+            user = cast(Optional[Dict[str, Any]], user)
             
             if user and user['password'] == password:
                 session['user_id'] = user['id']
@@ -443,7 +448,9 @@ def customer_booking():
             FROM loyalty_tokens 
             WHERE user_id = %s AND is_redeemed = FALSE AND (expiry_date IS NULL OR expiry_date > NOW())
         """, (session['user_id'],))
-        token_count = cursor.fetchone()['token_count']
+        token_count_row = cursor.fetchone()
+        token_count_row = cast(Optional[Dict[str, Any]], token_count_row)
+        token_count = token_count_row['token_count'] if token_count_row else 0
         logger.info(f"User {session['user_id']} has {token_count} available loyalty tokens")
         
         cursor.close()
@@ -550,16 +557,24 @@ def admin_dashboard():
     
     # Get dashboard statistics
     cursor.execute("SELECT COUNT(*) as total FROM vehicles")
-    total_vehicles = cursor.fetchone()['total']
+    total_vehicles_row = cursor.fetchone()
+    total_vehicles_row = cast(Optional[Dict[str, Any]], total_vehicles_row)
+    total_vehicles = total_vehicles_row['total'] if total_vehicles_row else 0
     
     cursor.execute("SELECT COUNT(*) as total FROM users WHERE role = 'customer'")
-    total_customers = cursor.fetchone()['total']
+    total_customers_row = cursor.fetchone()
+    total_customers_row = cast(Optional[Dict[str, Any]], total_customers_row)
+    total_customers = total_customers_row['total'] if total_customers_row else 0
     
     cursor.execute("SELECT COUNT(*) as total FROM bookings WHERE status = 'pending'")
-    pending_bookings = cursor.fetchone()['total']
+    pending_bookings_row = cursor.fetchone()
+    pending_bookings_row = cast(Optional[Dict[str, Any]], pending_bookings_row)
+    pending_bookings = pending_bookings_row['total'] if pending_bookings_row else 0
     
     cursor.execute("SELECT SUM(total_price) as total FROM bookings WHERE status = 'completed'")
-    total_revenue = cursor.fetchone()['total'] or 0
+    total_revenue_row = cursor.fetchone()
+    total_revenue_row = cast(Optional[Dict[str, Any]], total_revenue_row)
+    total_revenue = (total_revenue_row['total'] if total_revenue_row else 0) or 0
     
     # Get recent bookings
     cursor.execute("""
@@ -746,11 +761,15 @@ def api_create_booking():
             
             # Calculate base price
             total_price = calculate_final_price(vehicle_id, start_datetime, end_datetime)
+            if not (isinstance(total_price, float) or total_price is None):
+                logger.error(f"calculate_final_price returned non-float: {type(total_price)} value={total_price}")
+                return jsonify({'success': False, 'error': 'Internal error: price calculation returned invalid type.'}), 500
             if total_price is None:
                 return jsonify({'success': False, 'error': 'Could not calculate price for this booking.'}), 400
-            
-            discount_applied = 0
-            loyalty_token_used = 0
+            discount_applied = 0.0
+            loyalty_token_used = 0.0
+            if total_price is not None:
+                total_price = float(total_price)
             
             # Apply discount code if provided
             if discount_code:
@@ -760,10 +779,14 @@ def api_create_booking():
                     AND start_date <= CURDATE() AND end_date >= CURDATE()
                     AND (usage_limit = 0 OR times_used < usage_limit)
                 """, (discount_code,))
-                discount = cursor.fetchone()
+                discount_row = cursor.fetchone()
+                discount = cast(Optional[Dict[str, Any]], discount_row)
                 if discount:
-                    discount_applied = total_price * (float(discount['discount_percentage']) / 100)
-                    total_price -= discount_applied
+                    percent = float(discount['discount_percentage'])
+                    discount_applied = float(total_price) * (percent / 100)
+                    total_price = float(total_price) - discount_applied
+                    discount_applied = float(discount_applied)
+                    total_price = float(total_price)
                     # Update discount usage
                     cursor.execute(
                         "UPDATE discounts SET times_used = times_used + 1 WHERE id = %s",
@@ -778,11 +801,18 @@ def api_create_booking():
                     SELECT * FROM loyalty_tokens 
                     WHERE id = %s AND user_id = %s AND is_redeemed = FALSE
                     AND (expiry_date IS NULL OR expiry_date > NOW())
+                    FOR UPDATE
                 """, (loyalty_token_id, session['user_id']))
-                token = cursor.fetchone()
+                token_row = cursor.fetchone()
+                token = cast(Optional[Dict[str, Any]], token_row)
                 if token:
-                    loyalty_token_used = min(float(token['token_value']), total_price)
-                    total_price -= loyalty_token_used
+                    token_value = float(token['token_value'])
+                    total_price = float(total_price)
+                    min_token = min(token_value, total_price)
+                    loyalty_token_used = float(min_token)
+                    total_price = float(total_price - loyalty_token_used)
+                    loyalty_token_used = float(loyalty_token_used)
+                    total_price = float(total_price)
                     # Mark token as redeemed
                     cursor.execute(
                         "UPDATE loyalty_tokens SET is_redeemed = TRUE WHERE id = %s",
@@ -851,7 +881,7 @@ def api_validate_discount():
             AND (usage_limit = 0 OR times_used < usage_limit)
         """, (discount_code,))
         discount = cursor.fetchone()
-        
+        discount = cast(Optional[Dict[str, Any]], discount)
         if not discount:
             logger.warning(f"Discount code not found or invalid: {discount_code}")
             return jsonify({'error': 'Invalid or expired discount code'}), 400
@@ -860,11 +890,12 @@ def api_validate_discount():
         logger.info(f"Discount found: {discount}")
         
         # Check if discount applies to this vehicle type
-        if discount['vehicle_type'] and vehicle_type:
-            logger.info(f"Checking vehicle type: discount_type={discount['vehicle_type']}, vehicle_type={vehicle_type}")
-            if discount['vehicle_type'] != vehicle_type:
-                logger.warning(f"Vehicle type mismatch: {discount['vehicle_type']} != {vehicle_type}")
-                return jsonify({'error': f'Discount code only applies to {discount["vehicle_type"]} vehicles'}), 400
+        vehicle_type_db = discount.get('vehicle_type') if discount else None
+        if vehicle_type_db and vehicle_type:
+            logger.info(f"Checking vehicle type: discount_type={vehicle_type_db}, vehicle_type={vehicle_type}")
+            if vehicle_type_db != vehicle_type:
+                logger.warning(f"Vehicle type mismatch: {vehicle_type_db} != {vehicle_type}")
+                return jsonify({'error': f'Discount code only applies to {vehicle_type_db} vehicles'}), 400
         
         # Check if discount applies to specific vehicle
         if discount['vehicle_id'] and vehicle_id:
@@ -911,11 +942,12 @@ def api_loyalty_tokens():
             ORDER BY issued_date DESC
         """, (session['user_id'],))
         tokens = cursor.fetchall()
+        tokens = cast(List[Dict[str, Any]], tokens)
         logger.info(f"Found {len(tokens)} loyalty tokens for user {session['user_id']}")
         
         # Convert expiry_date to string for JSON
         for t in tokens:
-            if t['expiry_date']:
+            if t.get('expiry_date'):
                 t['expiry_date'] = t['expiry_date'].strftime('%Y-%m-%d')
         
         return jsonify({'tokens': tokens})
@@ -941,9 +973,10 @@ def api_notifications():
             LIMIT 10
         """, (session['user_id'],))
         notifications = cursor.fetchall()
+        notifications = cast(List[Dict[str, Any]], notifications)
         # Convert datetime to string for JSON
         for n in notifications:
-            if n['created_at']:
+            if n.get('created_at'):
                 n['created_at'] = n['created_at'].strftime('%Y-%m-%d %H:%M:%S')
         return jsonify({'notifications': notifications})
     finally:
@@ -986,6 +1019,7 @@ def api_issue_loyalty_token():
     try:
         cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
+        user = cast(Optional[Dict[str, Any]], user)
         if not user:
             return jsonify({'success': False, 'error': 'User not found'}), 404
         cursor = conn.cursor()
@@ -1040,6 +1074,7 @@ def api_list_vehicles():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM vehicles ORDER BY make, model")
     vehicles = cursor.fetchall()
+    vehicles = cast(List[Dict[str, Any]], vehicles)
     cursor.close()
     conn.close()
     return jsonify({'vehicles': vehicles})
@@ -1082,6 +1117,7 @@ def api_get_vehicle(vehicle_id):
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM vehicles WHERE id = %s", (vehicle_id,))
     vehicle = cursor.fetchone()
+    vehicle = cast(Optional[Dict[str, Any]], vehicle)
     cursor.close()
     conn.close()
     if not vehicle:
@@ -1216,7 +1252,9 @@ def admin_bookings():
 
 @app.route('/api/bookings/<int:booking_id>')
 def api_booking_details(booking_id):
-    require_admin()
+    # Allow admin or the booking's owner (customer) to fetch booking details
+    user_id = session.get('user_id')
+    user_role = session.get('role')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('''
@@ -1227,10 +1265,21 @@ def api_booking_details(booking_id):
         WHERE b.id = %s
     ''', (booking_id,))
     booking = cursor.fetchone()
+    booking = cast(Optional[Dict[str, Any]], booking)
     cursor.close()
     conn.close()
     if not booking:
+        if request.accept_mimetypes['application/json']:
+            return jsonify({'error': 'Booking not found'}), 404
         return '<div><h3>Booking not found</h3><button class="btn btn-outline modal-close modal-close-x" aria-label="Close">&times;</button></div>'
+    # Permission check: admin can view any, customer can only view their own
+    if not (user_role == 'admin' or (user_role == 'customer' and booking['user_id'] == user_id)):
+        if request.accept_mimetypes['application/json']:
+            return jsonify({'error': 'Forbidden'}), 403
+        return '<div><h3>Forbidden</h3><button class="btn btn-outline modal-close modal-close-x" aria-label="Close">&times;</button></div>'
+    # If JSON requested, return JSON
+    if request.accept_mimetypes['application/json']:
+        return jsonify(booking)
     # Render details as HTML for modal (structured, modern, grouped)
     return f'''
     <div style="position: relative; min-width: 320px; max-width: 480px;">
@@ -1271,6 +1320,7 @@ def api_update_booking_status_v2(booking_id):
     try:
         cursor.execute("SELECT * FROM bookings WHERE id = %s", (booking_id,))
         booking = cursor.fetchone()
+        booking = cast(Optional[Dict[str, Any]], booking)
         print(f"[DEBUG] Booking lookup result: {booking}")
         if not booking:
             print(f"[DEBUG] Booking not found for ID: {booking_id}")
@@ -1325,6 +1375,7 @@ def customer_review(booking_id):
         WHERE b.id = %s AND b.user_id = %s
     """, (booking_id, user_id))
     booking = cursor.fetchone()
+    booking = cast(Optional[Dict[str, Any]], booking)
     if not booking:
         flash('Booking not found.', 'error')
         cursor.close()
@@ -1372,9 +1423,9 @@ def customer_review(booking_id):
 
         # Validate category ratings
         try:
-            condition_rating = int(condition_rating)
-            service_rating = int(service_rating)
-            value_rating = int(value_rating)
+            condition_rating = int(condition_rating) if condition_rating is not None else 0
+            service_rating = int(service_rating) if service_rating is not None else 0
+            value_rating = int(value_rating) if value_rating is not None else 0
         except (TypeError, ValueError):
             flash('Please rate all specific aspects (condition, service, value).', 'error')
             cursor.close()
@@ -1417,6 +1468,7 @@ def customer_review_edit(review_id):
         WHERE r.id = %s AND r.user_id = %s
     ''', (review_id, user_id))
     review = cursor.fetchone()
+    review = cast(Optional[Dict[str, Any]], review)
     if not review:
         cursor.close()
         conn.close()
@@ -1489,6 +1541,7 @@ def export_bookings():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM bookings ORDER BY booking_date DESC")
     bookings = cursor.fetchall()
+    bookings = cast(List[Dict[str, Any]], bookings)
     cursor.close()
     conn.close()
     si = StringIO()
@@ -1505,6 +1558,7 @@ def export_payments():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM payments ORDER BY payment_date DESC")
     payments = cursor.fetchall()
+    payments = cast(List[Dict[str, Any]], payments)
     cursor.close()
     conn.close()
     si = StringIO()
@@ -1521,6 +1575,7 @@ def export_vehicles():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM vehicles ORDER BY id")
     vehicles = cursor.fetchall()
+    vehicles = cast(List[Dict[str, Any]], vehicles)
     cursor.close()
     conn.close()
     si = StringIO()
@@ -1634,6 +1689,7 @@ def api_pay_for_booking():
         # Check booking exists, is approved, and belongs to user
         cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, session['user_id']))
         booking = cursor.fetchone()
+        booking = cast(Optional[Dict[str, Any]], booking)
         if not booking:
             return jsonify({'success': False, 'error': 'Booking not found'}), 404
         if booking['status'] != 'approved':
@@ -1671,6 +1727,7 @@ def admin_reviews():
         ORDER BY r.review_date DESC
     ''')
     reviews = cursor.fetchall()
+    reviews = cast(List[Dict[str, Any]], reviews)
     # Stats
     total_reviews = len(reviews)
     average_rating = round(sum(r['rating'] for r in reviews) / total_reviews, 1) if total_reviews else 0
@@ -1684,7 +1741,9 @@ def admin_reviews():
     rating_distribution = {i: round((rating_counts[i] / total_reviews) * 100, 1) if total_reviews else 0 for i in range(1, 6)}
     # Vehicle types for filter
     cursor.execute('SELECT DISTINCT type FROM vehicles ORDER BY type')
-    vehicle_types = [row['type'] for row in cursor.fetchall()]
+    vehicle_types = cursor.fetchall()
+    vehicle_types = cast(List[Dict[str, Any]], vehicle_types)
+    vehicle_types = [row['type'] for row in vehicle_types]
     cursor.close()
     conn.close()
     return render_template('admin/reviews.html',
@@ -1732,6 +1791,7 @@ def export_reviews():
         ORDER BY r.review_date DESC
     ''')
     reviews = cursor.fetchall()
+    reviews = cast(List[Dict[str, Any]], reviews)
     cursor.close()
     conn.close()
     si = StringIO()
@@ -1757,9 +1817,15 @@ def admin_payments():
         ORDER BY p.payment_date DESC
     ''')
     payments = cursor.fetchall()
+    payments = cast(List[Dict[str, Any]], payments)
     cursor.close()
     conn.close()
-    return render_template('admin/payments.html', payments=payments)
+    si = StringIO()
+    writer = csv.DictWriter(si, fieldnames=payments[0].keys() if payments else [])
+    writer.writeheader()
+    writer.writerows(payments)
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=payments.csv"})
 
 if __name__ == '__main__':
     app.run(debug=DEBUG)

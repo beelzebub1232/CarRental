@@ -166,3 +166,4 @@ coverage/
 *.csv
 *.xlsx
 *.pdf 
+*.app.log
