@@ -717,6 +717,12 @@
                         console.error('Loyalty token select element not found!');
                         return;
                     }
+                    // Remove existing custom dropdown wrapper if present
+                    if (select.previousElementSibling && select.previousElementSibling.classList.contains('custom-dropdown')) {
+                        select.previousElementSibling.remove();
+                        select.dataset.customized = '';
+                        select.style.display = '';
+                    }
                     select.innerHTML = '<option value="">No loyalty token</option>';
                     if (data.tokens && data.tokens.length > 0) {
                         console.log(`Found ${data.tokens.length} loyalty tokens`);
@@ -729,6 +735,10 @@
                     } else {
                         console.log('No loyalty tokens found');
                     }
+                    // Re-initialize custom dropdown
+                    if (typeof customDropdown === 'function') {
+                        customDropdown(select);
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading loyalty tokens:', error);
@@ -737,6 +747,9 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Booking page DOM fully loaded, initializing map and preview...');
+
+            // Load loyalty tokens on page load
+            loadLoyaltyTokens();
 
             // Map and vehicle preview logic
             const vehicles = {{ vehicles|tojson }};
