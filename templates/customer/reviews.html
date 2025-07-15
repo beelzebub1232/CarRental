@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews - DriveEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Customer Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
+            <a href="{{ url_for('customer_bookings') }}" class="top-nav-link">Bookings</a>
+            <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Customer Reviews</h1>
+                <p class="page-subtitle">See what other customers are saying about their rental experiences</p>
+            </div>
+            <div class="header-actions">
+                <div class="overall-rating">
+                    <div class="rating-stars">
+                        {% for i in range(1, 6) %}
+                            <span class="star {% if i <= average_rating %}filled{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                    <div class="rating-text">
+                        <span class="rating-value">{{ "%.1f"|format(average_rating) }}</span>
+                        <span class="rating-count">({{ total_reviews }} reviews)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ total_reviews }}</div>
+                <div class="stat-label">Total Reviews</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ "%.1f"|format(average_rating) }}</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4"/>
+                            <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ recommend_percentage }}%</div>
+                <div class="stat-label">Would Recommend</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                            <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                            <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ unique_vehicles }}</div>
+                <div class="stat-label">Vehicles Reviewed</div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Rating Distribution</h3>
+            </div>
+            <div class="rating-distribution">
+                {% for rating in range(5, 0, -1) %}
+                <div class="rating-bar">
+                    <div class="rating-label">{{ rating }} ★</div>
+                    <div class="rating-progress">
+                        <div class="progress-bar" style="width: {{ rating_distribution[rating] }}%"></div>
+                    </div>
+                    <div class="rating-count">{{ rating_counts[rating] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">All Reviews</h3>
+                <div class="filter-controls">
+                    <select id="rating-filter" class="form-select">
+                        <option value="">All Ratings</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                    <select id="vehicle-filter" class="form-select">
+                        <option value="">All Vehicles</option>
+                        {% for vehicle in vehicle_types %}
+                        <option value="{{ vehicle }}">{{ vehicle }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            {% if reviews %}
+                <div class="reviews-list" id="reviews-container">
+                    {% for review in reviews %}
+                    <div class="review-item" data-rating="{{ review.rating }}" data-vehicle="{{ review.vehicle_type }}">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-name">{{ review.customer_name }}</div>
+                                <div class="review-date">{{ review.review_date.strftime('%B %d, %Y') }}</div>
+                            </div>
+                            <div class="review-rating">
+                                <div class="star-rating-display">
+                                    {% for i in range(1, 6) %}
+                                        <span class="star {% if i <= review.rating %}filled{% endif %}">★</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="rating-value">{{ review.rating }}/5</div>
+                            </div>
+                        </div>
+                        
+                        <div class="review-vehicle">
+                            <div class="vehicle-info">
+                                <span class="vehicle-name">{{ review.make }} {{ review.model }}</span>
+                                <span class="vehicle-type">{{ review.vehicle_type }}</span>
+                            </div>
+                            {% if review.image_url %}
+                            <div class="vehicle-image">
+                                <img src="{{ review.image_url }}" alt="{{ review.make }} {{ review.model }}">
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="review-content">
+                            <p class="review-comment">{{ review.comment }}</p>
+                        </div>
+                        
+                        <div class="review-footer">
+                            <div class="recommendation">
+                                {% if review.recommend == 'yes' %}
+                                    <span class="recommend-badge recommend-yes">✓ Would recommend</span>
+                                {% elif review.recommend == 'maybe' %}
+                                    <span class="recommend-badge recommend-maybe">? Maybe</span>
+                                {% else %}
+                                    <span class="recommend-badge recommend-no">✗ Would not recommend</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if review.condition_rating or review.service_rating or review.value_rating %}
+                            <div class="category-ratings">
+                                {% if review.condition_rating %}
+                                <div class="category-rating">
+                                    <span class="category-label">Condition:</span>
+                                    <div class="category-stars">
+                                        {% for i in range(1, 6) %}
+                                            <span class="star {% if i <= review.condition_rating %}filled{% endif %}">★</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if review.service_rating %}
+                                <div class="category-rating">
+                                    <span class="category-label">Service:</span>
+                                    <div class="category-stars">
+                                        {% for i in range(1, 6) %}
+                                            <span class="star {% if i <= review.service_rating %}filled{% endif %}">★</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if review.value_rating %}
+                                <div class="category-rating">
+                                    <span class="category-label">Value:</span>
+                                    <div class="category-stars">
+                                        {% for i in range(1, 6) %}
+                                            <span class="star {% if i <= review.value_rating %}filled{% endif %}">★</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <svg class="icon icon-xl" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <h4>No reviews yet</h4>
+                    <p>Be the first to share your experience!</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <style>
+    /* Reviews Page Specific Styles */
+    .overall-rating {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        background: var(--primary-50);
+        padding: var(--space-4);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--primary-200);
+    }
+    
+    .rating-stars {
+        display: flex;
+        gap: var(--space-1);
+        font-size: 1.5rem;
+    }
+    
+    .rating-stars .star.filled {
+        color: #ffd700;
+    }
+    
+    .rating-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .rating-value {
+        font-size: var(--text-2xl);
+        font-weight: 900;
+        color: var(--primary-700);
+    }
+    
+    .rating-count {
+        font-size: var(--text-sm);
+        color: var(--neutral-600);
+    }
+    
+    /* Rating Distribution */
+    .rating-distribution {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .rating-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+    }
+    
+    .rating-label {
+        min-width: 60px;
+        font-weight: 600;
+        color: var(--neutral-700);
+    }
+    
+    .rating-progress {
+        flex: 1;
+        height: 12px;
+        background: var(--neutral-200);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ffd700, #ffed4e);
+        border-radius: var(--radius-full);
+        transition: width 0.3s ease;
+    }
+    
+    .rating-count {
+        min-width: 40px;
+        text-align: right;
+        font-weight: 600;
+        color: var(--neutral-600);
+    }
+    
+    /* Filter Controls */
+    .filter-controls {
+        display: flex;
+        gap: var(--space-3);
+    }
+    
+    .form-select {
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        background: white;
+        font-size: var(--text-sm);
+    }
+    
+    /* Reviews List */
+    .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+    }
+    
+    .review-item {
+        background: white;
+        border: 1px solid var(--neutral-200);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        transition: all var(--transition-normal);
+    }
+    
+    .review-item:hover {
+        border-color: var(--primary-300);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--space-4);
+    }
+    
+    .reviewer-name {
+        font-weight: 700;
+        color: var(--neutral-900);
+        margin-bottom: var(--space-1);
+    }
+    
+    .review-date {
+        font-size: var(--text-sm);
+        color: var(--neutral-500);
+    }
+    
+    .review-rating {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: var(--space-1);
+    }
+    
+    .star-rating-display {
+        display: flex;
+        gap: var(--space-1);
+        font-size: 1.25rem;
+    }
+    
+    .star-rating-display .star.filled {
+        color: #ffd700;
+    }
+    
+    .rating-value {
+        font-weight: 600;
+        color: var(--neutral-700);
+    }
+    
+    /* Review Vehicle */
+    .review-vehicle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--neutral-50);
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-4);
+    }
+    
+    .vehicle-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+    
+    .vehicle-name {
+        font-weight: 700;
+        color: var(--neutral-900);
+    }
+    
+    .vehicle-type {
+        font-size: var(--text-sm);
+        color: var(--neutral-600);
+        text-transform: capitalize;
+    }
+    
+    .vehicle-image {
+        width: 60px;
+        height: 40px;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .vehicle-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Review Content */
+    .review-content {
+        margin-bottom: var(--space-4);
+    }
+    
+    .review-comment {
+        font-size: var(--text-base);
+        line-height: 1.6;
+        color: var(--neutral-800);
+        margin: 0;
+    }
+    
+    /* Review Footer */
+    .review-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: var(--space-4);
+    }
+    
+    .recommend-badge {
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+    
+    .recommend-yes {
+        background: var(--success-100);
+        color: var(--success-700);
+    }
+    
+    .recommend-maybe {
+        background: var(--warning-100);
+        color: var(--warning-700);
+    }
+    
+    .recommend-no {
+        background: var(--error-100);
+        color: var(--error-700);
+    }
+    
+    /* Category Ratings */
+    .category-ratings {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    .category-rating {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+    
+    .category-label {
+        font-size: var(--text-sm);
+        color: var(--neutral-600);
+        min-width: 70px;
+    }
+    
+    .category-stars {
+        display: flex;
+        gap: 2px;
+        font-size: 0.875rem;
+    }
+    
+    .category-stars .star.filled {
+        color: #ffd700;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .review-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+        
+        .review-rating {
+            align-items: flex-start;
+        }
+        
+        .review-vehicle {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+        
+        .review-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+        
+        .filter-controls {
+            flex-direction: column;
+        }
+        
+        .overall-rating {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingFilter = document.getElementById('rating-filter');
+        const vehicleFilter = document.getElementById('vehicle-filter');
+        const reviewsContainer = document.getElementById('reviews-container');
+        const reviewItems = document.querySelectorAll('.review-item');
+        
+        function filterReviews() {
+            const selectedRating = ratingFilter.value;
+            const selectedVehicle = vehicleFilter.value;
+            
+            reviewItems.forEach(item => {
+                const rating = item.dataset.rating;
+                const vehicle = item.dataset.vehicle;
+                
+                let showItem = true;
+                
+                if (selectedRating && rating !== selectedRating) {
+                    showItem = false;
+                }
+                
+                if (selectedVehicle && vehicle !== selectedVehicle) {
+                    showItem = false;
+                }
+                
+                if (showItem) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeIn 0.3s ease-in-out';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        ratingFilter.addEventListener('change', filterReviews);
+        vehicleFilter.addEventListener('change', filterReviews);
+        
+        // Add fade-in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+    </script>
+</body>
+</html> 

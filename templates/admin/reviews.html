@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Management - DriveEase Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="brand-logo">
+            <div class="sidebar-logo">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                    <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="sidebar-title">DriveEase</div>
+                <div class="sidebar-subtitle">Admin Portal</div>
+            </div>
+        </div>
+        <nav class="top-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}" class="top-nav-link">Dashboard</a>
+            <a href="{{ url_for('admin_manage_vehicles') }}" class="top-nav-link">Vehicles</a>
+            <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
+            <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
+            <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
+            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
+            <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Review Management</h1>
+                <p class="page-subtitle">Monitor and manage customer reviews and feedback</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="exportReviews()">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    Export Reviews
+                </button>
+            </div>
+        </div>
+
+        <!-- Review Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ total_reviews }}</div>
+                <div class="stat-label">Total Reviews</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ "%.1f"|format(average_rating) }}</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4"/>
+                            <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ recommend_percentage }}%</div>
+                <div class="stat-label">Would Recommend</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                            <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                            <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value">{{ unique_vehicles }}</div>
+                <div class="stat-label">Vehicles Reviewed</div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Rating Distribution</h3>
+            </div>
+            <div class="rating-distribution">
+                {% for rating in range(5, 0, -1) %}
+                <div class="rating-bar">
+                    <div class="rating-label">{{ rating }} ★</div>
+                    <div class="rating-progress">
+                        <div class="progress-bar" style="width: {{ rating_distribution[rating] }}%"></div>
+                    </div>
+                    <div class="rating-count">{{ rating_counts[rating] }}</div>
+                    <div class="rating-percentage">{{ rating_distribution[rating] }}%</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Reviews Management -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">All Reviews</h3>
+                <div class="filter-controls">
+                    <select id="rating-filter" class="form-select">
+                        <option value="">All Ratings</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                    <select id="vehicle-filter" class="form-select">
+                        <option value="">All Vehicles</option>
+                        {% for vehicle in vehicle_types %}
+                        <option value="{{ vehicle }}">{{ vehicle }}</option>
+                        {% endfor %}
+                    </select>
+                    <select id="recommend-filter" class="form-select">
+                        <option value="">All Recommendations</option>
+                        <option value="yes">Would Recommend</option>
+                        <option value="maybe">Maybe</option>
+                        <option value="no">Would Not Recommend</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% if reviews %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Recommend</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviews-table-body">
+                            {% for review in reviews %}
+                            <tr class="review-row" data-rating="{{ review.rating }}" data-vehicle="{{ review.vehicle_type }}" data-recommend="{{ review.recommend }}">
+                                <td>
+                                    <div class="review-id">#{{ review.id }}</div>
+                                </td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="customer-name">{{ review.customer_name }}</div>
+                                        <div class="customer-email">{{ review.customer_email }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="vehicle-info">
+                                        <div class="vehicle-name">{{ review.make }} {{ review.model }}</div>
+                                        <div class="vehicle-type">{{ review.vehicle_type }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="rating-display">
+                                        <div class="star-rating-display">
+                                            {% for i in range(1, 6) %}
+                                                <span class="star {% if i <= review.rating %}filled{% endif %}">★</span>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="rating-value">{{ review.rating }}/5</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="comment-preview">
+                                        {{ review.comment[:100] }}{% if review.comment|length > 100 %}...{% endif %}
+                                    </div>
+                                    <button class="btn btn-ghost btn-sm" onclick="showFullComment({{ review.id }})">View Full</button>
+                                </td>
+                                <td>
+                                    {% if review.recommend == 'yes' %}
+                                        <span class="recommend-badge recommend-yes">✓ Yes</span>
+                                    {% elif review.recommend == 'maybe' %}
+                                        <span class="recommend-badge recommend-maybe">? Maybe</span>
+                                    {% else %}
+                                        <span class="recommend-badge recommend-no">✗ No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="review-date">{{ review.review_date.strftime('%m/%d/%Y') }}</div>
+                                    <div class="review-time">{{ review.review_date.strftime('%I:%M %p') }}</div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-primary btn-sm" onclick="viewReviewDetails({{ review.id }})">
+                                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                            View
+                                        </button>
+                                        <button class="btn btn-error btn-sm" onclick="deleteReview({{ review.id }})">
+                                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                                <polyline points="3,6 5,6 21,6"/>
+                                                <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <svg class="icon icon-xl" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <h4>No reviews yet</h4>
+                    <p>Customer reviews will appear here as they are submitted</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Review Details Modal -->
+    <div id="review-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Review Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* Admin Reviews Page Specific Styles */
+    .rating-distribution {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .rating-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+    }
+    
+    .rating-label {
+        min-width: 60px;
+        font-weight: 600;
+        color: var(--neutral-700);
+    }
+    
+    .rating-progress {
+        flex: 1;
+        height: 12px;
+        background: var(--neutral-200);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ffd700, #ffed4e);
+        border-radius: var(--radius-full);
+        transition: width 0.3s ease;
+    }
+    
+    .rating-count {
+        min-width: 40px;
+        text-align: right;
+        font-weight: 600;
+        color: var(--neutral-600);
+    }
+    
+    .rating-percentage {
+        min-width: 50px;
+        text-align: right;
+        font-size: var(--text-sm);
+        color: var(--neutral-500);
+    }
+    
+    /* Filter Controls */
+    .filter-controls {
+        display: flex;
+        gap: var(--space-3);
+    }
+    
+    .form-select {
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        background: white;
+        font-size: var(--text-sm);
+    }
+    
+    /* Table Styles */
+    .customer-info, .vehicle-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+    
+    .customer-name, .vehicle-name {
+        font-weight: 600;
+        color: var(--neutral-900);
+    }
+    
+    .customer-email, .vehicle-type {
+        font-size: var(--text-sm);
+        color: var(--neutral-600);
+    }
+    
+    .rating-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-1);
+    }
+    
+    .star-rating-display {
+        display: flex;
+        gap: 2px;
+        font-size: 1rem;
+    }
+    
+    .star-rating-display .star.filled {
+        color: #ffd700;
+    }
+    
+    .rating-value {
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--neutral-700);
+    }
+    
+    .comment-preview {
+        max-width: 200px;
+        font-size: var(--text-sm);
+        color: var(--neutral-700);
+        line-height: 1.4;
+    }
+    
+    .recommend-badge {
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .recommend-yes {
+        background: var(--success-100);
+        color: var(--success-700);
+    }
+    
+    .recommend-maybe {
+        background: var(--warning-100);
+        color: var(--warning-700);
+    }
+    
+    .recommend-no {
+        background: var(--error-100);
+        color: var(--error-700);
+    }
+    
+    .review-date, .review-time {
+        font-size: var(--text-sm);
+        color: var(--neutral-600);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: var(--space-2);
+    }
+    
+    /* Modal Styles */
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: var(--radius-xl);
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-2xl);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-6);
+        border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--neutral-500);
+        padding: var(--space-1);
+    }
+    
+    .modal-close:hover {
+        color: var(--neutral-700);
+    }
+    
+    .modal-body {
+        padding: var(--space-6);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .filter-controls {
+            flex-direction: column;
+        }
+        
+        .rating-bar {
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingFilter = document.getElementById('rating-filter');
+        const vehicleFilter = document.getElementById('vehicle-filter');
+        const recommendFilter = document.getElementById('recommend-filter');
+        const reviewRows = document.querySelectorAll('.review-row');
+        
+        function filterReviews() {
+            const selectedRating = ratingFilter.value;
+            const selectedVehicle = vehicleFilter.value;
+            const selectedRecommend = recommendFilter.value;
+            
+            reviewRows.forEach(row => {
+                const rating = row.dataset.rating;
+                const vehicle = row.dataset.vehicle;
+                const recommend = row.dataset.recommend;
+                
+                let showRow = true;
+                
+                if (selectedRating && rating !== selectedRating) {
+                    showRow = false;
+                }
+                
+                if (selectedVehicle && vehicle !== selectedVehicle) {
+                    showRow = false;
+                }
+                
+                if (selectedRecommend && recommend !== selectedRecommend) {
+                    showRow = false;
+                }
+                
+                if (showRow) {
+                    row.style.display = 'table-row';
+                    row.style.animation = 'fadeIn 0.3s ease-in-out';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        ratingFilter.addEventListener('change', filterReviews);
+        vehicleFilter.addEventListener('change', filterReviews);
+        recommendFilter.addEventListener('change', filterReviews);
+    });
+    
+    function viewReviewDetails(reviewId) {
+        // This would typically fetch review details via AJAX
+        // For now, we'll show a simple modal
+        const modal = document.getElementById('review-modal');
+        const modalContent = document.getElementById('modal-content');
+        
+        // Find the review row
+        const reviewRow = document.querySelector(`[data-review-id="${reviewId}"]`);
+        if (reviewRow) {
+            const customerName = reviewRow.querySelector('.customer-name').textContent;
+            const vehicleName = reviewRow.querySelector('.vehicle-name').textContent;
+            const rating = reviewRow.querySelector('.rating-value').textContent;
+            const comment = reviewRow.querySelector('.comment-preview').textContent;
+            
+            modalContent.innerHTML = `
+                <div class="review-details">
+                    <h4>Review #${reviewId}</h4>
+                    <div class="detail-item">
+                        <strong>Customer:</strong> ${customerName}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Vehicle:</strong> ${vehicleName}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Rating:</strong> ${rating}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Comment:</strong> ${comment}
+                    </div>
+                </div>
+            `;
+        }
+        
+        modal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+        document.getElementById('review-modal').style.display = 'none';
+    }
+    
+    function showFullComment(reviewId) {
+        // This would show the full comment in a modal or expand the row
+        alert('Full comment functionality would be implemented here');
+    }
+    
+    function deleteReview(reviewId) {
+        if (confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+            // This would send a DELETE request to the server
+            fetch(`/api/reviews/${reviewId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from the table
+                    const row = document.querySelector(`[data-review-id="${reviewId}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                    alert('Review deleted successfully');
+                } else {
+                    alert('Error deleting review: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting review');
+            });
+        }
+    }
+    
+    function exportReviews() {
+        // This would trigger a download of reviews as CSV
+        window.location.href = '/api/export/reviews';
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('review-modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+    
+    // Add fade-in animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+    </script>
+</body>
+</html> 

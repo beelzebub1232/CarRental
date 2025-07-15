@@ -27,5 +27,5 @@ MESSAGES = {
     'booking_overlap': 'This vehicle is already booked for the selected time range.',
     'booking_window': f'Bookings cannot be made more than {BOOKING_WINDOW_DAYS} days in advance',
     'min_booking_duration': f'Minimum booking duration is {MIN_BOOKING_DURATION_HOURS} hour',
-    'password_requirements': 'Password must be at least 8 characters, include uppercase, lowercase, and a number.'
+    'password_requirements': 'Password must be at least 3 characters long.'
 }

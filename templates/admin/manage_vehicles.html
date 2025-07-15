@@ -299,9 +299,23 @@
             document.getElementById('add-vehicle-form').onsubmit = function(e) {
                 e.preventDefault();
                 const formData = new FormData(this);
+                const jsonData = {
+                    make: formData.get('make'),
+                    model: formData.get('model'),
+                    year: parseInt(formData.get('year')),
+                    type: formData.get('type'),
+                    base_price: parseFloat(formData.get('base_price')),
+                    pickup_lat: formData.get('pickup_lat') ? parseFloat(formData.get('pickup_lat')) : null,
+                    pickup_lng: formData.get('pickup_lng') ? parseFloat(formData.get('pickup_lng')) : null,
+                    image_url: formData.get('image_url'),
+                    status: formData.get('status')
+                };
                 fetch('/api/vehicles', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData)
                 })
                 .then(r => r.json())
                 .then(result => {
@@ -394,9 +408,23 @@
                     document.getElementById('edit-vehicle-form').onsubmit = function(e) {
                         e.preventDefault();
                         const formData = new FormData(this);
+                        const jsonData = {
+                            make: formData.get('make'),
+                            model: formData.get('model'),
+                            year: parseInt(formData.get('year')),
+                            type: formData.get('type'),
+                            base_price: parseFloat(formData.get('base_price')),
+                            pickup_lat: formData.get('pickup_lat') ? parseFloat(formData.get('pickup_lat')) : null,
+                            pickup_lng: formData.get('pickup_lng') ? parseFloat(formData.get('pickup_lng')) : null,
+                            image_url: formData.get('image_url'),
+                            status: formData.get('status')
+                        };
                         fetch(`/api/vehicles/${vehicleId}`, {
                             method: 'PUT',
-                            body: formData
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(jsonData)
                         })
                         .then(r => r.json())
                         .then(result => {

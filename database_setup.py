@@ -76,11 +76,32 @@ def create_database():
                 user_id INT NOT NULL,
                 rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
                 comment TEXT,
+                recommend ENUM('yes', 'maybe', 'no'),
+                condition_rating INT CHECK (condition_rating >= 1 AND condition_rating <= 5),
+                service_rating INT CHECK (service_rating >= 1 AND service_rating <= 5),
+                value_rating INT CHECK (value_rating >= 1 AND value_rating <= 5),
                 review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         """)
+        
+        # Add new columns if they don't exist
+        cursor.execute("SHOW COLUMNS FROM reviews LIKE 'recommend'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE reviews ADD COLUMN recommend ENUM('yes', 'maybe', 'no') AFTER comment")
+        
+        cursor.execute("SHOW COLUMNS FROM reviews LIKE 'condition_rating'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE reviews ADD COLUMN condition_rating INT CHECK (condition_rating >= 1 AND condition_rating <= 5) AFTER recommend")
+        
+        cursor.execute("SHOW COLUMNS FROM reviews LIKE 'service_rating'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE reviews ADD COLUMN service_rating INT CHECK (service_rating >= 1 AND service_rating <= 5) AFTER condition_rating")
+        
+        cursor.execute("SHOW COLUMNS FROM reviews LIKE 'value_rating'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE reviews ADD COLUMN value_rating INT CHECK (value_rating >= 1 AND value_rating <= 5) AFTER service_rating")
         
         # Create pricing_rules table
         cursor.execute("""
@@ -113,10 +134,16 @@ def create_database():
                 usage_limit INT DEFAULT 0,
                 times_used INT DEFAULT 0,
                 is_active BOOLEAN DEFAULT TRUE,
+                description VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE SET NULL
             )
         """)
+        
+        # Add description column if it doesn't exist
+        cursor.execute("SHOW COLUMNS FROM discounts LIKE 'description'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE discounts ADD COLUMN description VARCHAR(255) AFTER is_active")
         
         # Create loyalty_tokens table
         cursor.execute("""
@@ -129,6 +156,21 @@ def create_database():
                 expiry_date TIMESTAMP,
                 description VARCHAR(255),
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
+        
+        # Create customer_notifications table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS customer_notifications (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                message TEXT NOT NULL,
+                type VARCHAR(50) DEFAULT 'info',
+                related_booking_id INT,
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (related_booking_id) REFERENCES bookings(id) ON DELETE SET NULL
             )
         """)
         
@@ -221,14 +263,14 @@ def create_database():
         
         # Insert sample discounts
         sample_discounts = [
-            ('WELCOME20', 20.00, '2024-01-01', '2024-12-31', None, None, 100, 0, True),
-            ('LUXURY50', 50.00, '2024-01-01', '2024-12-31', None, 'Luxury SUV', 20, 0, True),
-            ('ELECTRIC15', 15.00, '2024-01-01', '2024-12-31', None, 'Electric', 50, 0, True)
+            ('WELCOME20', 20.00, '2024-01-01', '2024-12-31', None, None, 100, 0, True, 'Welcome discount for new customers'),
+            ('LUXURY50', 50.00, '2024-01-01', '2024-12-31', None, 'Luxury SUV', 20, 0, True, 'Special discount on luxury SUVs'),
+            ('ELECTRIC15', 15.00, '2024-01-01', '2024-12-31', None, 'Electric', 50, 0, True, 'Eco-friendly vehicle discount')
         ]
         
         cursor.executemany("""
-            INSERT IGNORE INTO discounts (code, discount_percentage, start_date, end_date, vehicle_id, vehicle_type, usage_limit, times_used, is_active)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT IGNORE INTO discounts (code, discount_percentage, start_date, end_date, vehicle_id, vehicle_type, usage_limit, times_used, is_active, description)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, sample_discounts)
         
         conn.commit()

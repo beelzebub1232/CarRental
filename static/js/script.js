@@ -1,5 +1,8 @@
 // Modern Car Rental System - Enhanced JavaScript
 
+// Global variables
+let appliedDiscount = null;
+
 // DOM Ready with enhanced initialization
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -141,8 +144,8 @@ async function calculatePrice() {
         const data = await response.json();
         console.log('Response data:', data);
         
-        if (data.price) {
-            displayPrice(priceDisplay, data.price, startDate, endDate);
+        if (data.total_price !== undefined) {
+            displayPrice(priceDisplay, data, startDate, endDate);
         } else {
             showError(priceDisplay, data.error || 'Unable to calculate price');
         }
@@ -152,43 +155,132 @@ async function calculatePrice() {
     }
 }
 
-function displayPrice(container, price, startDate, endDate) {
+function displayPrice(container, priceData, startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const hours = Math.ceil((end - start) / (1000 * 60 * 60));
+    const hours = priceData.duration_hours;
     
-    let originalPrice = price;
+    let originalPrice = priceData.total_price;
     let discountAmount = 0;
-    let finalPrice = price;
+    let finalPrice = priceData.total_price;
     
     // Apply discount if available
     if (appliedDiscount) {
-        discountAmount = price * (appliedDiscount.percentage / 100);
-        finalPrice = price - discountAmount;
+        discountAmount = priceData.total_price * (appliedDiscount.percentage / 100);
+        finalPrice = priceData.total_price - discountAmount;
     }
+    
+    // Format time for display
+    const formatTime = (date) => {
+        return date.toLocaleDateString('en-US', { 
+            weekday: 'short', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
     
     let priceHtml = `
         <div class="pricing-display" style="opacity: 0; transform: translateY(20px);">
             <div class="price-amount">₹${finalPrice.toFixed(2)}</div>
             <div class="price-details">
-                Total for ${hours} hour${hours !== 1 ? 's' : ''}
-                <br>
-                <small>Includes dynamic pricing adjustments</small>
+                <div style="font-size: var(--text-lg); font-weight: 600; margin-bottom: var(--space-2); text-align: center;">
+                    Total for ${hours} hour${hours !== 1 ? 's' : ''}
+                </div>
+                
+                <!-- Pricing Breakdown -->
+                <div class="pricing-breakdown">
+                    <div class="pricing-breakdown-header">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Pricing Breakdown
+                    </div>
+                    
+                    <!-- Base Price -->
+                    <div class="pricing-row">
+                        <span>Base Price (₹${priceData.base_price_per_hour}/hour × ${hours}h):</span>
+                        <span>₹${priceData.base_total.toFixed(2)}</span>
+                    </div>
+                    
+                    <!-- Peak Pricing -->
+                    ${priceData.peak_adjustments > 0 ? `
+                        <div class="pricing-row peak">
+                            <span>
+                                <svg class="icon icon-xs" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                Peak Hour Surcharge (${priceData.peak_hours} hour${priceData.peak_hours !== 1 ? 's' : ''}):
+                            </span>
+                            <span>+₹${priceData.peak_adjustments.toFixed(2)}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Demand Modifier -->
+                    ${priceData.demand_percentage > 0 ? `
+                        <div class="pricing-row demand">
+                            <span>
+                                <svg class="icon icon-xs" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4"/>
+                                    <circle cx="12" cy="12" r="9"/>
+                                </svg>
+                                ${priceData.vehicle_type} Demand (+${priceData.demand_percentage}%):
+                            </span>
+                            <span>+₹${((priceData.base_total + priceData.peak_adjustments) * (priceData.demand_percentage / 100)).toFixed(2)}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Subtotal -->
+                    <div class="pricing-row">
+                        <span>Subtotal:</span>
+                        <span>₹${priceData.total_price.toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                <!-- Rental Period -->
+                <div class="rental-period">
+                    <div class="rental-period-header">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        Rental Period
+                    </div>
+                    <div class="pricing-row">
+                        <span>From:</span>
+                        <span>${formatTime(start)}</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span>To:</span>
+                        <span>${formatTime(end)}</span>
+                    </div>
+                </div>
     `;
     
     if (appliedDiscount) {
         priceHtml += `
-                <br>
-                <div style="margin-top: var(--space-2); padding: var(--space-2); background: var(--success-50); border-radius: var(--radius-md); border: 1px solid var(--success-200);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm);">
+                <div class="discount-section">
+                    <div class="discount-header">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24">
+                            <path d="M21 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                            <path d="M3 12c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                            <path d="M12 21c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                            <path d="M12 3c.552 0 1-.448 1-1s-.448-1-1-1-1 .448-1 1 .448 1 1 1z"/>
+                        </svg>
+                        Discount Applied
+                    </div>
+                    <div class="pricing-row">
                         <span>Original Price:</span>
                         <span>₹${originalPrice.toFixed(2)}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm); color: var(--success-600); font-weight: 600;">
+                    <div class="pricing-row" style="color: var(--success-600); font-weight: 600;">
                         <span>Discount (${appliedDiscount.percentage}%):</span>
                         <span>-₹${discountAmount.toFixed(2)}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm); font-weight: 700; margin-top: var(--space-1);">
+                    <div class="pricing-row" style="border-top: 1px solid var(--success-200); padding-top: var(--space-2); margin-top: var(--space-2);">
                         <span>Final Price:</span>
                         <span>₹${finalPrice.toFixed(2)}</span>
                     </div>
@@ -318,7 +410,7 @@ async function handleBookingSubmission(event) {
                 const vehicleId = document.getElementById('vehicle_id')?.value;
                 const vehicleSelect = document.getElementById('vehicle_id');
                 const selectedOption = vehicleSelect?.options[vehicleSelect.selectedIndex];
-                const vehicleType = selectedOption?.textContent.split('(')[1]?.split(')')[0] || '';
+                const vehicleType = selectedOption?.getAttribute('data-type') || '';
                 const response = await fetch('/api/validate_discount', {
                     method: 'POST',
                     headers: {
@@ -365,9 +457,6 @@ async function handleBookingSubmission(event) {
                 return;
             }
         }
-    } else {
-        appliedDiscount = null;
-        if (discountStatusDiv) discountStatusDiv.style.display = 'none';
     }
     // --- End discount code robust validation ---
     
@@ -391,7 +480,7 @@ async function handleBookingSubmission(event) {
         const result = await response.json();
         
         if (result.success) {
-            showSuccessMessage('Booking created successfully! Redirecting...');
+            showSuccessMessage('Booking created successfully! You will earn loyalty rewards when your booking is completed.');
             // Animate form out
             event.target.style.transition = 'all 0.5s ease';
             event.target.style.opacity = '0.5';
@@ -401,6 +490,7 @@ async function handleBookingSubmission(event) {
             }, 2000);
         } else {
             // Show backend error message clearly
+            console.error('Booking failed:', result.error);
             showErrorMessage(result.error || 'Booking failed. Please try again.');
             // Optionally highlight fields if error is field-specific
             if (result.error && result.error.toLowerCase().includes('date')) {
@@ -431,9 +521,6 @@ async function handleBookingSubmission(event) {
     }
 }
 
-// Global variable to store applied discount
-let appliedDiscount = null;
-
 async function validateDiscountCode() {
     const discountInput = document.getElementById('discount_code');
     const applyBtn = document.getElementById('apply_discount_btn');
@@ -457,7 +544,7 @@ async function validateDiscountCode() {
         const vehicleId = document.getElementById('vehicle_id')?.value;
         const vehicleSelect = document.getElementById('vehicle_id');
         const selectedOption = vehicleSelect?.options[vehicleSelect.selectedIndex];
-        const vehicleType = selectedOption?.textContent.split('(')[1]?.split(')')[0] || '';
+        const vehicleType = selectedOption?.getAttribute('data-type') || '';
         
         const response = await fetch('/api/validate_discount', {
             method: 'POST',
@@ -562,7 +649,11 @@ async function handlePriceSimulation(event) {
             resultDiv.innerHTML = `
                 <div class="alert alert-error" style="opacity: 0; transform: translateY(10px);">
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="font-size: 2rem;">⚠️</div>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
                         <div>
                             <strong>Error:</strong> ${result.error || 'Unable to simulate price'}
                         </div>
@@ -584,7 +675,11 @@ async function handlePriceSimulation(event) {
         resultDiv.innerHTML = `
             <div class="alert alert-error">
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="font-size: 2rem;">❌</div>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
                     <div>An error occurred during simulation</div>
                 </div>
             </div>
@@ -703,7 +798,7 @@ function initScrollAnimations() {
 
 // Enhanced Form Validation
 function initFormValidation() {
-    const forms = document.querySelectorAll('form');
+    const forms = document.querySelectorAll('form:not([data-form="login"]):not([data-form="registration"])');
     
     forms.forEach(form => {
         const inputs = form.querySelectorAll('input[required], select[required]');
@@ -794,20 +889,8 @@ function validateEmail(email) {
 function validatePassword(password) {
     const errors = [];
     
-    if (password.length < 8) {
-        errors.push('Password must be at least 8 characters long');
-    }
-    
-    if (!/[A-Z]/.test(password)) {
-        errors.push('Password must contain at least one uppercase letter');
-    }
-    
-    if (!/[a-z]/.test(password)) {
-        errors.push('Password must contain at least one lowercase letter');
-    }
-    
-    if (!/\d/.test(password)) {
-        errors.push('Password must contain at least one number');
+    if (password.length < 3) {
+        errors.push('Password must be at least 3 characters long');
     }
     
     return errors;
@@ -882,43 +965,7 @@ function initEnhancedFormValidation() {
         });
     }
     
-    // Registration form validation
-    const registrationForm = document.querySelector('form[data-form="registration"]');
-    if (registrationForm) {
-        const inputs = registrationForm.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('blur', () => validateField(input));
-            input.addEventListener('input', () => clearFieldError(input));
-        });
-        
-        registrationForm.addEventListener('submit', (e) => {
-            const errors = validateRegistrationForm();
-            if (errors.length > 0) {
-                e.preventDefault();
-                showErrorMessage(errors.join('<br>'));
-                return false;
-            }
-        });
-    }
-    
-    // Login form validation
-    const loginForm = document.querySelector('form[data-form="login"]');
-    if (loginForm) {
-        const inputs = loginForm.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('blur', () => validateField(input));
-            input.addEventListener('input', () => clearFieldError(input));
-        });
-        
-        loginForm.addEventListener('submit', (e) => {
-            const errors = validateLoginForm();
-            if (errors.length > 0) {
-                e.preventDefault();
-                showErrorMessage(errors.join('<br>'));
-                return false;
-            }
-        });
-    }
+
 }
 
 // Enhanced field validation with specific rules
@@ -1005,7 +1052,11 @@ function showFieldError(field, message) {
     errorDiv.className = 'field-error';
     errorDiv.innerHTML = `
         <div style="display: flex; align-items: center; gap: 0.5rem; color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem;">
-            <span>⚠️</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
             <span>${message}</span>
         </div>
     `;
@@ -1025,7 +1076,10 @@ function showFieldSuccess(field, message = '') {
         successDiv.className = 'field-success';
         successDiv.innerHTML = `
             <div style="display: flex; align-items: center; gap: 0.5rem; color: #22c55e; font-size: 0.875rem; margin-top: 0.5rem;">
-                <span>✅</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="20,6 9,17 4,12"/>
+                </svg>
                 <span>${message}</span>
             </div>
         `;
@@ -1045,7 +1099,11 @@ function showFieldWarning(field, message) {
     warningDiv.className = 'field-warning';
     warningDiv.innerHTML = `
         <div style="display: flex; align-items: center; gap: 0.5rem; color: #f59e0b; font-size: 0.875rem; margin-top: 0.5rem;">
-            <span>💡</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
             <span>${message}</span>
         </div>
     `;
@@ -1085,27 +1143,30 @@ function clearFieldError(field) {
 
 // Enhanced Toast System
 function showSuccessMessage(message) {
-    showToast(message, 'success', '✅');
+    showToast(message, 'success');
 }
 
 function showErrorMessage(message) {
-    showToast(message, 'error', '❌');
+    showToast(message, 'error');
 }
 
 function showWarningMessage(message) {
-    showToast(message, 'warning', '⚠️');
+    showToast(message, 'warning');
 }
 
-function showToast(message, type = 'info', icon = 'ℹ️') {
+function showToast(message, type = 'info') {
     // Remove existing toasts
     document.querySelectorAll('.toast').forEach(toast => toast.remove());
+    
+    // Get appropriate icon based on type
+    const iconSvg = getToastIcon(type);
     
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
         <div class="toast-content">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <span style="font-size: 1.25rem;">${icon}</span>
+                ${iconSvg}
                 <span>${message}</span>
             </div>
             <button class="toast-close">&times;</button>
@@ -1136,6 +1197,32 @@ function showToast(message, type = 'info', icon = 'ℹ️') {
     toast.addEventListener('mouseleave', () => {
         setTimeout(() => removeToast(toast), 2000);
     });
+}
+
+function getToastIcon(type) {
+    const icons = {
+        success: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="20,6 9,17 4,12"/>
+        </svg>`,
+        error: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>`,
+        warning: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>`,
+        info: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>`
+    };
+    
+    return icons[type] || icons.info;
 }
 
 function removeToast(toast) {
@@ -1633,7 +1720,7 @@ function showStatusToast(status, context) {
             showToast('Payment successful! Booking confirmed.', 'success');
             break;
         case 'completed':
-            showToast('Booking marked as completed. Thank you!', 'success');
+            showToast('Booking marked as completed. Loyalty rewards have been issued to the customer!', 'success');
             break;
         case 'rejected':
             showToast('Booking was rejected by admin.', 'error');

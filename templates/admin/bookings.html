@@ -123,10 +123,9 @@
                                             <button class="btn btn-sm btn-primary" onclick="updateBookingStatus({{ booking.id }}, 'approved')" title="After approval, user must pay before completion">Approve</button>
                                             <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'rejected')">Reject</button>
                                         {% elif booking.status == 'approved' %}
-                                            <button class="btn btn-sm btn-success" disabled title="User must pay before you can complete this booking">Mark Completed</button>
                                             <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
                                         {% elif booking.status == 'paid' %}
-                                            <button class="btn btn-sm btn-success" onclick="updateBookingStatus({{ booking.id }}, 'completed')">Mark Completed</button>
+                                            <button class="btn btn-sm btn-success" onclick="updateBookingStatus({{ booking.id }}, 'completed')" title="Marking as completed will issue loyalty rewards to the customer">Mark Completed</button>
                                             <button class="btn btn-sm btn-danger" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">Cancel</button>
                                         {% endif %}
                                     </div>

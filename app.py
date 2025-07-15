@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, abort
 import mysql.connector
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, SECRET_KEY, DEBUG, LOYALTY_PERCENTAGE, LOYALTY_EXPIRY_DAYS, BOOKING_WINDOW_DAYS, MIN_BOOKING_DURATION_HOURS, MESSAGES
-from werkzeug.security import generate_password_hash, check_password_hash
+
 from datetime import datetime, timedelta
 import json
 import csv
@@ -25,6 +25,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config['DEBUG'] = DEBUG
+app.config['SESSION_COOKIE_SECURE'] = False  # Allow HTTP in development
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
 # Custom error handlers
 @app.errorhandler(404)
@@ -47,22 +50,32 @@ def validate_email(email):
 
 def validate_password(password):
     """Validate password strength"""
-    if len(password) < 8:
-        return False, "Password must be at least 8 characters long"
-    if not re.search(r'[A-Z]', password):
-        return False, "Password must contain at least one uppercase letter"
-    if not re.search(r'[a-z]', password):
-        return False, "Password must contain at least one lowercase letter"
-    if not re.search(r'\d', password):
-        return False, "Password must contain at least one number"
+    if len(password) < 3:
+        return False, "Password must be at least 3 characters long"
     return True, "Password is valid"
 
 def validate_booking_data(vehicle_id, start_date, end_date):
     """Validate booking data"""
     errors = []
     
-    if not vehicle_id or not isinstance(vehicle_id, int):
+    # Convert vehicle_id to int if it's a string
+    try:
+        if vehicle_id:
+            vehicle_id = int(vehicle_id)
+        else:
+            errors.append("Vehicle ID is required")
+            return errors, None, None
+    except (ValueError, TypeError):
         errors.append("Invalid vehicle ID")
+        return errors, None, None
+    
+    if not start_date:
+        errors.append("Start date is required")
+        return errors, None, None
+    
+    if not end_date:
+        errors.append("End date is required")
+        return errors, None, None
     
     try:
         start_datetime = datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
@@ -80,8 +93,9 @@ def validate_booking_data(vehicle_id, start_date, end_date):
             
     except ValueError:
         errors.append("Invalid date format")
+        return errors, None, None
     
-    return errors, start_datetime if 'start_datetime' in locals() else None, end_datetime if 'end_datetime' in locals() else None
+    return errors, start_datetime, end_datetime
 
 # Database connection with error handling
 def get_db_connection():
@@ -144,8 +158,8 @@ def check_duplicate_booking(cursor, user_id, vehicle_id, start_datetime, end_dat
     
     return False, None
 
-def calculate_final_price(vehicle_id, start_datetime, end_datetime):
-    """Calculate final price with dynamic pricing rules"""
+def calculate_final_price(vehicle_id, start_datetime, end_datetime, return_breakdown=False):
+    """Calculate final price robustly for any rental duration"""
     import datetime
     conn = get_db_connection()
     try:
@@ -160,38 +174,19 @@ def calculate_final_price(vehicle_id, start_datetime, end_datetime):
         base_price = float(vehicle['base_price'])
         vehicle_type = vehicle['type']
 
-        # Calculate duration in hours
-        duration_hours = (end_datetime - start_datetime).total_seconds() / 3600
-        calculated_price = base_price * duration_hours
+        # Calculate duration in hours, round up to next full hour
+        duration_seconds = (end_datetime - start_datetime).total_seconds()
+        if duration_seconds <= 0:
+            return 0
+        duration_hours = int(-(-duration_seconds // 3600))  # Ceiling division
 
-        # Apply time-based peak modifiers
+        # Get peak pricing rules
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM pricing_rules WHERE rule_type = 'time_peak' AND is_active = TRUE")
         time_rules = cursor.fetchall()
         cursor.close()
 
-        for rule in time_rules:
-            peak_start = rule['peak_start_time']
-            peak_end = rule['peak_end_time']
-            booking_time = start_datetime.time()
-
-            # Convert to time if needed
-            if isinstance(peak_start, datetime.timedelta):
-                peak_start = (datetime.datetime.min + peak_start).time()
-            if isinstance(peak_end, datetime.timedelta):
-                peak_end = (datetime.datetime.min + peak_end).time()
-
-            # Handle time comparison properly
-            if peak_start <= peak_end:
-                # Same day peak hours (e.g., 9:00 to 17:00)
-                if peak_start <= booking_time <= peak_end:
-                    calculated_price *= (1 + float(rule['modifier_percentage']) / 100)
-            else:
-                # Overnight peak hours (e.g., 22:00 to 06:00)
-                if booking_time >= peak_start or booking_time <= peak_end:
-                    calculated_price *= (1 + float(rule['modifier_percentage']) / 100)
-
-        # Apply demand-based modifiers for car type
+        # Get demand modifier for car type
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             "SELECT modifier_percentage FROM pricing_rules WHERE rule_type = 'demand_car_type' AND vehicle_type = %s AND is_active = TRUE",
@@ -199,11 +194,73 @@ def calculate_final_price(vehicle_id, start_datetime, end_datetime):
         )
         demand_rule = cursor.fetchone()
         cursor.close()
+        demand_multiplier = 1.0
+        demand_percentage = 0.0
         if demand_rule:
-            calculated_price *= (1 + float(demand_rule['modifier_percentage']) / 100)
+            demand_percentage = float(demand_rule['modifier_percentage'])
+            demand_multiplier += demand_percentage / 100
 
-        return round(calculated_price, 2)
+        # Calculate price hour by hour
+        total_price = 0.0
+        base_total = base_price * duration_hours
+        peak_adjustments = 0.0
+        peak_hours = 0
+        
+        for i in range(duration_hours):
+            hour_time = (start_datetime + timedelta(hours=i)).time()
+            hour_multiplier = 1.0
+            hour_peak_adjustment = 0.0
+            
+            for rule in time_rules:
+                peak_start = rule['peak_start_time']
+                peak_end = rule['peak_end_time']
+                # Convert to time if needed
+                if isinstance(peak_start, datetime.timedelta):
+                    peak_start = (datetime.datetime.min + peak_start).time()
+                if isinstance(peak_end, datetime.timedelta):
+                    peak_end = (datetime.datetime.min + peak_end).time()
+                # Handle time comparison
+                if peak_start <= peak_end:
+                    if peak_start <= hour_time <= peak_end:
+                        hour_multiplier += float(rule['modifier_percentage']) / 100
+                        hour_peak_adjustment += base_price * (float(rule['modifier_percentage']) / 100)
+                else:
+                    if hour_time >= peak_start or hour_time <= peak_end:
+                        hour_multiplier += float(rule['modifier_percentage']) / 100
+                        hour_peak_adjustment += base_price * (float(rule['modifier_percentage']) / 100)
+            
+            if hour_peak_adjustment > 0:
+                peak_hours += 1
+                peak_adjustments += hour_peak_adjustment
+            
+            total_price += base_price * hour_multiplier * demand_multiplier
 
+        # Minimum charge for 1 hour
+        if total_price < base_price:
+            total_price = base_price
+        # Cap to a reasonable max (e.g., 30 days)
+        max_hours = 30 * 24
+        if duration_hours > max_hours:
+            total_price = base_price * max_hours * demand_multiplier
+            
+        final_price = round(total_price, 2)
+        
+        if return_breakdown:
+            return {
+                'total_price': final_price,
+                'base_price_per_hour': base_price,
+                'duration_hours': duration_hours,
+                'base_total': round(base_total, 2),
+                'peak_adjustments': round(peak_adjustments, 2),
+                'peak_hours': peak_hours,
+                'demand_multiplier': demand_multiplier,
+                'demand_percentage': demand_percentage,
+                'vehicle_type': vehicle_type,
+                'start_datetime': start_datetime,
+                'end_datetime': end_datetime
+            }
+        else:
+            return final_price
     finally:
         conn.close()
 
@@ -239,12 +296,12 @@ def login():
             cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
             
-            if user and check_password_hash(user['password'], password):
+            if user and user['password'] == password:
                 session['user_id'] = user['id']
                 session['role'] = user['role']
                 session['full_name'] = user['full_name']
                 
-                logger.info(f"User {user['email']} logged in successfully")
+                logger.info(f"User {user['email']} logged in successfully. Session set: user_id={session['user_id']}, role={session['role']}")
                 
                 if user['role'] == 'admin':
                     return redirect(url_for('admin_dashboard'))
@@ -292,12 +349,9 @@ def register():
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # Hash the password
-            hashed_password = generate_password_hash(password)
-            
             cursor.execute(
                 "INSERT INTO users (email, password, full_name, role) VALUES (%s, %s, %s, 'customer')",
-                (email, hashed_password, full_name)
+                (email, password, full_name)
             )
             conn.commit()
             
@@ -371,12 +425,24 @@ def customer_booking():
     if 'user_id' not in session or session['role'] != 'customer':
         return redirect(url_for('login'))
     
+    # Debug logging
+    logger.info(f"Customer booking page accessed by user_id: {session.get('user_id')}, role: {session.get('role')}")
+    
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
         cursor.execute("SELECT * FROM vehicles WHERE status = 'available' ORDER BY make, model")
         vehicles = cursor.fetchall()
+        
+        # Also check if user has any loyalty tokens for debugging
+        cursor.execute("""
+            SELECT COUNT(*) as token_count 
+            FROM loyalty_tokens 
+            WHERE user_id = %s AND is_redeemed = FALSE AND (expiry_date IS NULL OR expiry_date > NOW())
+        """, (session['user_id'],))
+        token_count = cursor.fetchone()['token_count']
+        logger.info(f"User {session['user_id']} has {token_count} available loyalty tokens")
         
         cursor.close()
         conn.close()
@@ -419,6 +485,17 @@ def customer_profile():
         """, (session['user_id'],))
         loyalty_tokens = cursor.fetchall()
         
+        # Get user's reviews
+        cursor.execute("""
+            SELECT r.*, v.make, v.model, v.type as vehicle_type
+            FROM reviews r
+            JOIN bookings b ON r.booking_id = b.id
+            JOIN vehicles v ON b.vehicle_id = v.id
+            WHERE r.user_id = %s
+            ORDER BY r.review_date DESC
+        """, (session['user_id'],))
+        reviews = cursor.fetchall()
+        
         cursor.close()
         conn.close()
         
@@ -426,6 +503,7 @@ def customer_profile():
                              user=user, 
                              bookings=bookings, 
                              loyalty_tokens=loyalty_tokens,
+                             reviews=reviews,
                              messages=MESSAGES)
                              
     except Exception as e:
@@ -435,6 +513,7 @@ def customer_profile():
                              user=None, 
                              bookings=[], 
                              loyalty_tokens=[],
+                             reviews=[],
                              messages=MESSAGES)
 
 @app.route('/customer/bookings')
@@ -599,12 +678,12 @@ def api_calculate_price():
         if end_datetime <= start_datetime:
             return jsonify({'error': 'End date must be after start date'}), 400
         
-        price = calculate_final_price(vehicle_id, start_datetime, end_datetime)
+        price_breakdown = calculate_final_price(vehicle_id, start_datetime, end_datetime, return_breakdown=True)
         
-        if price is None:
+        if price_breakdown is None:
             return jsonify({'error': 'Vehicle not found or price calculation failed'}), 400
         
-        return jsonify({'price': price})
+        return jsonify(price_breakdown)
     except Exception as e:
         print(f"Error in calculate_price API: {str(e)}")
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
@@ -625,10 +704,16 @@ def api_create_booking():
         discount_code = data.get('discount_code', '').strip()
         loyalty_token_id = data.get('loyalty_token_id')
         
+        # Debug logging
+        logger.info(f"Booking request data: vehicle_id={vehicle_id}, start_date={start_date}, end_date={end_date}")
+        
         # Comprehensive input validation
         validation_errors, start_datetime, end_datetime = validate_booking_data(vehicle_id, start_date, end_date)
         if validation_errors:
             return jsonify({'success': False, 'error': validation_errors[0]}), 400
+        
+        # Convert vehicle_id to int for database operations
+        vehicle_id = int(vehicle_id)
         
         # Validate discount code format if provided
         if discount_code and len(discount_code) > 50:
@@ -722,14 +807,6 @@ def api_create_booking():
                   total_price, discount_applied, loyalty_token_used))
             booking_id = cursor.lastrowid
             
-            # Issue loyalty token (5% of booking value)
-            loyalty_value = total_price * 0.05
-            expiry_date = datetime.now() + timedelta(days=365)
-            cursor.execute("""
-                INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
-                VALUES (%s, %s, %s, %s)
-            """, (session['user_id'], loyalty_value, expiry_date, f'Earned from booking #{booking_id}'))
-            
             conn.commit()
             
             logger.info(f"Booking created successfully: ID {booking_id} by user {session['user_id']}")
@@ -738,13 +815,13 @@ def api_create_booking():
                 'success': True, 
                 'booking_id': booking_id,
                 'total_price': total_price,
-                'loyalty_earned': loyalty_value
+                'loyalty_earned': 0  # No loyalty earned until booking is completed
             })
             
         except Exception as e:
             conn.rollback()
             logger.error(f"Booking creation error: {e}")
-            return jsonify({'success': False, 'error': 'An unexpected error occurred while creating your booking. Please try again or contact support.'}), 500
+            return jsonify({'success': False, 'error': f'An unexpected error occurred while creating your booking: {str(e)}'}), 500
         finally:
             cursor.close()
             conn.close()
@@ -763,6 +840,9 @@ def api_validate_discount():
     vehicle_id = data.get('vehicle_id')
     vehicle_type = data.get('vehicle_type')
     
+    # Debug logging
+    logger.info(f"Discount validation request: code={discount_code}, vehicle_id={vehicle_id}, vehicle_type={vehicle_type}")
+    
     if not discount_code:
         return jsonify({'error': 'Discount code is required'}), 400
     
@@ -780,18 +860,32 @@ def api_validate_discount():
         discount = cursor.fetchone()
         
         if not discount:
+            logger.warning(f"Discount code not found or invalid: {discount_code}")
             return jsonify({'error': 'Invalid or expired discount code'}), 400
+        
+        # Debug logging for discount found
+        logger.info(f"Discount found: {discount}")
         
         # Check if discount applies to this vehicle type
         if discount['vehicle_type'] and vehicle_type:
-            if discount['vehicle_type'] not in vehicle_type:
+            logger.info(f"Checking vehicle type: discount_type={discount['vehicle_type']}, vehicle_type={vehicle_type}")
+            if discount['vehicle_type'] != vehicle_type:
+                logger.warning(f"Vehicle type mismatch: {discount['vehicle_type']} != {vehicle_type}")
                 return jsonify({'error': f'Discount code only applies to {discount["vehicle_type"]} vehicles'}), 400
         
         # Check if discount applies to specific vehicle
         if discount['vehicle_id'] and vehicle_id:
-            if discount['vehicle_id'] != vehicle_id:
-                return jsonify({'error': 'Discount code does not apply to this vehicle'}), 400
+            logger.info(f"Checking vehicle ID: discount_vehicle_id={discount['vehicle_id']}, vehicle_id={vehicle_id}")
+            try:
+                vehicle_id_int = int(vehicle_id)
+                if discount['vehicle_id'] != vehicle_id_int:
+                    logger.warning(f"Vehicle ID mismatch: {discount['vehicle_id']} != {vehicle_id_int}")
+                    return jsonify({'error': 'Discount code does not apply to this vehicle'}), 400
+            except (ValueError, TypeError):
+                logger.error(f"Invalid vehicle ID format: {vehicle_id}")
+                return jsonify({'error': 'Invalid vehicle ID'}), 400
         
+        logger.info(f"Discount validation successful: {discount_code} - {discount['discount_percentage']}%")
         return jsonify({
             'valid': True,
             'discount_percentage': float(discount['discount_percentage']),
@@ -808,8 +902,12 @@ def api_validate_discount():
 
 @app.route('/api/loyalty_tokens', methods=['GET'])
 def api_loyalty_tokens():
+    logger.info(f"Loyalty tokens API called by user_id: {session.get('user_id')}, role: {session.get('role')}")
+    
     if 'user_id' not in session:
+        logger.warning("Loyalty tokens API: User not authenticated")
         return jsonify({'error': 'Not authenticated'}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
@@ -820,11 +918,62 @@ def api_loyalty_tokens():
             ORDER BY issued_date DESC
         """, (session['user_id'],))
         tokens = cursor.fetchall()
+        logger.info(f"Found {len(tokens)} loyalty tokens for user {session['user_id']}")
+        
         # Convert expiry_date to string for JSON
         for t in tokens:
             if t['expiry_date']:
                 t['expiry_date'] = t['expiry_date'].strftime('%Y-%m-%d')
+        
         return jsonify({'tokens': tokens})
+    except Exception as e:
+        logger.error(f"Error in loyalty tokens API: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/notifications', methods=['GET'])
+def api_notifications():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT id, message, type, related_booking_id, is_read, created_at
+            FROM customer_notifications
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+            LIMIT 10
+        """, (session['user_id'],))
+        notifications = cursor.fetchall()
+        # Convert datetime to string for JSON
+        for n in notifications:
+            if n['created_at']:
+                n['created_at'] = n['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+        return jsonify({'notifications': notifications})
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/notifications/<int:notification_id>/read', methods=['PUT'])
+def api_mark_notification_read(notification_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE customer_notifications 
+            SET is_read = TRUE 
+            WHERE id = %s AND user_id = %s
+        """, (notification_id, session['user_id']))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
     finally:
         cursor.close()
         conn.close()
@@ -1133,6 +1282,25 @@ def api_update_booking_status_v2(booking_id):
         if not booking:
             print(f"[DEBUG] Booking not found for ID: {booking_id}")
             return jsonify({'success': False, 'error': 'Booking not found'}), 404
+        
+        # Check if this is a status change to 'completed'
+        if status == 'completed' and booking['status'] != 'completed':
+            # Issue loyalty token when booking is completed (5% of booking value)
+            loyalty_value = float(booking['total_price']) * 0.05
+            expiry_date = datetime.now() + timedelta(days=365)
+            cursor.execute("""
+                INSERT INTO loyalty_tokens (user_id, token_value, expiry_date, description)
+                VALUES (%s, %s, %s, %s)
+            """, (booking['user_id'], loyalty_value, expiry_date, f'Earned from completed booking #{booking_id}'))
+            
+            logger.info(f"Loyalty token issued for completed booking {booking_id}: {loyalty_value}")
+            
+            # Store a notification for the customer about the loyalty reward
+            cursor.execute("""
+                INSERT INTO customer_notifications (user_id, message, type, related_booking_id)
+                VALUES (%s, %s, %s, %s)
+            """, (booking['user_id'], f'Congratulations! You earned ₹{loyalty_value:.2f} in loyalty rewards for your completed booking #{booking_id}.', 'loyalty_reward', booking_id))
+        
         print(f"[DEBUG] Updating booking {booking_id} to status: {status}")
         cursor.execute("UPDATE bookings SET status = %s WHERE id = %s", (status, booking_id))
         conn.commit()
@@ -1153,42 +1321,246 @@ def customer_review(booking_id):
     user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    # Check booking ownership and status
-    cursor.execute("SELECT * FROM bookings WHERE id = %s AND user_id = %s", (booking_id, user_id))
+    
+    # Get booking with vehicle details
+    cursor.execute("""
+        SELECT b.*, v.make, v.model, v.year, v.type, v.image_url 
+        FROM bookings b 
+        JOIN vehicles v ON b.vehicle_id = v.id 
+        WHERE b.id = %s AND b.user_id = %s
+    """, (booking_id, user_id))
     booking = cursor.fetchone()
-    if not booking or booking['status'] != 'completed':
+    
+    if not booking:
+        flash('Booking not found.')
+        cursor.close()
+        conn.close()
+        return redirect(url_for('customer_dashboard'))
+    
+    if booking['status'] != 'completed':
         flash('You can only review completed bookings.')
         cursor.close()
         conn.close()
         return redirect(url_for('customer_dashboard'))
+    
     # Check if already reviewed
     cursor.execute("SELECT * FROM reviews WHERE booking_id = %s AND user_id = %s", (booking_id, user_id))
     review = cursor.fetchone()
+    
     if request.method == 'POST':
         if review:
             flash('You have already reviewed this booking.')
             cursor.close()
             conn.close()
             return redirect(url_for('customer_dashboard'))
+        
         rating = int(request.form.get('rating', 0))
-        comment = request.form.get('comment', '')
+        comment = request.form.get('comment', '').strip()
+        recommend = request.form.get('recommend', '')
+        
+        # Validation
         if not (1 <= rating <= 5):
             flash('Rating must be between 1 and 5.')
             cursor.close()
             conn.close()
             return redirect(request.url)
+        
+        if len(comment) < 10:
+            flash('Please provide a detailed review (at least 10 characters).')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        
+        if not recommend:
+            flash('Please indicate if you would recommend us.')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        
+        # Get category ratings from form
+        condition_rating = request.form.get('condition_rating')
+        service_rating = request.form.get('service_rating')
+        value_rating = request.form.get('value_rating')
+        
+        # Insert review with additional data
         cursor.execute("""
-            INSERT INTO reviews (booking_id, user_id, rating, comment)
-            VALUES (%s, %s, %s, %s)
-        """, (booking_id, user_id, rating, comment))
+            INSERT INTO reviews (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating))
+        
         conn.commit()
-        flash('Thank you for your review!')
+        flash('Thank you for your review! Your feedback helps us improve our service.')
         cursor.close()
         conn.close()
         return redirect(url_for('customer_dashboard'))
+    
     cursor.close()
     conn.close()
     return render_template('customer/review.html', booking=booking, review=review)
+
+@app.route('/customer/reviews')
+def customer_reviews():
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Get all reviews with vehicle and customer details
+    cursor.execute("""
+        SELECT r.*, u.full_name as customer_name, v.make, v.model, v.type as vehicle_type, v.image_url
+        FROM reviews r
+        JOIN users u ON r.user_id = u.id
+        JOIN bookings b ON r.booking_id = b.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        ORDER BY r.review_date DESC
+    """)
+    reviews = cursor.fetchall()
+    
+    # Calculate statistics
+    total_reviews = len(reviews)
+    if total_reviews > 0:
+        average_rating = sum(r['rating'] for r in reviews) / total_reviews
+        recommend_count = sum(1 for r in reviews if r['recommend'] == 'yes')
+        recommend_percentage = round((recommend_count / total_reviews) * 100, 1)
+        
+        # Rating distribution
+        rating_counts = {i: 0 for i in range(1, 6)}
+        for review in reviews:
+            rating_counts[review['rating']] += 1
+        
+        rating_distribution = {}
+        for rating in range(1, 6):
+            rating_distribution[rating] = round((rating_counts[rating] / total_reviews) * 100, 1)
+        
+        # Unique vehicles reviewed
+        unique_vehicles = len(set(r['vehicle_type'] for r in reviews))
+        
+        # Vehicle types for filter
+        vehicle_types = sorted(list(set(r['vehicle_type'] for r in reviews)))
+    else:
+        average_rating = 0
+        recommend_percentage = 0
+        rating_counts = {i: 0 for i in range(1, 6)}
+        rating_distribution = {i: 0 for i in range(1, 6)}
+        unique_vehicles = 0
+        vehicle_types = []
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('customer/reviews.html', 
+                         reviews=reviews,
+                         total_reviews=total_reviews,
+                         average_rating=average_rating,
+                         recommend_percentage=recommend_percentage,
+                         rating_counts=rating_counts,
+                         rating_distribution=rating_distribution,
+                         unique_vehicles=unique_vehicles,
+                         vehicle_types=vehicle_types)
+
+@app.route('/api/reviews/<int:review_id>', methods=['DELETE'])
+def api_delete_review(review_id):
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM reviews WHERE id = %s", (review_id,))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/export/reviews')
+def export_reviews():
+    require_admin()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT r.id, r.rating, r.comment, r.recommend, r.review_date,
+               u.full_name as customer_name, u.email as customer_email,
+               v.make, v.model, v.type as vehicle_type
+        FROM reviews r
+        JOIN users u ON r.user_id = u.id
+        JOIN bookings b ON r.booking_id = b.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        ORDER BY r.review_date DESC
+    """)
+    reviews = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    si = StringIO()
+    writer = csv.DictWriter(si, fieldnames=reviews[0].keys() if reviews else [])
+    writer.writeheader()
+    writer.writerows(reviews)
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=reviews.csv"})
+
+@app.route('/admin/reviews')
+def admin_reviews():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Get all reviews with vehicle and customer details
+    cursor.execute("""
+        SELECT r.*, u.full_name as customer_name, u.email as customer_email, v.make, v.model, v.type as vehicle_type, v.image_url
+        FROM reviews r
+        JOIN users u ON r.user_id = u.id
+        JOIN bookings b ON r.booking_id = b.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        ORDER BY r.review_date DESC
+    """)
+    reviews = cursor.fetchall()
+    
+    # Calculate statistics
+    total_reviews = len(reviews)
+    if total_reviews > 0:
+        average_rating = sum(r['rating'] for r in reviews) / total_reviews
+        recommend_count = sum(1 for r in reviews if r['recommend'] == 'yes')
+        recommend_percentage = round((recommend_count / total_reviews) * 100, 1)
+        
+        # Rating distribution
+        rating_counts = {i: 0 for i in range(1, 6)}
+        for review in reviews:
+            rating_counts[review['rating']] += 1
+        
+        rating_distribution = {}
+        for rating in range(1, 6):
+            rating_distribution[rating] = round((rating_counts[rating] / total_reviews) * 100, 1)
+        
+        # Unique vehicles reviewed
+        unique_vehicles = len(set(r['vehicle_type'] for r in reviews))
+        
+        # Vehicle types for filter
+        vehicle_types = sorted(list(set(r['vehicle_type'] for r in reviews)))
+    else:
+        average_rating = 0
+        recommend_percentage = 0
+        rating_counts = {i: 0 for i in range(1, 6)}
+        rating_distribution = {i: 0 for i in range(1, 6)}
+        unique_vehicles = 0
+        vehicle_types = []
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('admin/reviews.html', 
+                         reviews=reviews,
+                         total_reviews=total_reviews,
+                         average_rating=average_rating,
+                         recommend_percentage=recommend_percentage,
+                         rating_counts=rating_counts,
+                         rating_distribution=rating_distribution,
+                         unique_vehicles=unique_vehicles,
+                         vehicle_types=vehicle_types)
 
 @app.route('/api/users', methods=['GET'])
 def api_list_users():

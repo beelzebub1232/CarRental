@@ -27,6 +27,7 @@
             <a href="{{ url_for('customer_dashboard') }}" class="top-nav-link">Dashboard</a>
             <a href="{{ url_for('customer_booking') }}" class="top-nav-link">Book Vehicle</a>
             <a href="{{ url_for('customer_bookings') }}" class="top-nav-link">Bookings</a>
+            <a href="{{ url_for('customer_reviews') }}" class="top-nav-link">Reviews</a>
             <a href="{{ url_for('customer_profile') }}" class="top-nav-link">My Profile</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
@@ -422,6 +423,58 @@
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
+        // Load and display notifications
+        function loadNotifications() {
+            fetch('/api/notifications')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('notification-list');
+                    if (list && data.notifications) {
+                        if (data.notifications.length === 0) {
+                            list.innerHTML = '<div style="color: #6b7280; text-align: center;">No notifications yet.</div>';
+                        } else {
+                            list.innerHTML = '';
+                            data.notifications.forEach(notification => {
+                                const item = document.createElement('div');
+                                item.style.padding = '0.75rem 0';
+                                item.style.borderBottom = '1px solid #f3f4f6';
+                                item.style.cursor = 'pointer';
+                                item.style.opacity = notification.is_read ? '0.7' : '1';
+                                item.style.fontWeight = notification.is_read ? 'normal' : '600';
+                                
+                                const icon = notification.type === 'loyalty_reward' ? '🎉' : 'ℹ️';
+                                item.innerHTML = `
+                                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                                        <span style="font-size: 1.2rem;">${icon}</span>
+                                        <div style="flex: 1;">
+                                            <div style="color:#111827; margin-bottom: 0.25rem;">${notification.message}</div>
+                                            <div style="color:#6b7280; font-size: 0.8rem;">${notification.created_at}</div>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                if (!notification.is_read) {
+                                    item.addEventListener('click', () => {
+                                        fetch(`/api/notifications/${notification.id}/read`, {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json' }
+                                        }).then(() => {
+                                            item.style.opacity = '0.7';
+                                            item.style.fontWeight = 'normal';
+                                        });
+                                    });
+                                }
+                                
+                                list.appendChild(item);
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading notifications:', error);
+                });
+        }
+        
         // Mobile menu functionality
         document.addEventListener('DOMContentLoaded', () => {
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -440,6 +493,21 @@
                     sidebar.classList.remove('open');
                     sidebarOverlay.classList.remove('show');
                 });
+            }
+            
+            // Load notifications on page load
+            loadNotifications();
+            
+            // Notification widget functionality
+            const notifIcon = document.getElementById('notification-icon');
+            const notifPanel = document.getElementById('notification-panel');
+            if (notifIcon && notifPanel) {
+                notifIcon.onclick = () => {
+                    notifPanel.style.display = notifPanel.style.display === 'block' ? 'none' : 'block';
+                    if (notifPanel.style.display === 'block') {
+                        loadNotifications(); // Refresh notifications when panel is opened
+                    }
+                };
             }
         });
     </script>
