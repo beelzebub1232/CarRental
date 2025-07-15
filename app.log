@@ -3347,3 +3347,7 @@
 2025-07-15 09:45:32,006 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:45:32] "POST /api/calculate_price HTTP/1.1" 200 -
 2025-07-15 09:45:32,662 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:45:32] "POST /api/calculate_price HTTP/1.1" 200 -
 2025-07-15 09:45:33,162 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:45:33] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 09:46:17,391 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 09:46:17,437 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:46:17,711 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:46:17,713 - werkzeug - INFO -  * Debugger PIN: 128-682-088
