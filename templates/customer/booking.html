@@ -737,7 +737,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Booking page DOM fully loaded, initializing map and preview...');
-            loadLoyaltyTokens();
 
             // Map and vehicle preview logic
             const vehicles = {{ vehicles|tojson }};
@@ -798,6 +797,7 @@
                 } else {
                     console.log('CarRentalApp.calculatePrice not available');
                 }
+                loadLoyaltyTokens();
             });
             // When marker is clicked, select vehicle in dropdown
             window.selectVehicle = function(vehicleId) {

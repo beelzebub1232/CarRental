@@ -1607,3 +1607,9 @@
 2025-07-15 07:11:25,243 - werkzeug - INFO -  * Restarting with stat
 2025-07-15 07:11:25,530 - werkzeug - WARNING -  * Debugger is active!
 2025-07-15 07:11:25,532 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 01:43:45,486 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-15 01:43:45,486 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-15 01:43:45,487 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 01:43:45,763 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 01:43:45,765 - werkzeug - INFO -  * Debugger PIN: 797-777-221
