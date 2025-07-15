@@ -1481,33 +1481,33 @@ function showModal(content, options = {}) {
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.background = 'rgba(0,0,0,0.15)'; // lighter overlay
+    // Wider modal, hide vertical scrollbar but allow scroll
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: ${options.maxWidth || '600px'};">
-            ${content}
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+            <div style="background: #fff; border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(31,38,135,0.10); padding: 2.2rem 1.7rem; margin: auto; max-width: ${options.maxWidth || '600px'}; min-width: 320px; max-height: 90vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                <style>
+                    .modal-content::-webkit-scrollbar { display: none; }
+                </style>
+                ${content}
+            </div>
         </div>
     `;
-    
     document.body.appendChild(modal);
-    
     // Prevent body scroll
     document.body.style.overflow = 'hidden';
-    
     // Show modal with animation
     setTimeout(() => {
         modal.classList.add('show');
     }, 50);
-    
     // Close modal handlers
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal(modal);
         }
     });
-    
     modal.querySelector('.modal-close').addEventListener('click', () => {
         closeModal(modal);
     });
-    
     // ESC key handler
     const escHandler = (e) => {
         if (e.key === 'Escape') {
@@ -1516,7 +1516,6 @@ function showModal(content, options = {}) {
         }
     };
     document.addEventListener('keydown', escHandler);
-    
     return modal;
 }
 
@@ -1864,52 +1863,40 @@ function payForBooking(bookingId) {
 
 function showPaymentModal(bookingId) {
     const content = `
-        <div class="payment-modal-wrapper" style="background: #fff; border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(31,38,135,0.10); max-width: 420px; margin: auto; overflow: hidden;">
-            <div class="payment-modal-header" style="background: #f3f6fa; padding: 1.5rem 2rem 1rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5eaf2; position: relative;">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
-                    <span style="font-size: 1.5rem; font-weight: 700; color: #1e293b; letter-spacing: -1px;">Payment</span>
-                </div>
-                <button class="modal-close" style="background: none; border: none; font-size: 2rem; color: #64748b; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; height: 2.2rem; width: 2.2rem; padding: 0; margin-left: 1rem;" onclick="closeModal(this.closest('.modal'))">&times;</button>
+        <div class="payment-modal-header" style="background: #f3f6fa; padding: 1.5rem 2rem 1rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5eaf2; position: relative;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                <span style="font-size: 1.5rem; font-weight: 700; color: #1e293b; letter-spacing: -1px;">Payment</span>
             </div>
-            <div class="payment-modal-body" style="padding: 2rem 2rem 2.2rem 2rem; display: flex; flex-direction: column; gap: 2rem; align-items: center; background: #fff;">
-                <div class="payment-summary-card" style="width: 100%; max-width: 340px; background: #f8fafc; border-radius: 1rem; box-shadow: 0 2px 8px rgba(37,99,235,0.04); padding: 1.1rem 1.3rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; align-items: center;">
-                    <div style="font-size: 1.05rem; color: #2563eb; font-weight: 600; margin-bottom: 0.2rem; text-align: center; letter-spacing: 0.5px;">Booking Payment</div>
-                    <div style="font-size: 2rem; font-weight: 800; color: #2563eb; text-align: center; letter-spacing: -1px;">₹<span id="payment-amount">--</span></div>
-                    <div style="font-size: 0.98rem; color: #64748b; margin-top: 0.1rem;">Pay securely to confirm your booking</div>
-                </div>
-                <div style="width: 100%; max-width: 360px;">
-                    <div style="font-size: 1.08rem; font-weight: 600; color: #1e293b; margin-bottom: 1.1rem; text-align: center;">Choose Payment Method</div>
-                    <div class="payment-methods" style="display: flex; flex-direction: column; gap: 1.1rem;">
-                        <button class="payment-method-card" data-method="card" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #2563eb; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(37,99,235,0.04);">
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
-                            Credit/Debit Card
-                        </button>
-                        <button class="payment-method-card" data-method="upi" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #059669; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(16,185,129,0.04);">
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
-                            UPI
-                        </button>
-                        <button class="payment-method-card" data-method="netbanking" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #0ea5e9; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.04);">
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
-                            Netbanking
-                        </button>
-                    </div>
-                </div>
-                <div id="payment-processing" style="display:none; margin-top:1.5rem; text-align:center; width:100%; min-height: 48px;"></div>
+            <button class="modal-close" style="background: none; border: none; font-size: 2rem; color: #64748b; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; height: 2.2rem; width: 2.2rem; padding: 0; margin-left: 1rem;" onclick="closeModal(this.closest('.modal'))">&times;</button>
+        </div>
+        <div class="payment-modal-body" style="padding: 2rem 2rem 2.2rem 2rem; display: flex; flex-direction: column; gap: 2rem; align-items: center; background: #fff;">
+            <div style="width: 100%; max-width: 340px; margin-bottom: 0.5rem; display: flex; flex-direction: column; align-items: center;">
+                <div style="font-size: 1.05rem; color: #2563eb; font-weight: 600; margin-bottom: 0.2rem; text-align: center; letter-spacing: 0.5px;">Booking Payment</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #2563eb; text-align: center; letter-spacing: -1px;">₹<span id="payment-amount">--</span></div>
+                <div style="font-size: 0.98rem; color: #64748b; margin-top: 0.1rem;">Pay securely to confirm your booking</div>
             </div>
+            <div style="width: 100%; max-width: 360px;">
+                <div style="font-size: 1.08rem; font-weight: 600; color: #1e293b; margin-bottom: 1.1rem; text-align: center;">Choose Payment Method</div>
+                <div class="payment-methods" style="display: flex; flex-direction: column; gap: 1.1rem;">
+                    <button class="payment-method-card" data-method="card" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #2563eb; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(37,99,235,0.04);">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                        Credit/Debit Card
+                    </button>
+                    <button class="payment-method-card" data-method="upi" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #059669; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(16,185,129,0.04);">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                        UPI
+                    </button>
+                    <button class="payment-method-card" data-method="netbanking" style="display: flex; align-items: center; gap: 1.1rem; background: #fff; border: 2px solid #e0e7ef; border-radius: 0.9rem; padding: 1.1rem 1.3rem; font-size: 1.05rem; font-weight: 600; color: #0ea5e9; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.04);">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h.01"/></svg>
+                        Netbanking
+                    </button>
+                </div>
+            </div>
+            <div id="payment-processing" style="display:none; margin-top:1.5rem; text-align:center; width:100%; min-height: 48px;"></div>
         </div>
         <style>
-            .payment-modal-wrapper { animation: fadeInUp 0.5s cubic-bezier(.39,.575,.56,1.000); }
-            .payment-method-card:hover, .payment-method-card:focus {
-                background: #f1f5f9 !important;
-                border-color: #2563eb !important;
-                color: #1e293b !important;
-                box-shadow: 0 4px 16px rgba(37,99,235,0.08) !important;
-                outline: none;
-            }
-            .modal-content { font-family: var(--font-body); background: transparent; box-shadow: none; }
             @media (max-width: 600px) {
-                .payment-modal-wrapper { border-radius: 1rem; }
                 .payment-modal-header, .payment-modal-body { padding: 1rem !important; }
             }
             @keyframes fadeInUp {
@@ -1922,12 +1909,14 @@ function showPaymentModal(bookingId) {
     // Set lighter overlay
     modal.style.background = 'rgba(0,0,0,0.07)';
     // Fetch and set payment amount
-    fetch(`/api/bookings/${bookingId}`)
+    fetch(`/api/bookings/${bookingId}?json=1`)
         .then(res => res.json())
         .then(data => {
+            let el = modal.querySelector('span#payment-amount');
+            if (!el) el = modal.querySelector('#payment-amount');
+            if (!el) el = modal.querySelector('[id="payment-amount"]');
             if (data && (data.total_price !== undefined || (data.booking && data.booking.total_price !== undefined))) {
                 const amount = data.total_price !== undefined ? data.total_price : (data.booking ? data.booking.total_price : undefined);
-                const el = modal.querySelector('#payment-amount');
                 if (el && amount !== undefined) {
                     el.textContent = parseFloat(amount).toFixed(2);
                 }
@@ -2089,3 +2078,122 @@ window.CarRentalApp = {
     debounce,
     throttle
 };
+
+function editVehicle(vehicleId) {
+    fetch(`/api/vehicles/${vehicleId}`)
+        .then(response => response.json())
+        .then(vehicle => {
+            const content = `
+                <h2 style="margin-bottom: 1rem;">Edit Vehicle</h2>
+                <form id="edit-vehicle-form">
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Make</label>
+                            <input type="text" name="make" class="form-input" value="${vehicle.make}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Model</label>
+                            <input type="text" name="model" class="form-input" value="${vehicle.model}" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <input type="number" name="year" class="form-input" value="${vehicle.year}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select" id="edit-type-select" required>
+                                <option value="">Loading types...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Base Price (per hour)</label>
+                        <input type="number" name="base_price" class="form-input" value="${vehicle.base_price}" step="0.01" required>
+                    </div>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Pickup Latitude</label>
+                            <input type="number" name="pickup_lat" class="form-input" value="${vehicle.pickup_location_lat}" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pickup Longitude</label>
+                            <input type="number" name="pickup_lng" class="form-input" value="${vehicle.pickup_location_lng}" step="any">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image URL</label>
+                        <input type="text" name="image_url" class="form-input" value="${vehicle.image_url}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" id="edit-status-select" required>
+                            <option value="available" ${vehicle.status === 'available' ? 'selected' : ''}>Available</option>
+                            <option value="unavailable" ${vehicle.status === 'unavailable' ? 'selected' : ''}>Unavailable</option>
+                            <option value="maintenance" ${vehicle.status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                    </div>
+                </form>
+            `;
+            showModal(content, { maxWidth: '600px' });
+            fetch('/api/vehicle_types')
+                .then(r => r.json())
+                .then(data => {
+                    const select = document.getElementById('edit-type-select');
+                    select.innerHTML = '<option value="">Select type...</option>';
+                    data.types.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type;
+                        option.textContent = type;
+                        if (type === vehicle.type) option.selected = true;
+                        select.appendChild(option);
+                    });
+                    if (typeof customDropdown === 'function') customDropdown(select);
+                });
+            // Attach the form handler after modal is shown
+            setTimeout(() => {
+                document.getElementById('edit-vehicle-form').onsubmit = function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const status = formData.get('status');
+                    let availability = true;
+                    if (status === 'unavailable' || status === 'maintenance') availability = false;
+                    const jsonData = {
+                        make: formData.get('make'),
+                        model: formData.get('model'),
+                        year: parseInt(formData.get('year')),
+                        type: formData.get('type'),
+                        base_price: parseFloat(formData.get('base_price')),
+                        pickup_lat: formData.get('pickup_lat') ? parseFloat(formData.get('pickup_lat')) : null,
+                        pickup_lng: formData.get('pickup_lng') ? parseFloat(formData.get('pickup_lng')) : null,
+                        image_url: formData.get('image_url'),
+                        status: status, // 'available', 'unavailable', or 'maintenance'
+                        availability: availability // true or false
+                    };
+                    fetch(`/api/vehicles/${vehicleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonData)
+                    })
+                    .then(r => r.json())
+                    .then(result => {
+                        if (result.success) {
+                            showToast('Vehicle updated successfully!', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showToast(result.error || 'Failed to update vehicle', 'error');
+                        }
+                    })
+                    .catch(() => showToast('An error occurred', 'error'));
+                };
+            }, 100);
+        })
+        .catch(() => showToast('Failed to load vehicle data', 'error'));
+}

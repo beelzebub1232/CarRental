@@ -1277,32 +1277,37 @@ def api_booking_details(booking_id):
         if request.accept_mimetypes['application/json']:
             return jsonify({'error': 'Forbidden'}), 403
         return '<div><h3>Forbidden</h3><button class="btn btn-outline modal-close modal-close-x" aria-label="Close">&times;</button></div>'
-    # If JSON requested, return JSON
-    if request.accept_mimetypes['application/json']:
+    # If ?json=1 is present, return JSON for API clients (e.g., payment modal)
+    if request.args.get('json') == '1':
         return jsonify(booking)
-    # Render details as HTML for modal (structured, modern, grouped)
+    # Always return HTML for browser/modal requests, regardless of Accept header
+    # If you need JSON, add a query param like ?json=1 in the future
+    # if request.accept_mimetypes['application/json']:
+    #     return jsonify(booking)
+    # Render details as HTML for modal (centered, modern, visually appealing, design system colors)
     return f'''
-    <div style="position: relative; min-width: 320px; max-width: 480px;">
-        <button class="modal-close modal-close-x" aria-label="Close" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; line-height: 1; cursor: pointer; color: #888;">&times;</button>
-        <h2 style="margin-top:0; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px;">Booking Details</h2>
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 320px; max-width: 420px; margin: 0 auto; background: #fff; color: var(--neutral-900); border-radius: var(--radius-2xl); box-shadow: var(--shadow-2xl); padding: 2.2rem 1.7rem 1.7rem 1.7rem; position: relative; font-family: var(--font-body);">
+        <button class="modal-close modal-close-x" aria-label="Close" style="position: absolute; top: 1.1rem; right: 1.1rem; background: none; border: none; font-size: 1.7rem; color: var(--accent-main); cursor: pointer; border-radius: 50%; width: 2.3rem; height: 2.3rem; display: flex; align-items: center; justify-content: center; transition: background 0.18s, color 0.18s;">
+            &times;
+        </button>
+        <div style="display: flex; align-items: center; gap: 1.1rem; margin-bottom: 1.2rem;">
                 {'<img src="' + booking['image_url'] + '" alt="Vehicle" style="width: 72px; height: 48px; object-fit: cover; border-radius: 0.75rem; border: 1px solid #eee;">' if booking['image_url'] else ''}
                 <div>
-                    <div style="font-weight: 700; font-size: 1.1rem; color: #222;">{booking['make']} {booking['model']}</div>
-                    <div style="color: #666; font-size: 0.95rem;">{booking['year']} {booking['type']}</div>
+                <div style="font-weight: 700; font-size: 1.13rem; color: var(--primary-800);">{booking['make']} {booking['model']}</div>
+                <div style="color: var(--neutral-500); font-size: 0.97rem;">{booking['year']} {booking['type']}</div>
                 </div>
             </div>
-            <dl style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; font-size: 1rem;">
-                <dt style="color: #888;">Booking ID</dt><dd style="font-weight: 600; color: #2563eb;">#{booking['id']}</dd>
-                <dt style="color: #888;">Customer</dt><dd style="font-weight: 600;">{booking['full_name']}<br><span style='color:#888;font-size:0.95em'>{booking['email']}</span></dd>
-                <dt style="color: #888;">Dates</dt><dd>{booking['start_date']}<br>to {booking['end_date']}</dd>
-                <dt style="color: #888;">Status</dt><dd style="font-weight: 600; text-transform: uppercase;">{booking['status'].title()}</dd>
-                <dt style="color: #888;">Total Price</dt><dd style="font-weight: 700; color: #22c55e;">₹{booking['total_price']:.2f}</dd>
-                <dt style="color: #888;">Discount</dt><dd>₹{booking['discount_applied']:.2f}</dd>
-                <dt style="color: #888;">Loyalty Used</dt><dd>₹{booking['loyalty_token_used']:.2f}</dd>
+        <div style="width: 100%; height: 1px; background: var(--neutral-200); margin-bottom: 1.2rem;"></div>
+        <h2 class="modal-title" style="margin: 0 0 1.1rem 0; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; color: var(--accent-main); text-align: left; width: 100%;">Booking Details</h2>
+        <dl style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem 1.2rem; font-size: 1rem; width: 100%; margin-bottom: 0.2rem;">
+            <dt style="color: var(--neutral-500);">Booking ID</dt><dd style="font-weight: 600; color: var(--primary-600);">#{booking['id']}</dd>
+            <dt style="color: var(--neutral-500);">Customer</dt><dd style="font-weight: 600;">{booking['full_name']}<br><span style='color:var(--neutral-400);font-size:0.95em'>{booking['email']}</span></dd>
+            <dt style="color: var(--neutral-500);">Dates</dt><dd><span style='color:var(--neutral-700);'>{booking['start_date']}</span><br><span style='color:var(--neutral-400);'>to</span> <span style='color:var(--neutral-700);'>{booking['end_date']}</span></dd>
+            <dt style="color: var(--neutral-500);">Status</dt><dd style="font-weight: 600; text-transform: uppercase;"><span class="status-badge status-{booking['status']}" style="font-size:0.98em;">{booking['status'].title()}</span></dd>
+            <dt style="color: var(--neutral-500);">Total Price</dt><dd style="font-weight: 700; color: var(--success-700);">₹{booking['total_price']:.2f}</dd>
+            <dt style="color: var(--neutral-500);">Discount</dt><dd>{'₹{:.2f}'.format(booking['discount_applied']) if booking['discount_applied'] else '—'}</dd>
+            <dt style="color: var(--neutral-500);">Loyalty Used</dt><dd>{'₹{:.2f}'.format(booking['loyalty_token_used']) if booking['loyalty_token_used'] else '—'}</dd>
             </dl>
-        </div>
     </div>
     '''
 
