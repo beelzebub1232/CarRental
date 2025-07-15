@@ -22,10 +22,32 @@ if os.path.exists('database_setup.py'):
 else:
     print('database_setup.py not found. Skipping database setup.')
 
-# --- 4. Apply Carrental_schema.sql if possible ---
+# --- 4. Apply Carrental_schema.sql automatically ---
 if os.path.exists('Carrental_schema.sql'):
-    print('Carrental_schema.sql found. Please ensure your MySQL server is running and credentials are correct in config.py.')
-    print('You may need to apply the schema manually if not handled by database_setup.py.')
+    print('Applying Carrental_schema.sql to the database...')
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("config", "config.py")
+        config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(config)
+        import mysql.connector
+        with open('Carrental_schema.sql', 'r', encoding='utf-8') as f:
+            sql_commands = f.read()
+        conn = mysql.connector.connect(
+            host=config.DB_HOST,
+            user=config.DB_USER,
+            password=config.DB_PASSWORD,
+            database=config.DB_NAME
+        )
+        cursor = conn.cursor()
+        for result in cursor.execute(sql_commands, multi=True):
+            pass  # Just execute all
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print('Carrental_schema.sql applied successfully!')
+    except Exception as e:
+        print(f'Error applying Carrental_schema.sql: {e}')
 else:
     print('Carrental_schema.sql not found. Skipping schema application.')
 
