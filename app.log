@@ -1042,3 +1042,568 @@
 2025-07-15 06:15:09,109 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:15:09] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
 2025-07-15 06:15:09,111 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:15:09] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
 2025-07-15 06:15:09,200 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:15:09] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 06:16:55,559 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:16:55,594 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:16:55,889 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:16:55,891 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:17:07,216 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:17:07,256 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:17:07,550 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:17:07,553 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:17:54,731 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:17:54,765 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:17:55,037 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:17:55,038 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:20:48,616 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:48] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 06:20:48,645 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:48] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:48,743 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:48] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:48,744 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:48,744 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:48] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:49,358 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "GET /admin/users HTTP/1.1" 200 -
+2025-07-15 06:20:49,388 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:49,401 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:49,404 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:49,406 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:49,473 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "GET /api/users HTTP/1.1" 200 -
+2025-07-15 06:20:49,909 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "GET /admin/payments HTTP/1.1" 200 -
+2025-07-15 06:20:49,937 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:49,949 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:49,955 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:49,955 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:49] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:50,025 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:50] "GET /api/payments HTTP/1.1" 200 -
+2025-07-15 06:20:52,959 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:52] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 06:20:52,989 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:52] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:52,997 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:52] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:52,999 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:52] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:53,000 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:53] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:53,088 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:53] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 06:20:54,506 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 06:20:54,531 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:54,541 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:54,542 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:54,598 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:20:54,650 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:20:54,650 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:54] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:56,633 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:56] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 06:20:56,668 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:56] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:56,683 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:56] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:56,685 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:56] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:56,685 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:56] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,115 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "GET /admin/users HTTP/1.1" 200 -
+2025-07-15 06:20:57,148 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:57,162 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,164 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,165 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,228 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "GET /api/users HTTP/1.1" 200 -
+2025-07-15 06:20:57,407 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "GET /admin/payments HTTP/1.1" 200 -
+2025-07-15 06:20:57,441 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:20:57,453 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,455 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,457 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:20:57,519 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:20:57] "GET /api/payments HTTP/1.1" 200 -
+2025-07-15 06:21:00,495 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:00] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 06:21:00,527 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:00] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:00,539 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:00] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:00,540 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:00] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:00,544 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:00] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:21:06,318 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:06] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 06:21:06,338 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:06] "GET / HTTP/1.1" 200 -
+2025-07-15 06:21:06,375 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:06] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:06,385 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:06] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:06,389 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:06] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:06,391 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:06] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:21:12,346 - __main__ - INFO - User test@gmail.com logged in successfully. Session set: user_id=4, role=customer
+2025-07-15 06:21:12,350 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 06:21:12,407 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:21:12,458 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:12,460 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:12,461 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:21:12,477 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:12,531 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:12] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:21:16,749 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:16] "[35m[1mGET /customer/review/14 HTTP/1.1[0m" 500 -
+2025-07-15 06:21:16,784 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:16] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:16,816 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:16] "GET /customer/review/14?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-07-15 06:21:16,826 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:16] "GET /customer/review/14?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-07-15 06:21:16,860 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:16] "GET /customer/review/14?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-07-15 06:21:16,885 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:16] "[36mGET /customer/review/14?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 06:21:56,157 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:56] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:58,923 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:21:58,958 - __main__ - INFO - User 4 has 3 available loyalty tokens
+2025-07-15 06:21:58,994 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:58] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:21:59,022 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:59,033 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:59,035 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:59,155 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:21:59,175 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:21:59,176 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:21:59,214 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:21:59,245 - __main__ - INFO - Found 3 loyalty tokens for user 4
+2025-07-15 06:21:59,247 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:21:59,746 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 06:21:59,774 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:21:59,784 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:59,786 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:21:59,790 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:21:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:22:01,465 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:22:01,503 - __main__ - INFO - User 4 has 3 available loyalty tokens
+2025-07-15 06:22:01,512 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:22:01,543 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:22:01,553 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:22:01,556 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:22:01,665 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:22:01,687 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:22:01,687 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:22:01,731 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:22:01,761 - __main__ - INFO - Found 3 loyalty tokens for user 4
+2025-07-15 06:22:01,763 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:22:01] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:22:04,871 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:22:04,956 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:22:05,290 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:22:05,293 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:22:07,706 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:22:07,749 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:22:08,025 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:22:08,027 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:33:07,486 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:33:07,521 - __main__ - INFO - User 4 has 3 available loyalty tokens
+2025-07-15 06:33:07,537 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:33:07,567 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:07,602 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:07,603 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:07,733 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:33:07,757 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:33:07,757 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:07,795 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:33:07,814 - __main__ - INFO - Found 3 loyalty tokens for user 4
+2025-07-15 06:33:07,815 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:07] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:33:08,536 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:08] "GET /customer/reviews HTTP/1.1" 200 -
+2025-07-15 06:33:08,563 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:08] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:08,574 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:08] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:08,574 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:08] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:10,346 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:10] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:33:10,370 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:10] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:10,380 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:10] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:10,381 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:10] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:10,382 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:10] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:10,460 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:10] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:33:12,092 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:12] "GET /customer/review/14 HTTP/1.1" 200 -
+2025-07-15 06:33:12,125 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:12] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:12,141 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:12] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:12,141 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:12] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:12,144 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:12] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:12,214 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:12] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:33:15,132 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:33:15,162 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:15,175 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:15,176 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:15,180 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:15,273 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:33:15,542 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:33:15,574 - __main__ - INFO - User 4 has 3 available loyalty tokens
+2025-07-15 06:33:15,584 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:33:15,614 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:15,623 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:15,624 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:15,721 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:33:15,745 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:33:15,746 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:15,780 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:33:15,809 - __main__ - INFO - Found 3 loyalty tokens for user 4
+2025-07-15 06:33:15,810 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:15] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:33:16,943 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:16] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:33:16,972 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:16] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:16,982 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:16] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:16,984 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:16] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:16,988 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:16] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:17,074 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:17] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:33:18,557 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:18] "GET /customer/review/14 HTTP/1.1" 200 -
+2025-07-15 06:33:18,585 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:18] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:18,598 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:18] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:18,601 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:18] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:18,603 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:18,672 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:18] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:33:22,072 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:22] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:33:22,098 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:22] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:33:22,109 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:22] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:22,110 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:22] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:33:22,113 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:22] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:33:22,198 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:33:22] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:36:37,445 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:36:37,497 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:36:37,836 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:36:37,838 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:36:41,790 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:36:41,834 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:36:42,112 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:36:42,113 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:39:36,725 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:36] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:39:36,745 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:36] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:39:36,821 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:36] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:36,823 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:36] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:36,824 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:36] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:39:36,873 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:36] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:39:38,076 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:38] "GET /customer/review/14 HTTP/1.1" 200 -
+2025-07-15 06:39:38,108 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:38] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:39:38,122 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:38] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:38,124 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:38] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:38,125 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:38] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:39:38,195 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:38] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:39:45,153 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:45] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:39:45,328 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:45] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:39:45,368 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:45] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:45,370 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:45] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:50,026 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:50] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 06:39:50,060 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:50] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:39:50,073 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:50] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:50,075 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:50] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:50,075 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:50] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:39:52,472 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:52] "GET /customer/review/14 HTTP/1.1" 200 -
+2025-07-15 06:39:52,505 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:52] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:39:52,518 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:52] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:52,519 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:52] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:39:52,522 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:52] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:39:52,593 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:39:52] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:40:17,484 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:40:17] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:40:17,491 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:40:17] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:40:17,492 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:40:17] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:40:17,493 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:40:17] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:42:34,656 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:42:34,696 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:42:35,001 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:42:35,003 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:42:38,941 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 06:42:38,975 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 06:42:39,238 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 06:42:39,241 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 06:43:10,989 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:43:10] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 06:43:11,006 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:43:11] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:43:11,083 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:43:11] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:43:11,088 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:43:11] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:43:11,088 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:43:11] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 06:44:24,065 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:24] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 06:44:24,083 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:24] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:44:24,094 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:24] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:24,094 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:24] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:24,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:24] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:44:25,904 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:25] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:25,913 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:25] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:25,914 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:25] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:27,188 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:27] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:27,197 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:27] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:27,197 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:27] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:27,719 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:27] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:27,727 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:27] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:27,728 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:27] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,045 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:28,054 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,055 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,336 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:28,345 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,347 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,593 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:28,602 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,602 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,797 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:28,805 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:28,806 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:28] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:30,279 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:30] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:30,290 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:30] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:30,290 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:30] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:31,305 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:31] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:31,313 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:31] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:31,314 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:31] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:31,817 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:31] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:31,830 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:31] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:31,832 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:31] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:32,235 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:32] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:32,249 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:32,250 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:32,628 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:32] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:44:32,635 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:44:32,638 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:44:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:31,832 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:31] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 06:46:31,853 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:31] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:46:31,864 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:31] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:31,864 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:31] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:31,866 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:46:32,232 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:32] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 06:46:32,252 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:32] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 06:46:32,264 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:32,264 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:32] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:46:32,264 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:33,019 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:33] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:33,810 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:33] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:34,160 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:34] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:34,826 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:34] "GET /customer/review/12?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:35,376 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:35] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:37,213 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:37] "GET /customer/review/12?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:37,604 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:37] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:46:41,534 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:41] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 06:46:41,550 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:41] "GET / HTTP/1.1" 200 -
+2025-07-15 06:46:41,584 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:41] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:41,587 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:41] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:41,587 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:41] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:46:46,300 - __main__ - INFO - User test@gmail.com logged in successfully. Session set: user_id=4, role=customer
+2025-07-15 06:46:46,301 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:46] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 06:46:46,338 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:46] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:46:46,368 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:46] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:46,371 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:46] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:46,376 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:46] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:46:46,603 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:46] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:46:48,623 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:46:48,654 - __main__ - INFO - User 4 has 3 available loyalty tokens
+2025-07-15 06:46:48,678 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:48] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:46:48,721 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:48] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:48,729 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:48] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:46:48,737 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:48] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:46:48,737 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:46:48,861 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:46:48,891 - __main__ - INFO - Found 3 loyalty tokens for user 4
+2025-07-15 06:46:48,893 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:48] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:46:54,475 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:54] "[31m[1mPOST /api/calculate_price HTTP/1.1[0m" 400 -
+2025-07-15 06:46:56,117 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:56] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 06:46:57,575 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:57] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 06:46:58,076 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:58] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 06:46:58,928 - __main__ - INFO - Booking request data: vehicle_id=334, start_date=2025-07-18T06:46, end_date=2025-07-25T06:46
+2025-07-15 06:46:59,002 - __main__ - INFO - Booking created successfully: ID 15 by user 4
+2025-07-15 06:46:59,003 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:46:59] "POST /api/create_booking HTTP/1.1" 200 -
+2025-07-15 06:47:01,064 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:01] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:47:01,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:01] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:01,100 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:01] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:01,101 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:01] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:01,279 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:01] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:47:02,098 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:02] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 06:47:02,105 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:02] "GET / HTTP/1.1" 200 -
+2025-07-15 06:47:02,150 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:02] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:02,153 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:02] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:02,154 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:06,478 - __main__ - INFO - User admin@carrental.com logged in successfully. Session set: user_id=1, role=admin
+2025-07-15 06:47:06,479 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:06] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 06:47:06,528 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:06] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 06:47:06,562 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:06] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:06,564 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:06] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:06,566 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:06] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:06,625 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:06] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 06:47:09,799 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:09] "PUT /api/bookings/15/status HTTP/1.1" 200 -
+2025-07-15 06:47:10,834 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:10] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 06:47:10,861 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:10] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:10,861 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:10] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:10,862 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:10] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:10,911 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:10] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 06:47:13,785 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:13] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 06:47:13,821 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:13] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:13,821 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:13] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:13,823 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:13] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:18,231 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:18] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 06:47:18,237 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:18] "GET / HTTP/1.1" 200 -
+2025-07-15 06:47:18,274 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:18] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:18,275 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:18] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:18,280 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:23,177 - __main__ - INFO - User test@gmail.com logged in successfully. Session set: user_id=4, role=customer
+2025-07-15 06:47:23,179 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:23] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 06:47:23,220 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:23] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:47:23,254 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:23] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:23,259 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:23] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:23,260 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:23] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:23,433 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:23] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:47:53,720 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:53] "POST /api/pay_for_booking HTTP/1.1" 200 -
+2025-07-15 06:47:54,962 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:54] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:47:54,988 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:54] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:54,990 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:54] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:47:54,994 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:54] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:47:55,040 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:47:55] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:48:00,053 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:48:00,104 - __main__ - INFO - User 4 has 3 available loyalty tokens
+2025-07-15 06:48:00,115 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:48:00,148 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:00,150 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:00,216 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:48:00,232 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:48:00,232 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:00,256 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:48:00,285 - __main__ - INFO - Found 3 loyalty tokens for user 4
+2025-07-15 06:48:00,287 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:00] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:48:08,527 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:08] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 06:48:08,564 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:08] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:08,566 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:08] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:08,567 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:08] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:11,762 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:11] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 06:48:11,768 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:11] "GET / HTTP/1.1" 200 -
+2025-07-15 06:48:11,801 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:11] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:11,804 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:11] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:11,806 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:11] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:16,698 - __main__ - INFO - User admin@carrental.com logged in successfully. Session set: user_id=1, role=admin
+2025-07-15 06:48:16,699 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:16] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 06:48:16,737 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:16] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 06:48:16,771 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:16] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:16,772 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:16] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:16,775 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:16] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:16,839 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:16] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 06:48:19,010 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:19] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 06:48:19,039 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:19] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:19,043 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:19] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:19,046 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:19] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:20,674 - __main__ - INFO - Loyalty token issued for completed booking 15: 4123.0
+2025-07-15 06:48:20,677 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:20] "PUT /api/bookings/15/status HTTP/1.1" 200 -
+2025-07-15 06:48:21,718 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:21] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 06:48:21,740 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:21] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:21,744 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:21] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:21,746 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:21] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:23,262 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:23] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 06:48:23,268 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:23] "GET / HTTP/1.1" 200 -
+2025-07-15 06:48:23,305 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:23] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:23,307 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:23] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:23,311 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:23] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:27,831 - __main__ - INFO - User test@gmail.com logged in successfully. Session set: user_id=4, role=customer
+2025-07-15 06:48:27,832 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:27] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 06:48:27,866 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:27] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:48:27,899 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:27] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:27,901 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:27] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:48:27,905 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:27] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:48:28,087 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:48:28] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:50:15,811 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 06:50:15,843 - __main__ - INFO - User 4 has 4 available loyalty tokens
+2025-07-15 06:50:15,851 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:15] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 06:50:15,878 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:15] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:50:15,881 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:15] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:50:15,972 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:15] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:50:16,015 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:16] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:50:16,018 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:16] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 06:50:16,032 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 06:50:16,058 - __main__ - INFO - Found 4 loyalty tokens for user 4
+2025-07-15 06:50:16,059 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:16] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 06:50:41,513 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:41] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 06:50:41,536 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:41] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:50:41,538 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:41] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:50:41,538 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:41] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:50:50,028 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:50] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:50:55,369 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:55] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:50:55,884 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:55] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:50:56,495 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:56] "GET /customer/review/12?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:50:57,695 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:57] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:50:58,988 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:58] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:50:59,402 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:50:59] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:51:00,158 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:51:00] "GET /customer/review/12?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:54:57,830 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:57] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 06:54:57,856 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:57] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 06:54:57,856 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:54:57,857 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:54:58,952 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:58] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 06:54:58,971 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:58] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:54:58,973 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:58] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:54:58,974 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:58] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:54:59,880 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:59] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 06:54:59,914 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:59] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:54:59,916 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:59] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:54:59,918 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:54:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:55:00,115 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:00] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 06:55:00,605 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:00] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 06:55:00,638 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:00] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 06:55:00,640 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:00] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 06:55:00,641 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:00] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 06:55:02,572 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:02] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:55:03,685 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:03] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:55:04,276 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:04] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 06:55:04,811 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 06:55:04] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:00:25,392 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 07:00:25,446 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 07:00:25,749 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 07:00:25,751 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 07:01:17,579 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:17] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 07:01:17,658 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:17] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:01:17,659 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:17] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:01:17,661 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:17] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 07:01:18,276 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:18] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 07:01:18,294 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:18] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:01:18,296 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:01:18,296 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:18] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:01:20,007 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:20] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:01:22,058 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:22] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:01:22,094 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:22] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:01:22,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:22] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:01:22,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:22] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:01:22,284 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:22] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:01:23,688 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:23] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:01:24,754 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:24] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:01:25,444 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:01:25] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:02:41,790 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:41] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:02:42,754 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:42,774 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:42,775 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:42,775 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:02:42,833 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:02:42,919 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:42,957 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:42,957 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:42,957 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:02:42,980 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:42] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:02:43,086 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:43,123 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:43,125 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:43,125 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:02:43,153 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:02:43,763 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:43,782 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "GET /static/css/modern-design-system.css HTTP/1.1" 200 -
+2025-07-15 07:02:43,783 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "GET /static/css/layout.css HTTP/1.1" 200 -
+2025-07-15 07:02:43,784 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:43] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 07:02:44,045 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:02:44,229 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:44,255 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 07:02:44,256 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/css/modern-design-system.css HTTP/1.1" 200 -
+2025-07-15 07:02:44,256 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/css/layout.css HTTP/1.1" 200 -
+2025-07-15 07:02:44,450 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:44,475 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/css/modern-design-system.css HTTP/1.1" 200 -
+2025-07-15 07:02:44,475 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/css/layout.css HTTP/1.1" 200 -
+2025-07-15 07:02:44,478 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 07:02:44,658 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:44,678 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/css/modern-design-system.css HTTP/1.1" 200 -
+2025-07-15 07:02:44,679 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/css/layout.css HTTP/1.1" 200 -
+2025-07-15 07:02:44,681 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 07:02:44,936 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:44] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:02:45,039 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:45] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:02:45,575 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:45] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:02:45,771 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:45] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:02:45,994 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:45] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:02:46,259 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:46] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-15 07:02:47,731 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:47] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:47,734 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:47] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:47,741 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:47] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 07:02:54,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:54] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:02:54,113 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:54] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 07:02:54,120 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:54] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:54,124 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:54] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:02:54,125 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:54] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:02:54,205 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:02:54] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:05:10,434 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:10] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 07:05:10,452 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:10] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 07:05:10,461 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:10] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:05:10,462 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:10] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:05:10,463 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:10] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 07:05:10,541 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:10] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 07:05:12,041 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:12] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:05:16,131 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:16] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:05:22,978 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:22] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:05:40,884 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:40] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 07:05:40,920 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:40] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 07:05:40,922 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:40] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 07:05:40,926 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:40] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 07:05:40,927 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:40] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-15 07:05:46,474 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:05:46] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:06:24,878 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:06:24] "GET /customer/review/14?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:06:26,284 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 07:06:26] "GET /customer/review/15?modal=1 HTTP/1.1" 200 -
+2025-07-15 07:11:13,235 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 07:11:13,275 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 07:11:13,534 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 07:11:13,536 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 07:11:15,761 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 07:11:15,796 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 07:11:16,070 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 07:11:16,071 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 07:11:24,122 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 07:11:24,155 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 07:11:24,439 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 07:11:24,441 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 07:11:25,206 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 07:11:25,243 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 07:11:25,530 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 07:11:25,532 - werkzeug - INFO -  * Debugger PIN: 128-682-088

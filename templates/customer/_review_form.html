@@ -1,0 +1,120 @@
+<div class="booking-summary">
+    <div class="booking-header">
+        <h4>Booking #{{ booking.id }}</h4>
+        <div class="booking-details">
+            <div class="detail-item">
+                <span class="detail-label">Vehicle:</span>
+                <span class="detail-value">{{ booking.make }} {{ booking.model }} ({{ booking.year }})</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Rental Period:</span>
+                <span class="detail-value">{{ booking.start_date.strftime('%b %d, %Y at %I:%M %p') }} - {{ booking.end_date.strftime('%b %d, %Y at %I:%M %p') }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Total Amount:</span>
+                <span class="detail-value">₹{{ "%.2f"|format(booking.total_price) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<hr style="margin: 2rem 0; border-color: var(--neutral-200);">
+<div id="review-message" tabindex="-1" style="outline: none;" aria-live="polite"></div>
+<form method="POST" id="review-form" novalidate>
+    <!-- Star Rating -->
+    <div class="form-group">
+        <label class="form-label">Overall Rating</label>
+        <div class="star-rating-container">
+            <div class="star-rating" id="star-rating">
+                <span class="star" data-rating="1">★</span>
+                <span class="star" data-rating="2">★</span>
+                <span class="star" data-rating="3">★</span>
+                <span class="star" data-rating="4">★</span>
+                <span class="star" data-rating="5">★</span>
+            </div>
+            <input type="hidden" name="rating" id="rating-input" required>
+            <div class="rating-description" id="rating-description">Click to rate your experience</div>
+        </div>
+    </div>
+    <!-- Review Categories -->
+    <div class="form-group">
+        <label class="form-label">Rate Specific Aspects</label>
+        <div class="rating-categories">
+            <div class="category-item">
+                <label>Vehicle Condition</label>
+                <div class="category-stars" data-category="condition">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+            </div>
+            <div class="category-item">
+                <label>Service Quality</label>
+                <div class="category-stars" data-category="service">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+            </div>
+            <div class="category-item">
+                <label>Value for Money</label>
+                <div class="category-stars" data-category="value">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Review Comment -->
+    <div class="form-group">
+        <label for="comment" class="form-label">Share Your Experience</label>
+        <textarea 
+            name="comment" 
+            id="comment" 
+            class="form-input" 
+            rows="5" 
+            placeholder="Tell us about your rental experience. What did you like? What could be improved? Your feedback helps us provide better service to other customers."
+            maxlength="500"
+        ></textarea>
+        <div class="char-counter">
+            <span id="char-count">0</span>/500 characters
+        </div>
+    </div>
+    <!-- Would You Recommend -->
+    <div class="form-group">
+        <label class="form-label">Would you recommend us to others?</label>
+        <div class="recommendation-options">
+            <label class="radio-option">
+                <input type="radio" name="recommend" value="yes" required>
+                <span class="radio-custom"></span>
+                <span class="radio-label">Yes, definitely!</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="recommend" value="maybe" required>
+                <span class="radio-custom"></span>
+                <span class="radio-label">Maybe</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="recommend" value="no" required>
+                <span class="radio-custom"></span>
+                <span class="radio-label">No, probably not</span>
+            </label>
+        </div>
+    </div>
+    <!-- Submit Button -->
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="submit-review">
+            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Submit Review
+        </button>
+        <a href="#" class="btn btn-ghost btn-full" onclick="document.getElementById('review-modal').style.display='none'; return false;">Cancel</a>
+    </div>
+</form> 

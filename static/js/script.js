@@ -27,6 +27,221 @@ document.addEventListener('DOMContentLoaded', function() {
             notificationPanel.style.display = (notificationPanel.style.display === 'none' || !notificationPanel.style.display) ? 'block' : 'none';
         });
     }
+
+    // Review Modal Logic
+    const reviewModal = document.getElementById('review-modal');
+    const reviewModalBody = document.getElementById('review-modal-body');
+    const closeReviewModal = document.getElementById('close-review-modal');
+
+    function openReviewModal(bookingId, url) {
+        console.log('openReviewModal called with:', bookingId, url); // DEBUG
+        reviewModal.style.display = 'flex';
+        reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;">Loading...</div>';
+        fetch(url + '?modal=1', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(res => res.text())
+            .then(html => {
+                reviewModalBody.innerHTML = html;
+                attachReviewFormHandler();
+                initReviewForm();
+            })
+            .catch((err) => {
+                console.error('Failed to load review form:', err); // DEBUG
+                reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Failed to load review form. Please check your connection or contact support.</div>';
+            });
+    }
+
+    function closeModal() {
+        reviewModal.style.display = 'none';
+        reviewModalBody.innerHTML = '';
+    }
+
+    if (closeReviewModal) {
+        closeReviewModal.addEventListener('click', closeModal);
+    }
+    window.addEventListener('click', function(e) {
+        if (e.target === reviewModal) closeModal();
+    });
+
+    document.querySelectorAll('.open-review-modal').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const bookingId = this.getAttribute('data-booking-id');
+            const url = this.getAttribute('href');
+            openReviewModal(bookingId, url);
+        });
+    });
+
+    function attachReviewFormHandler() {
+        const form = reviewModalBody.querySelector('form#review-form');
+        if (!form) return;
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+            fetch(form.action + '?modal=1', {
+                method: 'POST',
+                body: formData,
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(res => res.text())
+            .then(html => {
+                reviewModalBody.innerHTML = html;
+                attachReviewFormHandler();
+                initReviewForm();
+            })
+            .catch(() => {
+                reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Failed to submit review.</div>';
+            })
+            .finally(() => {
+                if (submitBtn) submitBtn.disabled = false;
+            });
+        });
+    }
+
+    // Review form interactivity for both page and modal
+    window.initReviewForm = function() {
+        const form = document.getElementById('review-form');
+        if (!form) return;
+        const ratingInput = document.getElementById('rating-input');
+        const ratingDescription = document.getElementById('rating-description');
+        const commentTextarea = document.getElementById('comment');
+        const charCount = document.getElementById('char-count');
+        const submitButton = document.getElementById('submit-review');
+
+        // Star rating functionality
+        const starRating = document.getElementById('star-rating');
+        if (starRating) {
+            const stars = starRating.querySelectorAll('.star');
+            const ratingDescriptions = {
+                1: 'Poor - Very dissatisfied',
+                2: 'Fair - Somewhat dissatisfied',
+                3: 'Good - Satisfied',
+                4: 'Very Good - Very satisfied',
+                5: 'Excellent - Extremely satisfied'
+            };
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    ratingInput.value = rating;
+                    // Update star display
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('filled');
+                        } else {
+                            s.classList.remove('filled');
+                        }
+                    });
+                    // Update description
+                    ratingDescription.textContent = ratingDescriptions[rating];
+                });
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.style.color = '#ffd700';
+                        }
+                    });
+                });
+                star.addEventListener('mouseleave', function() {
+                    const currentRating = parseInt(ratingInput.value) || 0;
+                    stars.forEach((s, index) => {
+                        if (index < currentRating) {
+                            s.style.color = '#ffd700';
+                        } else {
+                            s.style.color = 'var(--neutral-300)';
+                        }
+                    });
+                });
+            });
+        }
+        // Category star ratings
+        const categoryStars = form.querySelectorAll('.category-stars');
+        categoryStars.forEach(container => {
+            const stars = container.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    const category = container.dataset.category;
+                    // Update stars for this category
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('filled');
+                        } else {
+                            s.classList.remove('filled');
+                        }
+                    });
+                    // Store category rating in a hidden input
+                    let hidden = form.querySelector('input[name="' + category + '_rating"]');
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = category + '_rating';
+                        form.appendChild(hidden);
+                    }
+                    hidden.value = rating;
+                });
+            });
+        });
+        // Character counter
+        if (commentTextarea && charCount) {
+            commentTextarea.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = count;
+                if (count > 450) {
+                    charCount.style.color = '#e74c3c';
+                } else if (count > 400) {
+                    charCount.style.color = '#f39c12';
+                } else {
+                    charCount.style.color = 'var(--neutral-500)';
+                }
+            });
+        }
+        // Form validation
+        if (form && ratingInput && commentTextarea && submitButton) {
+            form.addEventListener('submit', function(e) {
+                const rating = parseInt(ratingInput.value);
+                const comment = commentTextarea.value.trim();
+                // Category ratings validation
+                const conditionInput = form.querySelector('input[name="condition_rating"]');
+                const serviceInput = form.querySelector('input[name="service_rating"]');
+                const valueInput = form.querySelector('input[name="value_rating"]');
+                const conditionRating = conditionInput ? parseInt(conditionInput.value) : 0;
+                const serviceRating = serviceInput ? parseInt(serviceInput.value) : 0;
+                const valueRating = valueInput ? parseInt(valueInput.value) : 0;
+                if (!rating || rating < 1 || rating > 5) {
+                    e.preventDefault();
+                    showMessage('Please select a rating between 1 and 5 stars.', 'error');
+                    return;
+                }
+                if (comment.length < 10) {
+                    e.preventDefault();
+                    showMessage('Please provide a detailed review (at least 10 characters).', 'error');
+                    return;
+                }
+                if (!(conditionRating && serviceRating && valueRating && conditionRating >= 1 && conditionRating <= 5 && serviceRating >= 1 && serviceRating <= 5 && valueRating >= 1 && valueRating <= 5)) {
+                    e.preventDefault();
+                    showMessage('Please rate all specific aspects (condition, service, value) between 1 and 5.', 'error');
+                    return;
+                }
+                // Disable submit button to prevent double submission
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<svg class="icon icon-sm spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416"><animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/><animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/></circle></svg> Submitting...';
+            });
+        }
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('review-message');
+            if (!messageDiv) return;
+            messageDiv.textContent = message;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    };
+    // Also call on page load for non-modal review forms
+    initReviewForm();
 });
 
 function initializeApp() {

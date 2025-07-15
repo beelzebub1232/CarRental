@@ -387,13 +387,15 @@ def customer_dashboard():
         
         # Get recent bookings
         cursor.execute("""
-            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type, v.image_url
+            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type, v.image_url,
+                   CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END as has_review
             FROM bookings b
             JOIN vehicles v ON b.vehicle_id = v.id
+            LEFT JOIN reviews r ON b.id = r.booking_id AND r.user_id = %s
             WHERE b.user_id = %s
             ORDER BY b.booking_date DESC
             LIMIT 5
-        """, (session['user_id'],))
+        """, (session['user_id'], session['user_id']))
         recent_bookings = cursor.fetchall()
         
         # Get loyalty tokens
@@ -469,12 +471,14 @@ def customer_profile():
         
         # Get all bookings
         cursor.execute("""
-            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type
+            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type,
+                   CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END as has_review
             FROM bookings b
             JOIN vehicles v ON b.vehicle_id = v.id
+            LEFT JOIN reviews r ON b.id = r.booking_id AND r.user_id = %s
             WHERE b.user_id = %s
             ORDER BY b.booking_date DESC
-        """, (session['user_id'],))
+        """, (session['user_id'], session['user_id']))
         bookings = cursor.fetchall()
         
         # Get loyalty tokens history
@@ -526,12 +530,14 @@ def customer_bookings():
         cursor = conn.cursor(dictionary=True)
         
         cursor.execute("""
-            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type
+            SELECT b.id, b.status AS booking_status, b.start_date, b.end_date, b.total_price, b.discount_applied, b.loyalty_token_used, b.booking_date, v.make, v.model, v.year, v.type,
+                   CASE WHEN r.id IS NOT NULL THEN 1 ELSE 0 END as has_review
             FROM bookings b
             JOIN vehicles v ON b.vehicle_id = v.id
+            LEFT JOIN reviews r ON b.id = r.booking_id AND r.user_id = %s
             WHERE b.user_id = %s
             ORDER BY b.booking_date DESC
-        """, (session['user_id'],))
+        """, (session['user_id'], session['user_id']))
         bookings = cursor.fetchall()
         
         cursor.close()
@@ -1332,27 +1338,33 @@ def customer_review(booking_id):
     booking = cursor.fetchone()
     
     if not booking:
-        flash('Booking not found.')
+        flash('Booking not found.', 'error')
         cursor.close()
         conn.close()
-        return redirect(url_for('customer_dashboard'))
+        return redirect(url_for('customer_bookings'))
     
-    if booking['status'] != 'completed':
-        flash('You can only review completed bookings.')
+    # Use booking_status for consistency
+    booking_status = booking.get('booking_status') or booking.get('status')
+    if booking_status != 'completed':
+        flash('You can only review completed bookings.', 'error')
         cursor.close()
         conn.close()
-        return redirect(url_for('customer_dashboard'))
+        return redirect(url_for('customer_bookings'))
     
     # Check if already reviewed
     cursor.execute("SELECT * FROM reviews WHERE booking_id = %s AND user_id = %s", (booking_id, user_id))
     review = cursor.fetchone()
     
+    is_modal = request.args.get('modal') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     if request.method == 'POST':
         if review:
-            flash('You have already reviewed this booking.')
+            flash('You have already reviewed this booking.', 'info')
             cursor.close()
             conn.close()
-            return redirect(url_for('customer_dashboard'))
+            if is_modal:
+                return render_template('customer/_review_modal_content.html', booking=booking, review=review, messages=MESSAGES)
+            return redirect(url_for('customer_bookings'))
         
         rating = int(request.form.get('rating', 0))
         comment = request.form.get('comment', '').strip()
@@ -1360,19 +1372,19 @@ def customer_review(booking_id):
         
         # Validation
         if not (1 <= rating <= 5):
-            flash('Rating must be between 1 and 5.')
+            flash('Rating must be between 1 and 5.', 'error')
             cursor.close()
             conn.close()
             return redirect(request.url)
         
         if len(comment) < 10:
-            flash('Please provide a detailed review (at least 10 characters).')
+            flash('Please provide a detailed review (at least 10 characters).', 'error')
             cursor.close()
             conn.close()
             return redirect(request.url)
         
         if not recommend:
-            flash('Please indicate if you would recommend us.')
+            flash('Please indicate if you would recommend us.', 'error')
             cursor.close()
             conn.close()
             return redirect(request.url)
@@ -1381,6 +1393,22 @@ def customer_review(booking_id):
         condition_rating = request.form.get('condition_rating')
         service_rating = request.form.get('service_rating')
         value_rating = request.form.get('value_rating')
+
+        # Validate category ratings
+        try:
+            condition_rating = int(condition_rating)
+            service_rating = int(service_rating)
+            value_rating = int(value_rating)
+        except (TypeError, ValueError):
+            flash('Please rate all specific aspects (condition, service, value).', 'error')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        if not (1 <= condition_rating <= 5 and 1 <= service_rating <= 5 and 1 <= value_rating <= 5):
+            flash('All aspect ratings must be between 1 and 5.', 'error')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
         
         # Insert review with additional data
         cursor.execute("""
@@ -1389,14 +1417,22 @@ def customer_review(booking_id):
         """, (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating))
         
         conn.commit()
-        flash('Thank you for your review! Your feedback helps us improve our service.')
+        flash('Thank you for your review! Your feedback helps us improve our service.', 'success')
         cursor.close()
         conn.close()
-        return redirect(url_for('customer_dashboard'))
+        if is_modal:
+            # Show thank you and review summary in modal
+            return render_template('customer/_review_modal_content.html', booking=booking, review={
+                'rating': rating, 'comment': comment, 'recommend': recommend,
+                'condition_rating': condition_rating, 'service_rating': service_rating, 'value_rating': value_rating
+            }, messages=MESSAGES, submitted=True)
+        return redirect(url_for('customer_bookings'))
     
     cursor.close()
     conn.close()
-    return render_template('customer/review.html', booking=booking, review=review)
+    if is_modal:
+        return render_template('customer/_review_modal_content.html', booking=booking, review=review, messages=MESSAGES)
+    return render_template('customer/review.html', booking=booking, review=review, messages=MESSAGES)
 
 @app.route('/customer/reviews')
 def customer_reviews():
