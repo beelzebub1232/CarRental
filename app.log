@@ -3925,3 +3925,7 @@
 2025-07-15 11:05:25,294 - werkzeug - INFO -  * Restarting with stat
 2025-07-15 11:05:25,571 - werkzeug - WARNING -  * Debugger is active!
 2025-07-15 11:05:25,573 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 11:08:07,371 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 11:08:07,412 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 11:08:07,763 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 11:08:07,766 - werkzeug - INFO -  * Debugger PIN: 128-682-088
