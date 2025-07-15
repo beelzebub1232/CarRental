@@ -1516,6 +1516,79 @@ def admin_users():
         return redirect(url_for('login'))
     return render_template('admin/users.html')
 
+@app.route('/api/users')
+def api_users():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return jsonify({'error': 'Not authorized'}), 403
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, email, full_name, role FROM users ORDER BY id")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify({'users': users})
+
+@app.route('/api/users/<int:user_id>', methods=['PUT'])
+def api_update_user(user_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        return jsonify({'success': False, 'error': 'Not authorized'}), 403
+    data = request.get_json()
+    email = data.get('email')
+    full_name = data.get('full_name')
+    role = data.get('role')
+    if not email or not full_name or not role:
+        return jsonify({'success': False, 'error': 'Missing fields'}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE users SET email=%s, full_name=%s, role=%s WHERE id=%s", (email, full_name, role, user_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/users/<int:user_id>/reset_password', methods=['POST'])
+def api_reset_user_password(user_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        return jsonify({'success': False, 'error': 'Not authorized'}), 403
+    data = request.get_json()
+    new_password = data.get('new_password')
+    if not new_password:
+        return jsonify({'success': False, 'error': 'Missing new password'}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE users SET password=%s WHERE id=%s", (new_password, user_id))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+def api_delete_user(user_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        return jsonify({'success': False, 'error': 'Not authorized'}), 403
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM users WHERE id=%s", (user_id,))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/api/pay_for_booking', methods=['POST'])
 def api_pay_for_booking():
     if 'user_id' not in session or session.get('role') != 'customer':
@@ -1549,6 +1622,113 @@ def api_pay_for_booking():
     finally:
         cursor.close()
         conn.close()
+
+# --- Admin Reviews Management ---
+@app.route('/admin/reviews')
+def admin_reviews():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    # Fetch all reviews with customer and vehicle info
+    cursor.execute('''
+        SELECT r.*, b.id as booking_id, u.full_name as customer_name, u.email as customer_email, v.make, v.model, v.type as vehicle_type
+        FROM reviews r
+        JOIN bookings b ON r.booking_id = b.id
+        JOIN users u ON r.user_id = u.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        ORDER BY r.review_date DESC
+    ''')
+    reviews = cursor.fetchall()
+    # Stats
+    total_reviews = len(reviews)
+    average_rating = round(sum(r['rating'] for r in reviews) / total_reviews, 1) if total_reviews else 0
+    recommend_count = sum(1 for r in reviews if r['recommend'] == 'yes')
+    recommend_percentage = round((recommend_count / total_reviews) * 100, 1) if total_reviews else 0
+    unique_vehicles = len(set((r['make'], r['model'], r['vehicle_type']) for r in reviews))
+    # Rating distribution
+    rating_counts = {i: 0 for i in range(1, 6)}
+    for r in reviews:
+        rating_counts[r['rating']] += 1
+    rating_distribution = {i: round((rating_counts[i] / total_reviews) * 100, 1) if total_reviews else 0 for i in range(1, 6)}
+    # Vehicle types for filter
+    cursor.execute('SELECT DISTINCT type FROM vehicles ORDER BY type')
+    vehicle_types = [row['type'] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return render_template('admin/reviews.html',
+        reviews=reviews,
+        total_reviews=total_reviews,
+        average_rating=average_rating,
+        recommend_percentage=recommend_percentage,
+        unique_vehicles=unique_vehicles,
+        rating_counts=rating_counts,
+        rating_distribution=rating_distribution,
+        vehicle_types=vehicle_types
+    )
+
+# --- API: Delete Review (Admin Only) ---
+@app.route('/api/reviews/<int:review_id>', methods=['DELETE'])
+def api_delete_review(review_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        return jsonify({'success': False, 'error': 'Not authorized'}), 403
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('DELETE FROM reviews WHERE id = %s', (review_id,))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# --- API: Export Reviews as CSV (Admin Only) ---
+@app.route('/api/export/reviews')
+def export_reviews():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('''
+        SELECT r.id, r.rating, r.comment, r.recommend, r.review_date, b.id as booking_id, u.full_name as customer_name, u.email as customer_email, v.make, v.model, v.type as vehicle_type
+        FROM reviews r
+        JOIN bookings b ON r.booking_id = b.id
+        JOIN users u ON r.user_id = u.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        ORDER BY r.review_date DESC
+    ''')
+    reviews = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    si = StringIO()
+    if reviews:
+        writer = csv.DictWriter(si, fieldnames=reviews[0].keys())
+        writer.writeheader()
+        writer.writerows(reviews)
+    output = si.getvalue()
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=reviews.csv"})
+
+@app.route('/admin/payments')
+def admin_payments():
+    if 'user_id' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('''
+        SELECT p.*, u.full_name as customer_name, u.email as customer_email, b.id as booking_id, v.make, v.model
+        FROM payments p
+        JOIN users u ON p.user_id = u.id
+        JOIN bookings b ON p.booking_id = b.id
+        JOIN vehicles v ON b.vehicle_id = v.id
+        ORDER BY p.payment_date DESC
+    ''')
+    payments = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('admin/payments.html', payments=payments)
 
 if __name__ == '__main__':
     app.run(debug=DEBUG)

@@ -6,6 +6,23 @@
     <title>Reports - DriveEase</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <style>
+    .grid.grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+    @media (max-width: 900px) {
+        .grid.grid-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 600px) {
+        .grid.grid-4 {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
 </head>
 <body>
     <!-- Top Navigation Bar -->

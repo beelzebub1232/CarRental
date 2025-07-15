@@ -3351,3 +3351,459 @@
 2025-07-15 09:46:17,437 - werkzeug - INFO -  * Restarting with stat
 2025-07-15 09:46:17,711 - werkzeug - WARNING -  * Debugger is active!
 2025-07-15 09:46:17,713 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:47:22,282 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 09:47:22,341 - __main__ - INFO - Found 4 loyalty tokens for user 4
+2025-07-15 09:47:22,341 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:22] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 09:47:22,344 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:22] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 09:47:22,798 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:22] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 09:47:25,755 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:25] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 09:47:25,854 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:25] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:25,855 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:25] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:25,856 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:25] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 09:47:26,021 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:26] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 09:47:36,556 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:36] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 09:47:36,581 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:36] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:36,582 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:36] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:36,584 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:36] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:47:47,349 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:47] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 09:47:47,384 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:47] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:47,385 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:47] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:47,386 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:47] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:47:47,442 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:47] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 09:47:48,869 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 09:47:48,890 - __main__ - INFO - User 4 has 4 available loyalty tokens
+2025-07-15 09:47:48,905 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:48] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 09:47:48,943 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:48] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:48,944 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:48] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:48,952 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:48] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 09:47:48,953 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:47:50,597 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 09:47:50,614 - __main__ - INFO - Found 4 loyalty tokens for user 4
+2025-07-15 09:47:50,615 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:50] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 09:47:55,879 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:55] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 09:47:55,970 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:55] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 09:47:56,479 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:56] "POST /api/calculate_price HTTP/1.1" 200 -
+2025-07-15 09:47:57,870 - __main__ - INFO - Booking request data: vehicle_id=334, start_date=2025-07-16T09:47, end_date=2025-07-18T09:47
+2025-07-15 09:47:57,914 - __main__ - INFO - Booking created successfully: ID 16 by user 4
+2025-07-15 09:47:57,915 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:57] "POST /api/create_booking HTTP/1.1" 200 -
+2025-07-15 09:47:59,961 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:59] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 09:47:59,989 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:59] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:59,989 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:59] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:47:59,990 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:47:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:48:00,103 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:00] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 09:48:01,500 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:01] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 09:48:01,531 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:01] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:48:01,531 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:01] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:48:01,532 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:01] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:48:05,944 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:05] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 09:48:05,958 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:05] "GET / HTTP/1.1" 200 -
+2025-07-15 09:48:05,992 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:05] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:48:05,996 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:05] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:48:05,997 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:05] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:48:10,629 - __main__ - INFO - User admin@carrental.com logged in successfully. Session set: user_id=1, role=admin
+2025-07-15 09:48:10,629 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:10] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 09:48:10,663 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:10] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:48:10,686 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:10] "GET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-07-15 09:48:10,687 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:10] "GET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-07-15 09:48:10,716 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:10] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:48:10,752 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:48:10] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:19,721 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 09:49:19,754 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:49:20,023 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:49:20,024 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:49:39,240 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:39,294 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,297 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,314 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,330 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,807 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:39,832 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,834 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,850 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:39,865 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:39] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,254 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:40,276 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,276 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,289 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,300 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,641 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:40,658 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,658 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,667 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:40,675 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:40] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:41,111 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,112 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,122 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,131 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,467 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:41,486 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,486 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,497 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,509 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,693 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:41,712 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,712 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,723 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,734 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,961 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:41,981 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,981 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:41,992 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:41] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,004 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,210 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:42,229 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,230 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,242 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,250 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,461 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:42,479 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,480 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,494 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,505 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,710 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:42,729 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,729 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,743 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,754 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,961 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:42,980 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,981 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:42,996 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:42] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,012 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,178 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:43,198 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,198 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,210 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,221 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,430 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:43,448 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,449 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,459 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,470 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,657 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:43,676 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,676 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,688 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,699 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,899 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:43,916 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,917 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,932 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:43,938 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:43] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,116 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:44,132 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,133 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,143 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,153 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,294 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:49:44,311 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,311 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,321 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:44,330 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:49:50,025 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:50] "[32mGET /customer/profile HTTP/1.1[0m" 302 -
+2025-07-15 09:49:50,035 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:50] "GET /login HTTP/1.1" 200 -
+2025-07-15 09:49:53,857 - __main__ - INFO - User test@gmail.com logged in successfully. Session set: user_id=4, role=customer
+2025-07-15 09:49:53,858 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:53] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 09:49:53,885 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:53] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 09:49:53,916 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:53] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:53,917 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:53] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:53,918 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:53] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:54,034 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:54] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 09:49:56,368 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 09:49:56,387 - __main__ - INFO - User 4 has 4 available loyalty tokens
+2025-07-15 09:49:56,402 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:56] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 09:49:56,437 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:56] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:56,438 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:56] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:56,442 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:56] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:49:56,446 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:56] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 09:49:57,396 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:57] "GET /customer/reviews HTTP/1.1" 200 -
+2025-07-15 09:49:57,427 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:49:57,427 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:49:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:06,869 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:06] "GET /customer/review/edit/2 HTTP/1.1" 200 -
+2025-07-15 09:50:06,898 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:06] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:06,900 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:06] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:08,113 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:08] "GET /customer/reviews HTTP/1.1" 200 -
+2025-07-15 09:50:08,137 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:08] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:08,139 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:08] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:10,771 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:10] "[32mPOST /customer/review/delete/2 HTTP/1.1[0m" 302 -
+2025-07-15 09:50:10,790 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:10] "GET /customer/reviews HTTP/1.1" 200 -
+2025-07-15 09:50:10,811 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:10] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:10,811 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:50:10] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:50:55,128 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 09:50:55,174 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:50:55,445 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:50:55,447 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:51:39,968 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:39] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-15 09:51:39,982 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:39] "GET / HTTP/1.1" 200 -
+2025-07-15 09:51:40,065 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:40] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:51:40,066 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:40] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:51:40,069 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:40] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:51:44,544 - __main__ - INFO - User admin@carrental.com logged in successfully. Session set: user_id=1, role=admin
+2025-07-15 09:51:44,545 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:44] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-15 09:51:44,585 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:44] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:51:44,622 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:51:44,624 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:51:44,638 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:51:45,124 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 09:51:45,163 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:51:45,467 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:51:45,470 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:51:55,853 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:55] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:51:55,899 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:55] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:51:55,899 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:55] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:51:55,915 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:55] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:51:55,931 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:51:55] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:52:35,873 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:35] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:52:35,893 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:35] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:52:35,894 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:35] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:52:35,905 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:35] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:52:35,914 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:35] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:52:36,451 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:36] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:52:36,469 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:36] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:52:36,471 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:36] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:52:36,480 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:36] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:52:36,491 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:36] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:52:39,813 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-15 09:52:39,813 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-15 09:52:39,814 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:52:40,074 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:52:40,076 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:52:44,399 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:44] "[35m[1mGET /admin/dashboard HTTP/1.1[0m" 500 -
+2025-07-15 09:52:44,444 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-07-15 09:52:44,444 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-07-15 09:52:44,461 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:52:44,469 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:52:44] "[36mGET /admin/dashboard?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-07-15 09:55:50,376 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 09:55:50,501 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:55:50,961 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:55:50,963 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:55:54,073 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 09:55:54,121 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 09:55:54,469 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 09:55:54,472 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 09:56:16,777 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:16] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 09:56:16,862 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:16] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:16,865 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:16] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:16,867 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:16] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:56:16,911 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:16] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 09:56:20,023 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:20] "GET /admin/payments HTTP/1.1" 200 -
+2025-07-15 09:56:20,053 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:20] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:20,053 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:20] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:27,667 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:27] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 09:56:27,696 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:27] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:27,696 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:27] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:27,697 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:27] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:56:29,023 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 09:56:29,051 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:29,052 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:29,053 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:56:29,095 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 09:56:29,771 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 09:56:29,798 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:29,801 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:29,813 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 09:56:29,815 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:29] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,239 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 09:56:30,262 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,263 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,272 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 09:56:30,274 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,736 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 09:56:30,765 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,765 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,769 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:56:30,839 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:30] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 09:56:32,537 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:32] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:56:32,560 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:56:32,561 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:56:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:57:50,523 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:57:50] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:57:50,546 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:57:50] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:57:50,546 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:57:50] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:32,441 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:32] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:32,461 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:32,462 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:52,733 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:52] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:52,752 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:52] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:52,753 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:52] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:53,171 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:53,189 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:53,190 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:53,396 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:53,415 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:53,416 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:53,612 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:53,633 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:53,633 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:53] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:56,301 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:56] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:56,338 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:56] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:56,339 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:56] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:56,716 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:56] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:56,750 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:56] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:56,751 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:56] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:57,084 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:57,111 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:57,111 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:57,608 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:57,632 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:57,632 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:57,882 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:57,905 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:57,905 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:57] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:58,157 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:58,180 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:58,182 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:58,375 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:58,404 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:58,405 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:58,585 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:58:58,608 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:58:58,609 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:58:58] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:05,627 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:05] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:59:05,654 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:05] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:05,654 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:05] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:06,233 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:06] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:59:06,259 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:06] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:06,260 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:06] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:31,797 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:31] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 09:59:31,816 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:31] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:31,816 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:31] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:59,125 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:59] "GET /admin/users HTTP/1.1" 200 -
+2025-07-15 09:59:59,161 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:59] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:59,162 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:59] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 09:59:59,164 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 09:59:59,181 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 09:59:59] "[33mGET /api/users HTTP/1.1[0m" 404 -
+2025-07-15 10:00:02,235 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:00:02,268 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:02,270 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:02,271 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:00:02,672 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 10:00:02,706 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:02,709 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:02,709 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:00:03,408 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:03] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 10:00:03,439 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:03] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:03,441 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:03] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:03,444 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:03] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 10:00:03,444 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:03] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:00:05,018 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:05] "GET /api/vehicles/272 HTTP/1.1" 200 -
+2025-07-15 10:00:05,056 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:05] "GET /api/vehicle_types HTTP/1.1" 200 -
+2025-07-15 10:00:08,242 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:08] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 10:00:08,282 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:08] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:08,284 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:08] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:08,285 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:08] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:00:08,348 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:08] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 10:00:10,602 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:10] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:00:10,653 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:10] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:10,665 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:10] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:10,677 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:10] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:00:48,008 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:48] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:00:48,029 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:48] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:48,029 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:48] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:00:48,030 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:00:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:01:23,912 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:01:23] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:01:23,931 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:01:23] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:01:23,932 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:01:23] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:01:23,932 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:01:23] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:02:17,147 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:17] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:02:17,168 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:17] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:02:17,168 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:17] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:02:17,168 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:17] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:02:20,761 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:20] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:02:20,783 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:20] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:02:20,783 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:20] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:02:20,783 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:20] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:02:21,188 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:21] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:02:21,210 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:21] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:02:21,211 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:21] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:02:21,213 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:02:21] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:06:13,279 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:13] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 10:06:13,304 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:13] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:13,304 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:13] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:13,308 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:13] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:06:15,868 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:15] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 10:06:15,900 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:15] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:15,903 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:15] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:15,904 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:06:15,948 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:15] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 10:06:17,215 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:17] "GET /admin/reviews HTTP/1.1" 200 -
+2025-07-15 10:06:17,244 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:17] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:17,246 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:17] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:43,558 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:43] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 10:06:43,589 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:43] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:43,590 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:43] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:43,591 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:43] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:06:43,591 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:43] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 10:06:46,251 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:46] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:06:46,283 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:46] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:46,285 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:46] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:06:46,286 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:06:46] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:07:14,367 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 10:07:14,399 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 10:07:14,683 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 10:07:14,685 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 10:07:48,611 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:48] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:07:48,692 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:07:48,693 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:48] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:07:48,694 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:48] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:07:59,054 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:59] "GET /admin/reports HTTP/1.1" 200 -
+2025-07-15 10:07:59,075 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:59] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:07:59,078 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:59] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:07:59,080 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:07:59] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:08:00,379 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:08:00] "GET /admin/users HTTP/1.1" 200 -
+2025-07-15 10:08:00,411 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:08:00] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:08:00,411 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:08:00] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:08:00,413 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:08:00] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:08:00,448 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:08:00] "[33mGET /api/users HTTP/1.1[0m" 404 -
+2025-07-15 10:08:57,893 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 10:08:57,930 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 10:08:58,219 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 10:08:58,221 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 10:09:02,081 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 10:09:02,114 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 10:09:02,376 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 10:09:02,378 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 10:32:26,792 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:32:26] "GET /admin/users HTTP/1.1" 200 -
+2025-07-15 10:32:26,852 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:32:26] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:32:26,853 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:32:26] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:32:26,853 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:32:26] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:32:26,918 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:32:26] "GET /api/users HTTP/1.1" 200 -
+2025-07-15 10:33:07,479 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 10:33:07,546 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 10:33:07,828 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 10:33:07,831 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 10:33:10,095 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 10:33:10,134 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 10:33:10,407 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 10:33:10,409 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 10:43:13,937 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:13] "GET /admin/dashboard HTTP/1.1" 200 -
+2025-07-15 10:43:14,067 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:14] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:43:14,070 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:14] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:14,071 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:14] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:14,149 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:14] "GET /api/vehicles HTTP/1.1" 200 -
+2025-07-15 10:43:17,450 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:17] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 10:43:17,478 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:17] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:17,482 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:17] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:43:17,483 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:17] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:17,488 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:17] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 10:43:19,136 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:19] "GET /admin/manage_vehicles HTTP/1.1" 200 -
+2025-07-15 10:43:19,157 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:19] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:19,158 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:19] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:19,162 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:19] "[33mGET /admin/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 10:43:19,165 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:19] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:43:24,015 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:24] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 10:43:24,045 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:24] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:24,047 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:24] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:43:24,048 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:24] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:31,166 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:31] "PUT /api/bookings/16/status HTTP/1.1" 200 -
+2025-07-15 10:43:32,208 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:32] "GET /admin/bookings HTTP/1.1" 200 -
+2025-07-15 10:43:32,235 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:32,236 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 10:43:32,238 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 10:43:32] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 10:47:56,256 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-15 10:47:56,257 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-15 10:47:56,258 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 10:47:56,649 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 10:47:56,652 - werkzeug - INFO -  * Debugger PIN: 128-682-088
