@@ -87,8 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.text())
             .then(html => {
                 reviewModalBody.innerHTML = html;
-                attachReviewFormHandler();
-                initReviewForm();
+                const newForm = reviewModalBody.querySelector('form#review-form');
+                if (newForm) {
+                    attachReviewFormHandler();
+                    initReviewForm();
+                } else {
+                    // This is the success message, so we don't need to re-attach the form handler
+                }
             })
             .catch(() => {
                 reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Failed to submit review.</div>';

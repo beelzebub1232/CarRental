@@ -1375,18 +1375,24 @@ def customer_review(booking_id):
             flash('Rating must be between 1 and 5.', 'error')
             cursor.close()
             conn.close()
+            if is_modal:
+                return render_template('customer/_review_form.html', booking=booking, messages=MESSAGES, error='Rating must be between 1 and 5.')
             return redirect(request.url)
         
         if len(comment) < 10:
             flash('Please provide a detailed review (at least 10 characters).', 'error')
             cursor.close()
             conn.close()
+            if is_modal:
+                return render_template('customer/_review_form.html', booking=booking, messages=MESSAGES, error='Please provide a detailed review (at least 10 characters).')
             return redirect(request.url)
         
         if not recommend:
             flash('Please indicate if you would recommend us.', 'error')
             cursor.close()
             conn.close()
+            if is_modal:
+                return render_template('customer/_review_form.html', booking=booking, messages=MESSAGES, error='Please indicate if you would recommend us.')
             return redirect(request.url)
         
         # Get category ratings from form
