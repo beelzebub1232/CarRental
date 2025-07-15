@@ -39,6 +39,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function attachReviewFormHandler() {
+        const form = reviewModalBody.querySelector('form#review-form');
+        if (!form) return;
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+            fetch(form.action + '?modal=1', {
+                method: 'POST',
+                body: formData,
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(res => res.text())
+            .then(html => {
+                reviewModalBody.innerHTML = html;
+                const newForm = reviewModalBody.querySelector('form#review-form');
+                if (newForm) {
+                    attachReviewFormHandler();
+                    initReviewForm();
+                } else {
+                    // This is the success message, so we don't need to re-attach the form handler
+                }
+            })
+            .catch(() => {
+                reviewModalBody.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Failed to submit review.</div>';
+            })
+            .finally(() => {
+                if (submitBtn) submitBtn.disabled = false;
+            });
+        });
+    }
+
     // Review form interactivity for both page and modal
     window.initReviewForm = function() {
         console.log('initReviewForm called');

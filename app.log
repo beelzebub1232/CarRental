@@ -1613,6 +1613,7 @@
 2025-07-15 01:43:45,487 - werkzeug - INFO -  * Restarting with stat
 2025-07-15 01:43:45,763 - werkzeug - WARNING -  * Debugger is active!
 2025-07-15 01:43:45,765 - werkzeug - INFO -  * Debugger PIN: 797-777-221
+<<<<<<< HEAD
 2025-07-15 07:48:01,486 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://127.0.0.1:5000
 2025-07-15 07:48:01,486 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
@@ -3929,3 +3930,44 @@
 2025-07-15 11:08:07,412 - werkzeug - INFO -  * Restarting with stat
 2025-07-15 11:08:07,763 - werkzeug - WARNING -  * Debugger is active!
 2025-07-15 11:08:07,766 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+=======
+2025-07-15 02:07:55,533 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 02:07:55,534 - werkzeug - INFO -  * Debugger PIN: 797-777-221
+>>>>>>> c9d38d70ee75af74f0cd235fc4f8c3499b69e065
+2025-07-15 11:13:24,876 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-15 11:13:24,876 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-15 11:13:24,877 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 11:13:25,178 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 11:13:25,179 - werkzeug - INFO -  * Debugger PIN: 128-682-088
+2025-07-15 11:13:29,807 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:29] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 11:13:29,883 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:29] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:29,886 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:29] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:29,888 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:29] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-07-15 11:13:30,442 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:30] "GET /customer/profile HTTP/1.1" 200 -
+2025-07-15 11:13:30,469 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:30] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:30,470 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:30] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 11:13:30,471 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:30] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:31,160 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:31] "GET /customer/dashboard HTTP/1.1" 200 -
+2025-07-15 11:13:31,212 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 11:13:31,212 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:31] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:31,213 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:31] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:31,368 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:31] "GET /api/notifications HTTP/1.1" 200 -
+2025-07-15 11:13:31,918 - __main__ - INFO - Customer booking page accessed by user_id: 4, role: customer
+2025-07-15 11:13:31,941 - __main__ - INFO - User 4 has 4 available loyalty tokens
+2025-07-15 11:13:31,959 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:31] "GET /customer/booking HTTP/1.1" 200 -
+2025-07-15 11:13:32,000 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:32,000 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:32,021 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 11:13:32,087 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 11:13:32,089 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[33mGET /customer/nais.jpeg HTTP/1.1[0m" 404 -
+2025-07-15 11:13:32,111 - __main__ - INFO - Loyalty tokens API called by user_id: 4, role: customer
+2025-07-15 11:13:32,138 - __main__ - INFO - Found 4 loyalty tokens for user 4
+2025-07-15 11:13:32,139 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "GET /api/loyalty_tokens HTTP/1.1" 200 -
+2025-07-15 11:13:32,730 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "GET /customer/reviews HTTP/1.1" 200 -
+2025-07-15 11:13:32,776 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:32,777 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:32] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:33,889 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:33] "GET /customer/bookings HTTP/1.1" 200 -
+2025-07-15 11:13:33,925 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:33] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:33,926 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:33] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
+2025-07-15 11:13:33,927 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:13:33] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -

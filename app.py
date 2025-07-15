@@ -1349,18 +1349,49 @@ def customer_review(booking_id):
         # Validation
         if not (1 <= rating <= 5):
             flash('Rating must be between 1 and 5.', 'error')
-            return render_template('customer/review_form.html', booking=booking)
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        
         if len(comment) < 10:
             flash('Please provide a detailed review (at least 10 characters).', 'error')
-            return render_template('customer/review_form.html', booking=booking)
-        if recommend not in ['yes', 'maybe', 'no']:
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        
+        if not recommend:
             flash('Please indicate if you would recommend us.', 'error')
-            return render_template('customer/review_form.html', booking=booking)
-        # Insert review
-        cursor.execute('''
-            INSERT INTO reviews (booking_id, user_id, rating, comment, recommend, review_date)
-            VALUES (%s, %s, %s, %s, %s, NOW())
-        ''', (booking_id, user_id, rating, comment, recommend))
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        
+        # Get category ratings from form
+        condition_rating = request.form.get('condition_rating')
+        service_rating = request.form.get('service_rating')
+        value_rating = request.form.get('value_rating')
+
+        # Validate category ratings
+        try:
+            condition_rating = int(condition_rating)
+            service_rating = int(service_rating)
+            value_rating = int(value_rating)
+        except (TypeError, ValueError):
+            flash('Please rate all specific aspects (condition, service, value).', 'error')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        if not (1 <= condition_rating <= 5 and 1 <= service_rating <= 5 and 1 <= value_rating <= 5):
+            flash('All aspect ratings must be between 1 and 5.', 'error')
+            cursor.close()
+            conn.close()
+            return redirect(request.url)
+        
+        # Insert review with additional data
+        cursor.execute("""
+            INSERT INTO reviews (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (booking_id, user_id, rating, comment, recommend, condition_rating, service_rating, value_rating))
+        
         conn.commit()
         cursor.close()
         conn.close()
