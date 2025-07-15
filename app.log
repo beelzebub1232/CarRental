@@ -3921,3 +3921,7 @@
 2025-07-15 11:05:01,089 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:05:01] "[36mGET /static/css/modern-design-system.css HTTP/1.1[0m" 304 -
 2025-07-15 11:05:01,090 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:05:01] "[36mGET /static/css/layout.css HTTP/1.1[0m" 304 -
 2025-07-15 11:05:01,092 - werkzeug - INFO - 127.0.0.1 - - [15/Jul/2025 11:05:01] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-07-15 11:05:25,256 - werkzeug - INFO -  * Detected change in 'C:\\XCustom Tools\\XCustom Tools\\Works\\Client Projects\\Carrental\\app.py', reloading
+2025-07-15 11:05:25,294 - werkzeug - INFO -  * Restarting with stat
+2025-07-15 11:05:25,571 - werkzeug - WARNING -  * Debugger is active!
+2025-07-15 11:05:25,573 - werkzeug - INFO -  * Debugger PIN: 128-682-088
