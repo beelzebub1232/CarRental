@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <!-- Revenue Date Range Filter -->
+        <!-- Date Range Filter -->
         <form method="get" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-end;">
             <div>
                 <label for="start_date" class="form-label">Start Date</label>
@@ -85,7 +85,12 @@
                 <label for="end_date" class="form-label">End Date</label>
                 <input type="date" id="end_date" name="end_date" class="form-input" value="{{ request.args.get('end_date', '') }}">
             </div>
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="min-width: 80px;">Filter</button>
+                {% if request.args.get('start_date') or request.args.get('end_date') %}
+                    <a href="{{ url_for('admin_reports') }}" class="btn btn-secondary" style="min-width: 80px;">Clear Filter</a>
+                {% endif %}
+            </div>
         </form>
 
         <!-- Popular Vehicles -->

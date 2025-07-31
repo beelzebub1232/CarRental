@@ -621,21 +621,21 @@ def admin_reports():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Date range filter
+    # Date range filter - filter by rental period (start_date and end_date) instead of booking_date
     from flask import request
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     date_filter = ''
     params = []
     if start_date and end_date:
-        date_filter = 'WHERE booking_date >= %s AND booking_date <= %s'
-        params = [start_date, end_date]
+        date_filter = 'WHERE (DATE(start_date) >= %s AND DATE(start_date) <= %s) OR (DATE(end_date) >= %s AND DATE(end_date) <= %s) OR (DATE(start_date) <= %s AND DATE(end_date) >= %s)'
+        params = [start_date, end_date, start_date, end_date, start_date, end_date]
     elif start_date:
-        date_filter = 'WHERE booking_date >= %s'
-        params = [start_date]
+        date_filter = 'WHERE DATE(start_date) >= %s OR DATE(end_date) >= %s'
+        params = [start_date, start_date]
     elif end_date:
-        date_filter = 'WHERE booking_date <= %s'
-        params = [end_date]
+        date_filter = 'WHERE DATE(start_date) <= %s OR DATE(end_date) <= %s'
+        params = [end_date, end_date]
 
     # Get booking statistics with date filter
     cursor.execute(f'''
@@ -650,15 +650,26 @@ def admin_reports():
     ''', params)
     stats = cursor.fetchone()
 
-    # Get popular vehicles (not filtered by date for now)
-    cursor.execute('''
-        SELECT v.make, v.model, v.type, COUNT(b.id) as booking_count
-        FROM vehicles v
-        LEFT JOIN bookings b ON v.id = b.vehicle_id
-        GROUP BY v.id
-        ORDER BY booking_count DESC
-        LIMIT 10
-    ''')
+    # Get popular vehicles with date filter
+    if date_filter:
+        popular_vehicles_query = f'''
+            SELECT v.make, v.model, v.type, COUNT(b.id) as booking_count
+            FROM vehicles v
+            LEFT JOIN bookings b ON v.id = b.vehicle_id {date_filter.replace("WHERE", "AND")}
+            GROUP BY v.id
+            ORDER BY booking_count DESC
+            LIMIT 10
+        '''
+        cursor.execute(popular_vehicles_query, params)
+    else:
+        cursor.execute('''
+            SELECT v.make, v.model, v.type, COUNT(b.id) as booking_count
+            FROM vehicles v
+            LEFT JOIN bookings b ON v.id = b.vehicle_id
+            GROUP BY v.id
+            ORDER BY booking_count DESC
+            LIMIT 10
+        ''')
     popular_vehicles = cursor.fetchall()
 
     cursor.close()
@@ -1565,14 +1576,14 @@ def export_bookings():
     date_filter = ''
     params = []
     if start_date and end_date:
-        date_filter = 'WHERE booking_date >= %s AND booking_date <= %s'
-        params = [start_date, end_date]
+        date_filter = 'WHERE (DATE(start_date) >= %s AND DATE(start_date) <= %s) OR (DATE(end_date) >= %s AND DATE(end_date) <= %s) OR (DATE(start_date) <= %s AND DATE(end_date) >= %s)'
+        params = [start_date, end_date, start_date, end_date, start_date, end_date]
     elif start_date:
-        date_filter = 'WHERE booking_date >= %s'
-        params = [start_date]
+        date_filter = 'WHERE DATE(start_date) >= %s OR DATE(end_date) >= %s'
+        params = [start_date, start_date]
     elif end_date:
-        date_filter = 'WHERE booking_date <= %s'
-        params = [end_date]
+        date_filter = 'WHERE DATE(start_date) <= %s OR DATE(end_date) <= %s'
+        params = [end_date, end_date]
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute(f"SELECT * FROM bookings {date_filter} ORDER BY booking_date DESC", params)
@@ -1596,17 +1607,17 @@ def export_payments():
     date_filter = ''
     params = []
     if start_date and end_date:
-        date_filter = 'WHERE payment_date >= %s AND payment_date <= %s'
-        params = [start_date, end_date]
+        date_filter = 'WHERE (DATE(b.start_date) >= %s AND DATE(b.start_date) <= %s) OR (DATE(b.end_date) >= %s AND DATE(b.end_date) <= %s) OR (DATE(b.start_date) <= %s AND DATE(b.end_date) >= %s)'
+        params = [start_date, end_date, start_date, end_date, start_date, end_date]
     elif start_date:
-        date_filter = 'WHERE payment_date >= %s'
-        params = [start_date]
+        date_filter = 'WHERE DATE(b.start_date) >= %s OR DATE(b.end_date) >= %s'
+        params = [start_date, start_date]
     elif end_date:
-        date_filter = 'WHERE payment_date <= %s'
-        params = [end_date]
+        date_filter = 'WHERE DATE(b.start_date) <= %s OR DATE(b.end_date) <= %s'
+        params = [end_date, end_date]
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute(f"SELECT * FROM payments {date_filter} ORDER BY payment_date DESC", params)
+    cursor.execute(f"SELECT p.*, b.start_date, b.end_date FROM payments p JOIN bookings b ON p.booking_id = b.id {date_filter} ORDER BY p.payment_date DESC", params)
     payments = cursor.fetchall()
     payments = cast(List[Dict[str, Any]], payments)
     cursor.close()
