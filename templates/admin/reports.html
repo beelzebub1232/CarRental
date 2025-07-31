@@ -46,7 +46,6 @@
             <a href="{{ url_for('admin_bookings') }}" class="top-nav-link">Bookings</a>
             <a href="{{ url_for('admin_reports') }}" class="top-nav-link">Reports</a>
             <a href="{{ url_for('admin_users') }}" class="top-nav-link">User Management</a>
-            <a href="{{ url_for('admin_payments') }}" class="top-nav-link">Payments</a>
             <a href="{{ url_for('logout') }}" class="top-nav-link">Logout</a>
         </nav>
     </header>
@@ -76,80 +75,91 @@
             </div>
         </div>
 
-        <div class="grid grid-2">
-            <!-- Popular Vehicles -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Popular Vehicles</h2>
-                </div>
-                {% if popular_vehicles %}
-                    <div class="table-container" style="overflow-x: auto;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Vehicle</th>
-                                    <th>Type</th>
-                                    <th>Bookings</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for vehicle in popular_vehicles[:10] %}
-                                <tr>
-                                    <td style="font-weight: 600; color: #3b82f6;">{{ loop.index }}</td>
-                                    <td>
-                                        <div style="font-weight: 600;">{{ vehicle.make }} {{ vehicle.model }}</div>
-                                    </td>
-                                    <td style="color: #6b7280;">{{ vehicle.type }}</td>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <div style="background: #3b82f6; height: 4px; border-radius: 2px; 
-                                                        width: {{ (vehicle.booking_count / (popular_vehicles[0].booking_count if popular_vehicles[0].booking_count > 0 else 1) * 100)|int }}px; 
-                                                        min-width: 10px;"></div>
-                                            <span style="font-weight: 600;">{{ vehicle.booking_count }}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <p style="color: #6b7280; text-align: center;">No booking data available yet.</p>
-                {% endif %}
+        <!-- Revenue Date Range Filter -->
+        <form method="get" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-end;">
+            <div>
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" id="start_date" name="start_date" class="form-input" value="{{ request.args.get('start_date', '') }}">
             </div>
+            <div>
+                <label for="end_date" class="form-label">End Date</label>
+                <input type="date" id="end_date" name="end_date" class="form-input" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
 
-            <!-- Revenue Breakdown -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Revenue Breakdown</h2>
+        <!-- Popular Vehicles -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Popular Vehicles</h2>
+            </div>
+            {% if popular_vehicles %}
+                <div class="table-container" style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Vehicle</th>
+                                <th>Type</th>
+                                <th>Bookings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehicle in popular_vehicles[:10] %}
+                            <tr>
+                                <td style="font-weight: 600; color: #3b82f6;">{{ loop.index }}</td>
+                                <td>
+                                    <div style="font-weight: 600;">{{ vehicle.make }} {{ vehicle.model }}</div>
+                                </td>
+                                <td style="color: #6b7280;">{{ vehicle.type }}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="background: #3b82f6; height: 4px; border-radius: 2px; 
+                                                    width: {{ (vehicle.booking_count / (popular_vehicles[0].booking_count if popular_vehicles[0].booking_count > 0 else 1) * 100)|int }}px; 
+                                                    min-width: 10px;"></div>
+                                        <span style="font-weight: 600;">{{ vehicle.booking_count }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="grid" style="gap: 1rem;">
-                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1)); 
-                                border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 1.5rem;">
-                        <div style="font-size: 1.25rem; font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">
-                            ₹{{ "%.2f"|format(stats.total_revenue or 0) }}
-                        </div>
-                        <div style="color: #6b7280; font-size: 0.875rem;">Total Revenue</div>
+            {% else %}
+                <p style="color: #6b7280; text-align: center;">No booking data available yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Revenue Breakdown -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Revenue Breakdown</h2>
+            </div>
+            <div class="grid" style="gap: 1rem;">
+                <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1)); 
+                            border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 1.5rem;">
+                    <div style="font-size: 1.25rem; font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">
+                        ₹{{ "%.2f"|format(stats.total_revenue or 0) }}
                     </div>
-                    
-                    {% if stats.completed_bookings and stats.completed_bookings > 0 %}
-                    <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1)); 
-                                border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 1.5rem;">
-                        <div style="font-size: 1.25rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">
-                            ₹{{ "%.2f"|format((stats.total_revenue or 0) / stats.completed_bookings) }}
-                        </div>
-                        <div style="color: #6b7280; font-size: 0.875rem;">Average per Booking</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Total Revenue</div>
+                </div>
+                
+                {% if stats.completed_bookings and stats.completed_bookings > 0 %}
+                <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1)); 
+                            border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 1.5rem;">
+                    <div style="font-size: 1.25rem; font-weight: bold; color: #22c55e; margin-bottom: 0.5rem;">
+                        ₹{{ "%.2f"|format((stats.total_revenue or 0) / stats.completed_bookings) }}
                     </div>
-                    {% endif %}
-                    
-                    <div style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1)); 
-                                border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 12px; padding: 1.5rem;">
-                        <div style="font-size: 1.25rem; font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">
-                            {{ "%.1f"|format(((stats.completed_bookings or 0) / (stats.total_bookings or 1)) * 100) }}%
-                        </div>
-                        <div style="color: #6b7280; font-size: 0.875rem;">Completion Rate</div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Average per Booking</div>
+                </div>
+                {% endif %}
+                
+                <div style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1)); 
+                            border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 12px; padding: 1.5rem;">
+                    <div style="font-size: 1.25rem; font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">
+                        {{ "%.1f"|format(((stats.completed_bookings or 0) / (stats.total_bookings or 1)) * 100) }}%
                     </div>
+                    <div style="color: #6b7280; font-size: 0.875rem;">Completion Rate</div>
                 </div>
             </div>
         </div>
@@ -210,9 +220,6 @@
                 <button class="btn btn-secondary" onclick="exportData('revenue')">
                     Export Revenue Report
                 </button>
-                <button class="btn btn-secondary" onclick="exportData('vehicles')">
-                    Export Vehicle Performance
-                </button>
             </div>
         </div>
     </main>
@@ -225,11 +232,20 @@
     }
     // Export actions
     function exportData(type) {
-        showToast(`Exporting ${type} data...`, 'info');
-        // In a real implementation, this would trigger a download
-        setTimeout(() => {
-            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`, 'success');
-        }, 2000);
+        // Get current date range from the filter inputs
+        const startDate = document.getElementById('start_date')?.value;
+        const endDate = document.getElementById('end_date')?.value;
+        let query = '';
+        if (startDate) query += `start_date=${encodeURIComponent(startDate)}`;
+        if (endDate) query += (query ? '&' : '') + `end_date=${encodeURIComponent(endDate)}`;
+        let url = '';
+        if (type === 'bookings') {
+            url = '/api/export/bookings';
+        } else if (type === 'revenue') {
+            url = '/api/export/payments';
+        }
+        if (url && query) url += '?' + query;
+        if (url) window.location.href = url;
     }
     // (If there are any selects, customDropdown will be applied automatically)
     </script>

@@ -620,9 +620,25 @@ def admin_reports():
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Get booking statistics
-    cursor.execute("""
+
+    # Date range filter
+    from flask import request
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    date_filter = ''
+    params = []
+    if start_date and end_date:
+        date_filter = 'WHERE booking_date >= %s AND booking_date <= %s'
+        params = [start_date, end_date]
+    elif start_date:
+        date_filter = 'WHERE booking_date >= %s'
+        params = [start_date]
+    elif end_date:
+        date_filter = 'WHERE booking_date <= %s'
+        params = [end_date]
+
+    # Get booking statistics with date filter
+    cursor.execute(f'''
         SELECT 
             COUNT(*) as total_bookings,
             SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_bookings,
@@ -630,23 +646,24 @@ def admin_reports():
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_bookings,
             SUM(total_price) as total_revenue
         FROM bookings
-    """)
+        {date_filter}
+    ''', params)
     stats = cursor.fetchone()
-    
-    # Get popular vehicles
-    cursor.execute("""
+
+    # Get popular vehicles (not filtered by date for now)
+    cursor.execute('''
         SELECT v.make, v.model, v.type, COUNT(b.id) as booking_count
         FROM vehicles v
         LEFT JOIN bookings b ON v.id = b.vehicle_id
         GROUP BY v.id
         ORDER BY booking_count DESC
         LIMIT 10
-    """)
+    ''')
     popular_vehicles = cursor.fetchall()
-    
+
     cursor.close()
     conn.close()
-    
+
     return render_template('admin/reports.html', stats=stats, popular_vehicles=popular_vehicles)
 
 # API routes
@@ -1542,9 +1559,23 @@ def customer_reviews():
 @app.route('/api/export/bookings')
 def export_bookings():
     require_admin()
+    from flask import request
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    date_filter = ''
+    params = []
+    if start_date and end_date:
+        date_filter = 'WHERE booking_date >= %s AND booking_date <= %s'
+        params = [start_date, end_date]
+    elif start_date:
+        date_filter = 'WHERE booking_date >= %s'
+        params = [start_date]
+    elif end_date:
+        date_filter = 'WHERE booking_date <= %s'
+        params = [end_date]
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM bookings ORDER BY booking_date DESC")
+    cursor.execute(f"SELECT * FROM bookings {date_filter} ORDER BY booking_date DESC", params)
     bookings = cursor.fetchall()
     bookings = cast(List[Dict[str, Any]], bookings)
     cursor.close()
@@ -1559,9 +1590,23 @@ def export_bookings():
 @app.route('/api/export/payments')
 def export_payments():
     require_admin()
+    from flask import request
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    date_filter = ''
+    params = []
+    if start_date and end_date:
+        date_filter = 'WHERE payment_date >= %s AND payment_date <= %s'
+        params = [start_date, end_date]
+    elif start_date:
+        date_filter = 'WHERE payment_date >= %s'
+        params = [start_date]
+    elif end_date:
+        date_filter = 'WHERE payment_date <= %s'
+        params = [end_date]
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM payments ORDER BY payment_date DESC")
+    cursor.execute(f"SELECT * FROM payments {date_filter} ORDER BY payment_date DESC", params)
     payments = cursor.fetchall()
     payments = cast(List[Dict[str, Any]], payments)
     cursor.close()
