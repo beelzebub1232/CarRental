@@ -911,3 +911,26 @@
 .status-pending::before {
   background: var(--warning-500, #ffb300);
 }
+
+.stat-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.stat-tab {
+    background: none;
+    border: 1px solid var(--neutral-300);
+    border-radius: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--neutral-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stat-tab.active {
+    background: var(--primary-500);
+    color: white;
+    border-color: var(--primary-500);
+}

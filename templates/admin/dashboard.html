@@ -6,6 +6,7 @@
     <title>Admin Dashboard - DriveEase</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-design-system.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 </head>
 <body>
     <!-- Top Navigation Bar -->
@@ -87,7 +88,7 @@
                     <div class="stat-label">Pending Bookings</div>
                 </div>
                 
-                <div class="stat-card">
+                <div class="stat-card" x-data="{ tab: 'total' }">
                     <div class="stat-header">
                         <div class="stat-icon">
                             <svg class="icon" viewBox="0 0 24 24">
@@ -95,9 +96,19 @@
                                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                             </svg>
                         </div>
+                        <div class="stat-tabs">
+                            <button class="stat-tab" :class="{ 'active': tab === 'total' }" @click="tab = 'total'">Total</button>
+                            <button class="stat-tab" :class="{ 'active': tab === 'today' }" @click="tab = 'today'">Today</button>
+                        </div>
                     </div>
-                    <div class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</div>
-                    <div class="stat-label">Total Revenue</div>
+                    <div x-show="tab === 'total'">
+                        <div class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div x-show="tab === 'today'" style="display: none;">
+                        <div class="stat-value">₹{{ "%.0f"|format(todays_revenue) }}</div>
+                        <div class="stat-label">Today's Revenue</div>
+                    </div>
                 </div>
             </div>
 

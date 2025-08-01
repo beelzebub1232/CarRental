@@ -575,6 +575,11 @@ def admin_dashboard():
     total_revenue_row = cursor.fetchone()
     total_revenue_row = cast(Optional[Dict[str, Any]], total_revenue_row)
     total_revenue = (total_revenue_row['total'] if total_revenue_row else 0) or 0
+
+    cursor.execute("SELECT SUM(total_price) as total FROM bookings WHERE status = 'completed' AND DATE(booking_date) = CURDATE()")
+    todays_revenue_row = cursor.fetchone()
+    todays_revenue_row = cast(Optional[Dict[str, Any]], todays_revenue_row)
+    todays_revenue = (todays_revenue_row['total'] if todays_revenue_row else 0) or 0
     
     # Get recent bookings
     cursor.execute("""
@@ -595,6 +600,7 @@ def admin_dashboard():
                          total_customers=total_customers,
                          pending_bookings=pending_bookings,
                          total_revenue=total_revenue,
+                         todays_revenue=todays_revenue,
                          recent_bookings=recent_bookings)
 
 @app.route('/admin/manage_vehicles')
