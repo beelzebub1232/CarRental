@@ -659,11 +659,27 @@ def admin_reports():
             # Validate date format
             datetime.strptime(start_date, '%Y-%m-%d')
             datetime.strptime(end_date, '%Y-%m-%d')
-            date_filter_clause = ' WHERE b.booking_date BETWEEN %s AND %s'
-            params = [start_date, end_date]
+            date_filter_clause = ' WHERE (DATE(b.start_date) >= %s AND DATE(b.start_date) <= %s) OR (DATE(b.end_date) >= %s AND DATE(b.end_date) <= %s) OR (DATE(b.start_date) <= %s AND DATE(b.end_date) >= %s)'
+            params = [start_date, end_date, start_date, end_date, start_date, end_date]
         except ValueError:
             flash('Invalid date format. Please use YYYY-MM-DD.', 'error')
             start_date = end_date = None # Reset dates on error
+    elif start_date:
+        try:
+            datetime.strptime(start_date, '%Y-%m-%d')
+            date_filter_clause = ' WHERE DATE(b.start_date) >= %s OR DATE(b.end_date) >= %s'
+            params = [start_date, start_date]
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'error')
+            start_date = None
+    elif end_date:
+        try:
+            datetime.strptime(end_date, '%Y-%m-%d')
+            date_filter_clause = ' WHERE DATE(b.start_date) <= %s OR DATE(b.end_date) <= %s'
+            params = [end_date, end_date]
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'error')
+            end_date = None
 
     # Append date filter to queries
     if date_filter_clause:
@@ -688,7 +704,7 @@ def admin_reports():
     cursor.close()
     conn.close()
 
-    return render_template('admin/reports.html', stats=stats, popular_vehicles=popular_vehicles, top_vehicle=top_vehicle)
+    return render_template('admin/reports.html', stats=stats, popular_vehicles=popular_vehicles, top_vehicle=top_vehicle, start_date=start_date, end_date=end_date)
 
 # API routes
 @app.route('/api/calculate_price', methods=['POST'])
