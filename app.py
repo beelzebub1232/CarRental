@@ -623,65 +623,72 @@ def admin_manage_vehicles():
 def admin_reports():
     if 'user_id' not in session or session['role'] != 'admin':
         return redirect(url_for('login'))
-    
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Date range filter - filter by rental period (start_date and end_date) instead of booking_date
-    from flask import request
+    # Date range filter
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
-    date_filter = ''
+    
+    # Base queries
+    stats_query = '''
+        SELECT 
+            COUNT(b.id) as total_bookings,
+            SUM(CASE WHEN b.status = 'completed' THEN 1 ELSE 0 END) as completed_bookings,
+            SUM(CASE WHEN b.status = 'pending' THEN 1 ELSE 0 END) as pending_bookings,
+            SUM(CASE WHEN b.status = 'approved' THEN 1 ELSE 0 END) as approved_bookings,
+            SUM(CASE WHEN b.status = 'completed' THEN b.total_price ELSE 0 END) as total_revenue
+        FROM bookings AS b
+    '''
+    
+    popular_vehicles_query = '''
+        SELECT 
+            v.make, v.model, v.type, 
+            COUNT(b.id) as booking_count,
+            SUM(CASE WHEN b.status = 'completed' THEN b.total_price ELSE 0 END) as vehicle_revenue
+        FROM vehicles v
+        JOIN bookings b ON v.id = b.vehicle_id
+    '''
+
+    # Add date filtering
+    date_filter_clause = ''
     params = []
     if start_date and end_date:
-        date_filter = 'WHERE (DATE(start_date) >= %s AND DATE(start_date) <= %s) OR (DATE(end_date) >= %s AND DATE(end_date) <= %s) OR (DATE(start_date) <= %s AND DATE(end_date) >= %s)'
-        params = [start_date, end_date, start_date, end_date, start_date, end_date]
-    elif start_date:
-        date_filter = 'WHERE DATE(start_date) >= %s OR DATE(end_date) >= %s'
-        params = [start_date, start_date]
-    elif end_date:
-        date_filter = 'WHERE DATE(start_date) <= %s OR DATE(end_date) <= %s'
-        params = [end_date, end_date]
+        try:
+            # Validate date format
+            datetime.strptime(start_date, '%Y-%m-%d')
+            datetime.strptime(end_date, '%Y-%m-%d')
+            date_filter_clause = ' WHERE b.booking_date BETWEEN %s AND %s'
+            params = [start_date, end_date]
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'error')
+            start_date = end_date = None # Reset dates on error
 
-    # Get booking statistics with date filter
-    cursor.execute(f'''
-        SELECT 
-            COUNT(*) as total_bookings,
-            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_bookings,
-            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_bookings,
-            SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_bookings,
-            SUM(total_price) as total_revenue
-        FROM bookings
-        {date_filter}
-    ''', params)
+    # Append date filter to queries
+    if date_filter_clause:
+        stats_query += date_filter_clause
+        popular_vehicles_query += date_filter_clause
+
+    # Add grouping and ordering for popular vehicles
+    popular_vehicles_query += ' GROUP BY v.id ORDER BY booking_count DESC, vehicle_revenue DESC LIMIT 10'
+
+    # Execute queries
+    cursor.execute(stats_query, params)
     stats = cursor.fetchone()
 
-    # Get popular vehicles with date filter
-    if date_filter:
-        popular_vehicles_query = f'''
-            SELECT v.make, v.model, v.type, COUNT(b.id) as booking_count
-            FROM vehicles v
-            LEFT JOIN bookings b ON v.id = b.vehicle_id {date_filter.replace("WHERE", "AND")}
-            GROUP BY v.id
-            ORDER BY booking_count DESC
-            LIMIT 10
-        '''
-        cursor.execute(popular_vehicles_query, params)
-    else:
-        cursor.execute('''
-            SELECT v.make, v.model, v.type, COUNT(b.id) as booking_count
-            FROM vehicles v
-            LEFT JOIN bookings b ON v.id = b.vehicle_id
-            GROUP BY v.id
-            ORDER BY booking_count DESC
-            LIMIT 10
-        ''')
+    cursor.execute(popular_vehicles_query, params)
     popular_vehicles = cursor.fetchall()
+
+    # Find the top vehicle (most booked)
+    top_vehicle = None
+    if popular_vehicles:
+        top_vehicle = popular_vehicles[0]
 
     cursor.close()
     conn.close()
 
-    return render_template('admin/reports.html', stats=stats, popular_vehicles=popular_vehicles)
+    return render_template('admin/reports.html', stats=stats, popular_vehicles=popular_vehicles, top_vehicle=top_vehicle)
 
 # API routes
 @app.route('/api/calculate_price', methods=['POST'])

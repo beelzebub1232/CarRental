@@ -93,6 +93,37 @@
             </div>
         </form>
 
+        <!-- Top Performing Vehicle -->
+        {% if top_vehicle %}
+        <div class="card mb-5">
+            <div class="card-header">
+                <h2 class="card-title">Top Performing Vehicle</h2>
+                <p style="color: #6b7280;">The most booked vehicle in the selected date range.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem;">
+                <div style="flex-shrink: 0;">
+                    <svg class="icon" style="width: 64px; height: 64px; color: #3b82f6;" viewBox="0 0 24 24">
+                        <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                        <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                        <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/>
+                    </svg>
+                </div>
+                <div>
+                    <div style="font-size: 1.25rem; font-weight: 600;">{{ top_vehicle.make }} {{ top_vehicle.model }}</div>
+                    <div style="color: #6b7280;">{{ top_vehicle.type }}</div>
+                </div>
+                <div style="margin-left: auto; text-align: right;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #10b981;">₹{{ "%.2f"|format(top_vehicle.vehicle_revenue or 0) }}</div>
+                    <div style="color: #6b7280;">Total Revenue</div>
+                </div>
+                <div style="margin-left: 2rem; text-align: right;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">{{ top_vehicle.booking_count }}</div>
+                    <div style="color: #6b7280;">Total Bookings</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Popular Vehicles -->
         <div class="card">
             <div class="card-header">
@@ -107,10 +138,11 @@
                                 <th>Vehicle</th>
                                 <th>Type</th>
                                 <th>Bookings</th>
+                                <th>Revenue</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for vehicle in popular_vehicles[:10] %}
+                            {% for vehicle in popular_vehicles %}
                             <tr>
                                 <td style="font-weight: 600; color: #3b82f6;">{{ loop.index }}</td>
                                 <td>
@@ -125,13 +157,14 @@
                                         <span style="font-weight: 600;">{{ vehicle.booking_count }}</span>
                                     </div>
                                 </td>
+                                <td style="font-weight: 600; color: #10b981;">₹{{ "%.2f"|format(vehicle.vehicle_revenue or 0) }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             {% else %}
-                <p style="color: #6b7280; text-align: center;">No booking data available yet.</p>
+                <p style="color: #6b7280; text-align: center;">No booking data available for the selected date range.</p>
             {% endif %}
         </div>
 
